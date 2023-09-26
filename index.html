@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 1: Understanding the Hydrogen Atom</title>
+
+    <link href="./style.css" rel="stylesheet" />
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@400;700&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.0.0/lib/p5.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.7/ScrollMagic.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.7/plugins/debug.addIndicators.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.15.1/d3.min.js"></script>
+
+    <script src="./scroll.js"></script>
+    <script src="./sketch.js"></script>
+    <script src="./box.js"></script>
+    <script src="./prob.js"></script>
+    <script src="./graph.js"></script>
+</head>
+
+<body id="body_parent" onload="StartScroll()">
+    <a href="../index.html"><img id="back-icon" src="../images/arrow-left.svg" /></a>
+    <div class="container">
+        <div class="row title">
+            <h1 class="col-lg-12">ELECTRIC FIELD</h1>
+            <div class="col-lg-1"></div>
+            <p class="col-lg-10">
+                Before we begin looking into how transistors work, we first need to understand the 
+                electric field. In this chapter, we see how two charged surfaces interact with each other.
+            </p>
+            <div class="col-lg-1"></div>
+        </div>
+        <div class="row row1" id="scene_1">
+            <div class="col-lg-4">
+                <h1>[SCENE 1]: 3D Field</h1>
+                
+                <p>
+                    Any positive or negative charge creates an electric field in the space surrounding it (typically represented by arrows). If we line up an array of electric fields, we have a screen (or sheet).
+                <br><br>
+                    Click on the right graphic to charge it with electrons.
+            </p>
+            </div>
+            
+        </div>
+
+        <div class="row row2" id="scene_2">
+            <div class="col-lg-4">
+                <h1>[SCENE 2]: Change Electrons</h1>
+                <p>
+                    Here, we've simplified the graphic to show one array for visualization purposes.
+                    <br><br>
+                    
+                    If we have an array of positive charges, for the side of the sheet facing left, the direction of the electric field (on
+                    x plane) is negative. For the side of the sheet facing right, the direction of the electric field is positive. Try changing the number of electrons and see how it affects the electric field vector.
+                    
+                    Try changing the magnitude by dragging the arrows.</p>
+                <button type="button" onclick="reverseCharge()">Reverse Charge</button>
+                <button type="button" onclick="showBlueArrows()">Blue Arrows</button>
+                <!-- <button type="button" onclick="toggleArrows()">Toggle Arrows</button> -->
+            </div>
+            
+        </div>
+
+        <div class="row row2" id="scene_3">
+            <div class="col-lg-4">
+                <h1>[SCENE 3]: Change Charge</h1>
+                
+                <p>
+What about an array of negative charges? What directions for the electric field would the left and right sides of the
+sheet be?</p>
+                <button type="button" onclick="reverseCharge()">Reverse Charge</button>
+                <button type="button" onclick="changeChargeAmount()">Change Charge Amount</button>
+                <button type="button" onclick="showBlueArrows()">Blue Arrows</button>
+                <button type="button" onclick="showRedArrows()">Red Arrows</button>
+            </div>
+        </div>
+        <div class="row row3" id="scene_4">
+            <div class="col-lg-4">
+                <h1>[SCENE 4]</h1>
+                
+                <p>
+                    
+                For the side of the sheet facing left, the direction of the electric field is positive. For the side of the sheet facing
+                right, the direction of the electric field is negative.
+                <br><br>
+                
+                Let’s look at what happens when we put two sheets of opposite charges together. We can see that the left and right sides
+                of the charges cancel each other except the middle section.
+                
+                <br><br>
+                Drag your mouse to move the sheet to see the effect.
+                <br><br>
+
+                Use the button below to show the screening effect.
+
+                </p>
+                <button type="button" onclick="showScreen()">Show Screen</button>
+                                <button type="button" onclick="showBlueArrows()">Blue Arrows</button>
+                                <button type="button" onclick="showRedArrows()">Red Arrows</button>
+                                <button type="button" onclick="showPurpleArrows()">Purple Arrows</button>
+                                <button type="button" onclick="changeChargeAmount()">Change Charge Amount</button>
+                
+            </div>
+        </div>
+        <div class="row row4" id="scene_5">
+            <div class="col-lg-4">
+                
+                <h1>[SCENE 5]: Imperfect Screening</h1>
+                <p> We put a negative sheet on the right side of the positive sheet. The negative charges “screen” (cancel) the positive
+                charges. The positive charges screen the negative charges. That leaves us with an intersecting portion creates a doubled
+                electric field that is of negative charge and doubled. (Try the slider and see what happens when you move the negative
+                array). This effect is called screening.
+
+                </p>
+                <button type="button" onclick="showScreen()">Show Screening</button>
+                                <button type="button" onclick="showBlueArrows()">Blue Arrows</button>
+                                <button type="button" onclick="showRedArrows()">Red Arrows</button>
+            </div>
+        </div>
+        <div class="row row5" id="scene_6">
+            <div class="col-lg-4">
+                
+                <h1>[SCENE 6]: More Sheets</h1>
+                <p>
+                The process screening is not perfect. The strength of the electric charges in the two arrays may not match exactly, so
+                the charges are not fully cancelled.
+
+                If we have a negative array with less strength, the negative charge of the middle portion is still stronger but not
+                doubled.
+                </p>
+                <button type="button" onclick="showScreen()">Show Screening</button>
+                                <button type="button" onclick="showBlueArrows()">Blue Arrows</button>
+                                <button type="button" onclick="showRedArrows()">Red Arrows</button>
+                <svg id="d3-viz">
+
+                </svg>
+            </div>
+        </div>
+        <div class="row row6" id="scene_7">
+            <div class="col-lg-4">
+                
+                <h1>[SCENE 7]: Multiple Sheets</h1>
+                <p>What if we try using multiple sheets? We can put multiple sheets, with charges of varying (strengths). Then the sheets
+                will screen out the positive electric field over a distance.</p>
+
+                <button type="button" onclick="showScreening()">Show Screening</button>
+                                <button type="button" onclick="showBlueArrows()">Blue Arrows</button>
+                                <button type="button" onclick="showRedArrows()">Red Arrows</button>
+                <svg id="d3-viz-final">
+
+                </svg>
+            </div>
+        </div>
+        <div class="row row7" id="scene_8">
+            <div class="col-lg-4">
+                <h1>[SCENE 8]: Slope</h1>
+                
+                <p>The graph can be represented like a slope...</p>
+
+
+                                <button type="button" onclick="showBlueArrows()">Blue Arrows</button>
+                                <button type="button" onclick="showRedArrows()">Red Arrows</button>
+                <svg id="d3-viz-final-2s">
+
+                </svg>
+            </div>
+        </div>
+        <div class="row row8" id="scene_9">
+            <div class="col-lg-4">
+                <h1>[SCENE 9]: Volume</h1>
+                
+                <p>
+                    The negative charge is then distributed over a distance where eventually, total positive charge = total negative charge.
+                    The set of negative sheets can be considered a volume.
+                    
+                    The volume might be a sheet of metal that is a semiconductor.
+                </p>
+                <svg id="d3-viz-final-2p">
+
+                </svg>
+            </div>
+        </div>
+        <div class="row row9" id="scene_10">
+            <div class="col-lg-4">
+                
+                <h1>[SCENE 10]</h1>
+                <p>
+                </p>
+                <svg id="d3-viz-final-2p">
+
+                </svg>
+            </div>
+        </div>
+        <div class="row row10" id="scene_11">
+            <div class="col-lg-4">
+                <h1>[SCENE 11]</h1>
+                
+                <p>
+                </p>
+            </div>
+        </div>
+        <div id="visualization">
+
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,172 @@
+@font-face {
+    font-family: 'Agency FB';
+    src: url('../Agency_FB.ttf');
+}
+
+#body_parent {
+    background-color: #121212;
+    padding-bottom: 50px;
+}
+
+.title {
+    margin-top: 300px;
+}
+
+.title h1 {
+
+    font-family: Agency FB;
+    font-style: normal;
+    font-weight: bold;
+    letter-spacing: 2px;
+    font-size: 48px;
+    line-height: 96px;
+    /* identical to box height */
+
+    text-align: center;
+
+    color: #FFF7AE;
+}
+
+.title p {
+    margin-top: 30px;
+    font-family: Bai Jamjuree;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 20px;
+    line-height: 30px;
+
+    color: #FFFFFF;
+
+    text-align: center;
+}
+
+.row1,
+.row2,
+.row3,
+.row4,
+.row5,
+.row6,
+.row7,
+.row8, 
+.row9,
+.row10 {
+    margin-top: 200px;
+    opacity: 0;
+    transform: translateY(50px);
+    transition: all 0.3s ease-out;
+}
+
+.row10 {
+    margin-bottom: 300px;
+}
+
+.row1 h1,
+.row2 h1,
+.row3 h1,
+.row4 h1,
+.row5 h1,
+.row6 h1,
+.row7 h1,
+.row8 h1,
+.row9 h1,
+.row10 h1
+
+ {
+
+    font-family: Agency FB;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 36px;
+    line-height: 72px;
+
+    color: #FFF7AE;
+}
+
+.row1 p,
+.row2 p,
+.row3 p,
+.row4 p,
+.row5 p,
+.row6 p,
+.row7 p,
+.row8 p,
+.row9 p,
+.row10 p {
+    margin-top: 30px;
+    font-family: Bai Jamjuree;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 18px;
+    line-height: 27px;
+
+    color: #FFFFFF;
+}
+
+.fade-in {
+    opacity: 1 !important;
+    transform: translateY(0px) !important;
+}
+
+#visualization {
+    position: fixed;
+    top: 0px;
+    right: 0px;
+    z-index: -100;
+    margin: 60px;
+}
+
+
+.axis line {
+    stroke: #fff;
+}
+
+.axis path {
+    fill: none;
+    stroke: #fff;
+}
+
+.label {
+    fill: #fff;
+}
+
+#d3-viz {
+    /* background-color: white; */
+    min-height: 400px;
+    opacity: 0;
+    transform: translateY(50px);
+    transition: all 0.3s ease-out;
+}
+
+.noselect {
+    -webkit-touch-callout: none;
+    /* iOS Safari */
+    -webkit-user-select: none;
+    /* Safari */
+    -khtml-user-select: none;
+    /* Konqueror HTML */
+    -moz-user-select: none;
+    /* Old versions of Firefox */
+    -ms-user-select: none;
+    /* Internet Explorer/Edge */
+    user-select: none;
+    /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
+}
+
+.cursor-grab {
+    cursor: -webkit-grab;
+    cursor: grab;
+}
+
+.cursor-point {
+    cursor: pointer;
+}
+
+#back-icon {
+    width: 36px;
+    height: 36px;
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    cursor: pointer;
+}
