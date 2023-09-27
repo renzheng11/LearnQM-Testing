@@ -1,3 +1,6 @@
+let blueBox;
+let canvas;
+
 // scene 1
 let boxScene1;
 
@@ -40,17 +43,48 @@ let chargeDecrease;
 let drawScene1;
 let drawScene2;
 
-let chargeX;
-let chargeY;
-let chargeXR;
-let chargeYR;
+let chargeXArray;
+let chargeYArray;
+let chargeXRArray;
+let chargeYRArray;
 
 let blueBoxes;
 let redBoxes;
 
+let chargeSlider;
+let sliderCharge;
+
+let shiftRed;
+
+// COLORS
+let color;
+let grey;
+let red;
+let blue;
+let redSurface;
+let blueSurface;
+let purple;
+let blueCharge;
+let redCharge;
+let blueSign;
+let redSign;
+
+
 setup = () => {
-    let canvas = createCanvas(2 * windowWidth / 4, windowHeight);
+    canvas = createCanvas(2 * windowWidth / 4 + 40, windowHeight);
     canvas.parent('visualization');
+
+    color = [0, 0, 0];
+    grey = [113, 113, 133];
+    redSurface = [111, 67, 67];
+    blueSurface = [54, 78, 99];
+    blue = [91, 149, 203];
+    red = [191, 81, 81];
+    purple = [140, 52, 228];
+    blueCharge = [66, 117, 166];
+    redCharge = [245, 112, 112];
+    blueSign = [183, 220, 255];
+    redSign = [253, 192, 192];
 
     bg = 18;
 
@@ -58,45 +92,52 @@ setup = () => {
     graphW = 540;
 
     leftPadding = 48;
+    letShiftRed = 10;
     
     // graphX = graphC - graphW / 2;
     graphC = graphW / 2 + leftPadding;
     graphX = graphC - graphW / 2 + leftPadding;
 
-    chargeX = [];
-    chargeY = [];
-    chargeXR = [];
-    chargeYR = [];
+    chargeXArray = [];
+    chargeYArray = [];
+    chargeXRArray = [];
+    chargeYRArray = [];
 
-
-    console.log(chargeX);
-    console.log(chargeY);
+    chargeSlider = createSlider(1, 40, 20, 1);
+    sliderCharge = 20;
 
     drawScreenScene5 = false;
     drawScene1 = false;
     drawScene2 = false;
 
-    boxScene1 = new Box("pos", true, 12, false, 440, true, "lr", 310, 140, 20, 80);
 
-    boxScene2 = new Box("pos", true, 12, false, 440, true, "lr", 310, 140, 20, 80);
+    boxThickness = 1;
 
-    boxScene4 = new Box("pos", true, 10, false, 440, true, "lr", 310, 140, 20, 80);
-    redboxScene4 = new Box("neg", true, 10, true, 440, true, "lr", 400, 150, 20, 80);
+    // instantiate boxes
+    boxScene1 = new Box("pos", true, 20, false, 440, true, "lrp", 0, 310, 140, boxThickness, 80);
+    blueBox = boxScene1;
 
-    boxScene5 = new Box("pos", true, 30, false, 440, true, "lr", 310, 140, 20, 80);
-    redboxScene5 = new Box("neg", true, 20, true, 440, true, "lrp", 400, 140, 20, 80);
+    boxScene2 = new Box("pos", true, 20, false, 440, true, "lrp", 0, 310, 140, boxThickness, 80);
 
-    boxScene6 = new Box("pos", true, 12, false, 440, true, "lr", 310, 140, 20, 80);
-    redboxScene6a = new Box("neg", true, 8, true, 440, true, "lrp", 400, 150, 20, 80);
-    redboxScene6b = new Box("neg", true, 4, true, 440, true, "lrp", 500, 150, 20, 80);
+    boxScene3 = new Box("pos", true, 20, false, 440, true, "lrp", 0, 310, 140, boxThickness, 80);
 
-    boxScene7 = new Box("pos", true, 12, false, 440, true, "lr", 310, 140, 20, 80);
-    redboxScene7a = new Box("neg", true, 6, true, 440, true, "lrp", 360, 140, 20, 80);
-    redboxScene7b = new Box("neg", true, 4, true, 440, true, "lrp", 420, 140, 20, 80);
-    redboxScene7c = new Box("neg", true, 2, true, 440, true, "lrp", 480, 140, 20, 80);
+    boxScene4 = new Box("pos", true, 20, false, 440, true, "lrp", 0, 310, 140, boxThickness, 80);
+    redboxScene4 = new Box("neg", true, 20, true, 440, true, "lrp", 0, 400, 150, boxThickness, 80);
 
-    boxScene9 = new Box("pos", true, 12, false, 440, true, "lr", 310, 140, 20, 80);
-    redboxScene9 = new Box("neg", true, 12, true, 440, true, "lrp", 400, 140, 200, 80);
+    boxScene5 = new Box("pos", true, 36, false, 440, true, "lrp", 0, 310, 140, boxThickness, 80);
+    redboxScene5 = new Box("neg", true, 16, true, 440, true, "lrp", 0, 400, 152, boxThickness, 80);
+
+    boxScene6 = new Box("pos", true, 36, false, 440, true, "lrp", 0, 310, 140, boxThickness, 80);
+    redboxScene6a = new Box("neg", true, 22, true, 440, true, "lrp", 120, 410, 150, boxThickness, 80);
+    redboxScene6b = new Box("neg", true, 14, true, 440, true, "lrp", 0, 510, 150, boxThickness, 80);
+
+    boxScene7 = new Box("pos", true, 36, false, 440, true, "lrp", 0, 310, 140, boxThickness, 80);
+    redboxScene7a = new Box("neg", true, 24, true, 440, true, "lrp", 120, 370, 150, boxThickness, 80);
+    redboxScene7b = new Box("neg", true, 8, true, 440, true, "lrp", 0, 430, 150, boxThickness, 80);
+    redboxScene7c = new Box("neg", true, 4, true, 440, true, "lrp", 0, 490, 150, boxThickness, 80);
+
+    boxScene9 = new Box("pos", true, 36, false, 440, true, "lrp", 0, 310, 140, boxThickness, 80);
+    redboxScene9 = new Box("neg", true, 36, true, 440, true, "lrp", 0, 380, 150, 200, 80);
 
     blueBoxes = [boxScene1, boxScene2, boxScene4, boxScene5, boxScene6, boxScene7, boxScene9];
     redBoxes = [redboxScene4, redboxScene5, redboxScene6a, redboxScene6b, redboxScene7a, redboxScene7b, redboxScene7c, redboxScene9];
@@ -105,22 +146,24 @@ setup = () => {
 
     chargeDecrease = true;
 
-    // Returns a random integer from 1 to 100:
+    // Example: Returns a random integer from 1 to 100:
     // Math.floor(Math.random() * 100) + 1;
+
+    // Populate charge array
     for (let i = 0; i < 40; i++) {
-        chargeX.push(Math.floor(Math.random() * (64)) + boxScene1.x + 20)
-        chargeY.push(Math.floor(Math.random() * (boxScene1.h - 100)) + boxScene1.y)
+        chargeXArray.push(Math.floor(Math.random() * (64)) + boxScene1.x + 20)
+        chargeYArray.push(Math.floor(Math.random() * (boxScene1.h - 100)) + boxScene1.y)
     }
     for (let i = 0; i < 40; i++) {
-        chargeXR.push(Math.floor(Math.random() * (64)) + boxScene1.x + 20)
-        chargeYR.push(Math.floor(Math.random() * (boxScene1.h - 100)) + boxScene1.y)
+        chargeXRArray.push(Math.floor(Math.random() * (64)) + boxScene1.x + 20)
+        chargeYRArray.push(Math.floor(Math.random() * (boxScene1.h - 100)) + boxScene1.y)
     }
 }
 
 draw = () => {
     background(bg);
+
     if (sceneCount == 1) {
-        translate(-38, 0);
         scene1();
     }
     else if (sceneCount == 2) {
@@ -162,31 +205,46 @@ function resetScene() {
     }
 }
 
-function scene1() { // 3D field
-    drawBox(boxScene1, false, false);
+// SCENOS
+
+function scene1() { // 1scene
+    drawBox(boxScene1, false, false, "lrs");
     if (drawScene1) {
-        drawBox(boxScene1, true, true);
+        drawBox(boxScene1, true, true, "lrs");
+        fill(grey)
+        text('EF (vector)', 90, 40);
     }
 }
 
-function scene2() { // change charges
-    drawBox(boxScene2, true, true);
+function scene2() { // 2scene
+    blueBox = boxScene2;
+    drawBox(boxScene2, true, true, "lrs");
     drawGraph(boxScene2, null, false);
+    // Set the position of slider on the canvas
+    chargeSlider.position(100, 1840);
+    
+    sliderCharge = chargeSlider.value();
+    boxScene2.changeChargeAmount(sliderCharge);
+    console.log(boxScene2.chargeAmount);
+
+    // background(18);
 }
 
-function scene3() { // change charges
-    drawGraph(boxScene2, null, false);
-    drawBox(boxScene2, true, true);
+function scene3() { // 3scene
+    blueBox = boxScene3;
+    drawGraph(boxScene3, null, false);
+    drawBox(boxScene3, true, true, "lrs");
 }
 
-function scene4() { // scene4
+function scene4() { // 4scene
+    blueBox = boxScene4;
     drawGraph(boxScene4, redboxScene4, true);
     
-    drawBox(boxScene4, true, true);
-    drawBox(redboxScene4, true, true);
-    // drawBox(boxScene4, false, true);
+    drawBox(boxScene4, true, true, "ls");
+    drawBox(redboxScene4, true, true, "lrps");
+    drawBox(boxScene4, true, true, "lr");
 
-    if (mouseX > graphC && mouseX < graphW) {
+    if (mouseX > graphC && mouseX < graphW - 10) {
         redboxScene4.updateX(mouseX);
     }
     
@@ -195,90 +253,128 @@ function scene4() { // scene4
     }
 }
 
-function scene5() {
+function scene5() { // 5scene
+    blueBox = boxScene5;
 
     drawGraph(boxScene5, redboxScene5, true); 
-
-    drawBox(boxScene5, true, true);
+    drawBox(boxScene5, true, true, "ls");
 
     if (mouseX > graphC && mouseX < graphW) {
         redboxScene5.updateX(mouseX);
     }
 
-    drawBox(redboxScene5, true, true);
+    drawBox(redboxScene5, true, true, "lrps");
+    drawBox(boxScene5, true, true, "r");
 
     if (drawScreenScene5) {
         drawScreen(redboxScene5);
     }
 }
 
-function scene6() {
+function scene6() { // 6scene
+    blueBox = boxScene6;
 
     drawGraph(boxScene6, redboxScene6a, true);
 
-    drawBox(boxScene6, true, true);
+    // show charge
+    drawBox(boxScene6, true, true, "ls");
+    drawBox(redboxScene6a, true, true, "lps");
+    drawBox(redboxScene6b, true, true, "lrps");
+    drawBox(boxScene4, true, true, "r");
 
-    drawBox(redboxScene6a, true, true);
-
-    drawBox(redboxScene6b, true, true);
+    // drawBox(boxScene6, false, true, "ls");
+    // drawBox(redboxScene6a, false, true, "lps");
+    // drawBox(redboxScene6b, false, true, "lrps");
+    // drawBox(boxScene6, false, true, "r");
 }
 
-function scene7() {
+function scene7() { // 7scene
+    blueBox = boxScene7;
     drawGraph(boxScene7, redboxScene7a, true);
 
-    drawBox(boxScene7, true, true);
-    drawBox(redboxScene7a, true, true);
+    drawBox(boxScene7, true, true, "ls");
+    drawBox(redboxScene7a, true, true, "lps");
+    drawBox(redboxScene7b, true, true, "lsp");
+    drawBox(redboxScene7c, true, true, "lrsp");
 
+    // drawBox(boxScene7, false, true, "ls");
+    // drawBox(redboxScene7a, false, true, "lps");
+    // drawBox(redboxScene7b, false, true, "lsp");
+    // drawBox(redboxScene7c, false, true, "lrsp");
 
-    drawBox(redboxScene7b, true, true);
-
-
-    drawBox(redboxScene7c, true, true);
+    drawBox(boxScene7, true, true, "r");
 
 }
 
 function scene8() {
+    blueBox = boxScene8;
     drawGraph(boxScene7, redboxScene7a, true);
-    drawBox(boxScene, true, true);
-    drawBox(redboxScene7a, true, true);
-    drawBox(redboxScene7b, true, true);
-    drawBox(redboxScene7c, true, true);
+    drawBox(boxScene, true, true, "ls");
+    drawBox(redboxScene7a, true, true, "lrps");
+    drawBox(redboxScene7b, true, true, "lrs");
+    drawBox(redboxScene7c, true, true, "lrs");
+    drawBox(boxScene7, true, true, "r");
 }
 
 function scene9() {
+    // Populate charge array
+    // for (let i = 0; i < 40; i++) {
+    //     chargeXArray.push(Math.floor(Math.random() * (64)) + boxScene1.x + 20)
+    //     chargeYArray.push(Math.floor(Math.random() * (boxScene1.h - 100)) + boxScene1.y)
+    // }
+    // for (let i = 0; i < 40; i++) {
+    //     chargeXRArray.push(Math.floor(Math.random() * (300)) + boxScene1.x + 20)
+    //     chargeYRArray.push(Math.floor(Math.random() * (boxScene1.h - 100)) + boxScene1.y)
+    // }
+    
+    blueBox = boxScene9;
     drawGraph(boxScene9, redboxScene9, true);
-    drawBox(boxScene9, true, true);
+    drawBox(boxScene9, true, true, "s");
     redboxScene5.updateX(mouseX, true, true);
-    drawBox(redboxScene9, true, true);
+    drawBox(redboxScene9, true, true, "s");
 }
 
 drawAxis = () => {
-    stroke('#717171'); // axis color
-    strokeWeight(3);
+    color = grey;
+    stroke(grey); // axis color
+    strokeWeight(2);
+    
+    canvas.drawingContext.setLineDash([10, 5]);
 
     line(graphX, graphY, graphW, graphY); // hor
     line(graphC, graphY - 64, graphC, graphY + 64); // vert
 
     noStroke();
-    fill('#717171');
+
+    fill(grey);
     text('EF (vector)', graphC - 26, graphY + 80);
     text('x', graphW + 10, graphY);
+
+    
+
+    canvas.drawingContext.setLineDash([]);
+
+    let size = 7;
+    stroke(grey);
+
+    // y axis arrow
+    line(graphC, graphY - 64, graphC - size, graphY - 64 + size);
+    line(graphC, graphY - 64, graphC + size, graphY - 64 + size);
+
+    // x axis arrow
+    line(graphW, graphY, graphW - size, graphY - size);
+    line(graphW, graphY, graphW - size, graphY + size);
 }
 
-function drawGraph(box, red, purple) {
+drawGraph = (box, red, purple) => {
     drawAxis();
     let redRightY;
     let redLeftY;
     strokeWeight(2);
-    // let graphOffset = 4 * box.chargeAmount;
 
     stroke(box.color);
-    // let blueRightY = graphOffset;
-    // let blueLeftY = -(graphOffset);
-    // let redRightY = -(graphOffset);
-    // let redLeftY = graphOffset;
 
-    let unit = 3;
+    let unit = 1;
 
     let blueRightY = unit * box.chargeAmount;
     let blueLeftY = -(unit * box.chargeAmount);
@@ -312,26 +408,10 @@ function drawGraph(box, red, purple) {
         line(redX, graphY - redLeftY, redX, graphY - redRightY); // straight
     }
 
-    // red line
-    // else if (box.charge == "neg") {
-    //     line(graphX, graphY - redLeftY, graphC, graphY - redLeftY); // left
-    //     line(graphC, graphY - redRightY, graphW, graphY - redRightY); // right
-    //     line(graphC, graphY - redLeftY, graphC, graphY - redRightY); // straight
-    // }
-
-    // if (red) {
-    //     let redX = red.x;
-    //     stroke(red.color);
-    //     line(graphX, graphY - redLeftY, redX, graphY - redLeftY); // left
-    //     line(redX, graphY - redRightY, graphW, graphY - redRightY); // right
-    //     line(redX, graphY - redLeftY, redX, graphY - redRightY); // straight
-    // }
-
-
     if (purple) {
         let redX = red.x;
-        // purple line
-        stroke(140, 52, 228); // purple color
+        // purple graph line
+        stroke(147, 82, 212); // purple
         let purpleRightY = -(redRightY + blueRightY);
         let purpleLeftY = -(redLeftY + blueLeftY);
         let purpleMidY = -(redLeftY + blueRightY);
@@ -342,17 +422,15 @@ function drawGraph(box, red, purple) {
         line(graphX, graphY + purpleLeftY,
             graphC, graphY + purpleLeftY); // left
 
-        
-
-        if (mouseX > graphC) {
+        if (mouseX > graphC || (sceneCount != 4 && sceneCount != 5)) {
             line(graphC, graphY + purpleMidY,
                 redX, graphY + purpleMidY); // middle
-            // left straight 
-            line(redX, graphY - blueRightY + redRightY, redX, graphY + blueRightY + redRightY);
-            // right straight
+            // right straight 
+            // line(redX, graphY - blueRightY + redRightY, redX, graphY + blueRightY + redRightY);
+            line(redX, graphY - blueRightY + redRightY, redX, graphW, graphY + purpleRightY);
+            // left straight
             line(graphC, graphY - blueLeftY - redLeftY, graphC, graphY - blueRightY + redRightY);
         }
-
 
         if (sceneCount == 5) {
             print("redLeftY: " + redLeftY);
@@ -403,35 +481,13 @@ toggleArrows = () => {
 }
 
 changeChargeAmount = () => {
-    if (boxScene2.chargeAmount == 2) {
-        chargeDecrease = false;
-    }
-    if (boxScene2.chargeAmount == 16) {
-        chargeDecrease = true;
-    }
-    if (chargeDecrease) {
-        boxScene2.changeChargeAmount(boxScene2.chargeAmount - 1);
-    }
-    else {
-        boxScene2.changeChargeAmount(boxScene2.chargeAmount + 1);
-    }
-
-    if (redboxScene4.chargeAmount == 2) {
-        chargeDecrease = false;
-    }
-    if (redboxScene4.chargeAmount == 16) {
-        chargeDecrease = true;
-    }
-    if (chargeDecrease) {
-        redboxScene4.changeChargeAmount(redboxScene4.chargeAmount - 1);
-    }
-    else {
-        redboxScene4.changeChargeAmount(redboxScene4.chargeAmount + 1);
+    if (sceneCount == 2) {
+        boxScene2.changeChargeAmount(sliderCharge);
     }
 }
 
 reverseCharge = () => {
-    boxScene2.reverseCharge();
+    boxScene3.reverseCharge();
 }
 
 showScreen = () => {
@@ -443,56 +499,67 @@ showScreen = () => {
     }
 }
 
-function drawSurface(box) {
+drawSurface = (box) => {
     strokeWeight(1.4);
-    stroke(box.color);
-    fill(0, 0, 0, 0);
+    // stroke(box.color);
+    let surfaceOpacity = 0;
 
-    // if (sceneCount == 1) {
-        fill("#364E63");
-    // }
-        // box color
-        if (box.charge == "pos") {
-            // fill(91, 149, 203, 100);
-            fill(91, 149, 203, 100);
-            fill("#364E63");
-        }
-        else if (box.charge == "neg") {
-            // fill(193, 88, 88, 100);
-            fill("#6F4343");
-        }
+    if (box == redboxScene6b) {
+        surfaceOpacity = surfaceOpacity + 40;
+    }
+    if (box == redboxScene7b) {
+        surfaceOpacity = surfaceOpacity + 40;
+    }
+    if (box == redboxScene7c) {
+        surfaceOpacity = surfaceOpacity + 80;
+    }
 
+    if (sceneCount == 1 || sceneCount == 2 || sceneCount == 3 || sceneCount == 9) {
+        // (box.charge == "pos") ? fill(blueSurface) : fill(redSurface);
+        fill(bg);
+        (box.charge == "pos") ? stroke(blue) : stroke(red);
+    }
+    else {
+        fill(bg);
+        // (box.charge == "pos") ? fill(54, 78, 99, 180 - surfaceOpacity) : fill(111, 67, 67, 180 - surfaceOpacity);
+        // (box.charge == "pos") ? stroke(91, 149, 203, 120 - surfaceOpacity) : stroke(191, 81, 81, 120 - surfaceOpacity);
+        (box.charge == "pos") ? stroke(91, 149, 203, 120) : stroke(191, 81, 81, 120);
+    }
+
+    let yOffset = 0;
+    if (box.charge == "neg" && sceneCount != 3) {
+        yOffset = -10;
+    }
 
     beginShape();
-    vertex(box.x, box.y);
-    vertex(box.x, box.y + box.h);
-    vertex(box.x + box.w, box.y + box.h);
-    vertex(box.x + box.w, box.y);
+    vertex(box.x, box.y + yOffset);
+    vertex(box.x, box.y + box.h + yOffset);
+    vertex(box.x + box.w, box.y + box.h + yOffset);
+    vertex(box.x + box.w, box.y + yOffset);
     endShape(CLOSE);
 
-    // fill(0, 0, 0, 0);
-    // fill(91, 149, 203, 100);
     // box side
     beginShape();
-    vertex(box.x + box.w, box.y + box.h); // left top
-    vertex(box.x + box.w, box.y); // left bottom
-    vertex(box.x + box.w + box.d, box.y + box.a); // top right
-    vertex(box.x + box.w + box.d, box.y + box.h + box.a);
+    vertex(box.x + box.w, box.y + box.h + yOffset); // left top
+    vertex(box.x + box.w, box.y + yOffset); // left bottom
+    vertex(box.x + box.w + box.d, box.y + box.a + yOffset); // top right
+    vertex(box.x + box.w + box.d, box.y + box.h + box.a + yOffset);
     endShape(CLOSE);
 
     // box top
     beginShape();
-    vertex(box.x, box.y); // bottom left
-    vertex(box.x + box.w, box.y); // bottom right
-    vertex(box.x + box.w + box.d, box.y + box.a); // top right
-    vertex(box.x + box.d, box.y + box.a); // top left
+    vertex(box.x, box.y + yOffset); // bottom left
+    vertex(box.x + box.w, box.y + yOffset); // bottom right
+    vertex(box.x + box.w + box.d, box.y + box.a + yOffset); // top right
+    vertex(box.x + box.d, box.y + box.a + yOffset); // top left
     endShape(CLOSE);
 }
 
-function drawMidzone(box) {
+drawMidzone = (box) => {
     if (box.midzone) {
         // Mid Zone
-        fill(140, 52, 228, 100); // purple
+        color = purple;
+        fill(color[0], color[1], color[2]); // purple
         noStroke();
 
         let blueEnd = 330;
@@ -506,16 +573,6 @@ function drawMidzone(box) {
         vertex(box.x - offset + box.w, box.y); // left top
         endShape(CLOSE);
 
-        // fill(0, 0, 0, 0);
-        // fill(91, 149, 203, 100);
-        // box side
-        // beginShape();
-        // vertex(box.x - offset + box.w, box.y + box.h); // left top
-        // vertex(box.x - offset + box.w, box.y); // left bottom
-        // vertex(box.x - offset + box.w + box.d, box.y + box.a); // right top
-        // vertex(box.x - offset + box.w + box.d, box.y + box.h + box.a); // right bottom
-        // endShape(CLOSE);
-
         // box top
         beginShape();
         vertex(blueEnd, box.y); // bottom left
@@ -527,70 +584,103 @@ function drawMidzone(box) {
     }
 }
 
-function drawBox(box, showCharges, showArrows) {
+drawBox = (box, showCharges, showArrows, sides) => {
     //order: left arrows, box, charges, right arrows
-    if (showArrows && (box.sides).includes("l")) {
+    noStroke();
+    fill(grey);
+
+    if (sceneCount != 1) {
+        text('EF (vector)', 90, 40);
+    }
+    
+
+    if (showArrows && (box.sides).includes("l") && sides.includes("l")) {
         drawArrows(box, "l");
     }
 
-    if (showArrows && (box.sides).includes("p")) {
+    if (showArrows && (box.sides).includes("p") && sides.includes("p")) {
         drawArrows(box, "p");
     }
 
-
-    drawSurface(box);
-    if (showCharges) {
-        drawCharges(box);
+    if (sides.includes("s")) {
+        drawSurface(box);
+        if (showCharges) {
+            drawCharges(box);
+        }
     }
     
-    if (showArrows & (box.sides).includes("r")) {
+    if (showArrows & (box.sides).includes("r") && sides.includes("r")) {
         drawArrows(box, "r");
     }
-
-    // drawMidzone(box);
 }
 
-function drawCharges(box) {
+drawCharges = (box) => {
     let chargeSize = 12;
     let signSize = chargeSize - 4;
+    let chargeOpacity = 70;
+    let signOpacity = 72;
 
-    for (let i = 0; i < box.chargeAmount - 1; i++) {
-            noStroke();
-        
-        (box.charge == "pos") ? fill('#4275A6') : fill("#F57070");
-
-
+    for (let i = 0; i < box.chargeAmount; i++) {
         noStroke();
-        moveCharge = box.x - 300;
+        noStroke();
+        moveCharge = box.x - 316;
 
         if (box.charge == "pos") {
-            circle(chargeX[i] + moveCharge, chargeY[i], chargeSize);
-            stroke("#B7DCFF"); //bg
-            strokeWeight(1);
-            // cross line
-            line(chargeX[i] + moveCharge - signSize / 2, chargeY[i], chargeX[i] + moveCharge + signSize / 2, chargeY[i])
-            if (box.charge == "pos") {
-                // up line
-                line(chargeX[i] + moveCharge, chargeY[i] - signSize / 2, chargeX[i] + moveCharge, chargeY[i] + signSize / 2)
+            if (sceneCount == 1 || sceneCount == 2 || sceneCount == 3) {
+                fill(66, 117, 166, chargeOpacity + 60); // blueCharge
             }
+            else {
+                fill(66, 117, 166, chargeOpacity); //redCharge
+            }
+
+            let chargeX = chargeXArray[i];
+            let chargeY = chargeYArray[i]
+
+            circle(chargeX + moveCharge, chargeY, chargeSize);
+
+            strokeWeight(1);
+
+            if (sceneCount == 1 || sceneCount == 2 || sceneCount == 3) {
+                stroke(183, 220, 255, signOpacity + 60); // blueSign
+            }
+            else {
+                stroke(183, 220, 255, signOpacity); // blueSign
+            }
+            // cross line
+            line(chargeX + moveCharge - signSize / 2, chargeY, chargeX + moveCharge + signSize / 2, chargeY)
+            // up line
+            line(chargeX + moveCharge, chargeY - signSize / 2, chargeX + moveCharge, chargeY + signSize / 2)
         }
         else if (box.charge == "neg") {
-            circle(chargeXR[i] + moveCharge, chargeYR[i], chargeSize);
-            stroke("#9F6464"); //bg
-            strokeWeight(1);
-            // cross line
-            line(chargeXR[i] + moveCharge - signSize / 2, chargeYR[i], chargeXR[i] + moveCharge + signSize / 2, chargeYR[i])
-            if (box.charge == "pos") {
-                // up line
-                line(chargeXR[i] + moveCharge, chargeYR[i] - signSize / 2, chargeXR[i] + moveCharge, chargeYR[i] + signSize / 2)
+            if (sceneCount == 1 || sceneCount == 2 || sceneCount == 3) {
+                fill(245, 112, 112);
             }
+            else {
+                fill(245, 112, 112, chargeOpacity);
+            }
+            
+            let chargeX = chargeXRArray[i];
+            let chargeY = chargeYRArray[i];
+
+            circle(chargeX + moveCharge, chargeY + 20, chargeSize);
+
+            if (sceneCount == 1 || sceneCount == 2 || sceneCount == 3) {
+                stroke(253, 192, 192); // redSign
+            }
+            else {
+                stroke(253, 192, 192, signOpacity); // redSign
+            }
+            strokeWeight(1);
+
+            // cross line
+            line(chargeX + moveCharge - signSize / 2, chargeY + 20, chargeX + moveCharge + signSize / 2, chargeY + 20)
         }
 
     }
 }
 
-function drawScreen(box) {
-    fill(18, 18, 18, 180);
+drawScreen = (box) => {
+    // fill(18, 18, 18, 180);
     noStroke();
     let gap = 20;
 
@@ -612,190 +702,263 @@ function drawScreen(box) {
 }
 
 
-function drawArrows(box, sides) {
-    let rows = 8;
-    let spaceBetween = rows * 4.2;
-    let spacing = spaceBetween;
+drawArrows = (box, sides) => {
+    let rows = 6;
+    // let spaceBetween = rows * 4.2;
+    let spaceBetween = rows * 7;
+    let spacing = spaceBetween - 6;
 
-    let arrowSize = 12;
-    // let lineLength = 1600;
-    let fieldLineLength = 260;
+    let triangleSize = 12;
+    let lineSize = 255;
 
     // 3D Field
     if (box.dim3) {
         let offsetX = 0;
         let offsetY = 0;
-        let fillAmount = 240;
+        let fillAmount;
+        let thickScale = .15;
 
-        let chargeSize = 12;
-        // let signSize = chargeSize - 4;
 
+        if (sceneCount == 1 || sceneCount == 2 || sceneCount == 3) {
+            fillAmount = 220; // 3d fillamount
+        }
+        else {
+            fillAmount = 240; // 2d fillamount
+        }
+        
+        
         // for each row
-        for (let i = 0; i < rows; i++) {
+        for (let r = 0; r < rows; r++) {
+            let zRow = 1;
             // for each set in z axis
             for (let i = 0; i < 5; i++) {
                 (box.charge == "pos") ? stroke(91, 149, 203, fillAmount) : stroke(193, 81, 81, fillAmount);
+
+                strokeWeight(box.chargeAmount * thickScale);
+                
+                strokeCap(SQUARE);
+                let btwLine = 3;
+
                 // stroke(91, 149, 203, fillAmount);
                 let gap;
-                strokeWeight(3);
+                // strokeWeight(3);
+                // right set of lines
+                
                 if (box.charge == "pos") {
-                    // strokeWeight(.6 * box.chargeAmount);
-                    // gap = 12;
-                    gap = 12;
-                } else if (box.charge == "neg") {
-                    // strokeWeight(2);
-                    // gap = 24;
-                    gap = 12;
+                    strokeWeight(box.chargeAmount * thickScale);
+                    gap = 0;
+                    // blue right lines
+                    if (sides.includes("r")) {
+                        line(gap + box.c + offsetX,
+                            box.y + spacing + offsetY,
+                            gap + box.c + lineSize + offsetX,
+                            box.y + spacing + offsetY);
+                    }
+                    // blue left lines
+                    if (sides.includes("l")) {
+                        line(box.c - gap + offsetX,
+                            box.y + spacing + offsetY,
+                            box.c - lineSize - gap + offsetX,
+                            box.y + spacing + offsetY);
+                    }
                 }
 
                 
-                strokeWeight(box.chargeAmount * .26);
+                else if (box.charge == "neg") {
+                    
+                    gap = 12;
+                    // red right lines
+                    if (sides.includes("r")) {
+                        if (sceneCount == 1 || sceneCount == 2 || sceneCount == 3) {
+                            // 3D
+                            line(gap + box.x + box.w + offsetX,
+                                box.y + spacing + offsetY,
+                                gap + box.x + lineSize + offsetX,
+                                box.y + spacing + offsetY);
+                        }
+                        else {
+                            // 2D
+                            let redRightGap = 0;
+                            if (sceneCount == 9) {
+                                redRightGap = 24;
+                            }
+
+                            
+                            line(gap + box.c + box.w + offsetX - 4, // left x
+                                box.y + spacing + offsetY + btwLine, // left y
+                                gap + blueBox.c + lineSize + offsetX + redRightGap - box.minusLine, // right x
+                                box.y + spacing + offsetY + btwLine); // right y
+                        }
+                        
+                    }
+                    // red left lines
+                    if (sides.includes("l")) {
+                        // 3D
+                        if (sceneCount == 1 || sceneCount == 2 || sceneCount == 3) {
+                            line(box.x - gap + offsetX,
+                                box.y + spacing + offsetY,
+                                gap + box.x - lineSize - gap + offsetX - triangleSize,
+                                box.y + spacing + offsetY);
+                        }
+                        else {
+                            // for 2D
+                            line(box.x - gap + offsetX, // right x
+                                box.y + spacing + offsetY + btwLine, // right y
+                                gap + blueBox.c - lineSize - gap + offsetX - triangleSize, // left x
+                                box.y + spacing + offsetY + btwLine); // left y
+                        }
+                    }
+                }
+
+
+
+
                 // purple lines
-                if (sides.includes("p")) {
-                    stroke(140, 52, 228, fillAmount); // purple color
-                    line(-4 + box.c - gap + offsetX, // x1
-                        10+ box.y + spacing + offsetY, // y1
-                        -4 + 610 - fieldLineLength - gap + offsetX, // x2
-                        10 + box.y + spacing + offsetY); // y
+                if (sides.includes("p") && (mouseX > graphC || (sceneCount != 4 && sceneCount !=5))) {
+                    let purpleOffset = 16;
+                    let offsetX = 0;
+                    color = purple;
+                    // stroke(color[0], color[1], color[2], fillAmount); // purple color
+                    stroke(147, 82, 212, 200); // purple
+                    
+                    strokeWeight(box.chargeAmount * thickScale + (blueBox.chargeAmount * thickScale)); // box scene 5 charges
+                    // strokeWeight(6);
 
-                    // purple arrows
+                    let movePurple = 0;
+                    if (box == redboxScene6b) {
+                        movePurple = 100;
+                    }
+                    if (box == redboxScene7b) {
+                        movePurple = 60;
+                    }
+                    if (box == redboxScene7c) {
+                        movePurple = 120;
+                    }
+
+                    line( offsetX + box.x - 12, // x1
+                        purpleOffset + box.y + spacing, // y1
+                        offsetX + lineSize + 57 + movePurple, // x2
+                        purpleOffset + box.y + spacing); // y
+
+                    // purple triangles
+                    noStroke();
                     let off = -10;
-                    fill(140, 52, 228, fillAmount); 
-                    if (mouseX > graphC + 20) {
-                        triangle(
-                            box.c + off + offsetX,
-                            10 +box.y + spacing + offsetY,
-                            box.c + off - arrowSize + offsetX,
-                            10 +box.y + arrowSize / 2 + spacing + offsetY,
 
-                            box.c + off - arrowSize + offsetX,
-                            10 +box.y - arrowSize / 2 + spacing + offsetY,
-                        )
+                    fill(147, 82, 212, 200); // purple
+                    // stroke(147, 82, 212); // purple
+                    let m = 10;
+                    // if (mouseX > graphC) {
+                        drawTriangle(triangleSize, "right", m + box.x + off, box.y + spacing + purpleOffset);
+                    // }
+
+
+                }
+
+                // TRIANGLES
+                noStroke();
+                // let move = 40;
+                let move = 44;
+                (box.charge == "pos") ? fill(91, 149, 203, fillAmount) : fill(193, 81, 81, fillAmount);
+
+                if (box.charge == "pos") {
+                    // blue right triangles
+                    if (sides.includes("r")) {
+                        let arrowOffset = 584;
+                        drawTriangle(triangleSize, "right",
+                        box.c + lineSize + offsetX + 12, // x
+                        box.y + spacing + offsetY); //y
+                    }
+                    // blue left triangles
+                    if (sides.includes("l")) {
+                        drawTriangle(triangleSize, "left",
+                        move + offsetX,
+                        box.y + spacing + offsetY);
+                    }
+                }
+
+            
+                else if (box.charge == "neg") {
+                    // // mid blue triangle
+                    if (sides.includes("p")) {
+                        let yOffset = -11;
+                        let off = -7;
+                        noStroke();
+                        fill(91, 149, 203, 100);
+                        drawTriangle(triangleSize, "right", 7 + box.c + off, box.y + spacing + yOffset);
+                    }
+
+                    let off = -4;
+                    // red left triangles
+                    if (sides.includes("l")) {
+                        drawTriangle(triangleSize, "right", box.x + offsetX, box.y + spacing + offsetY + btwLine);
+                    }
+                    // red right triangles
+                    if (sides.includes("r")) {
+                        let m = -8;
+                        drawTriangle(triangleSize, "left", m + box.x + box.w + off + gap + offsetX, box.y + spacing + offsetY + btwLine);
                     }
 
                     
                 }
 
-                fill(box.color);
                 
-                strokeWeight(box.chargeAmount * .2);
-                if  (box.showArrows) {
-                    // right set of lines
-                    if (sides.includes("r")) {
-                        (box.charge == "pos") ? stroke(91, 149, 203, fillAmount) : stroke(193, 81, 81, 40);
-                        line(gap + box.c + offsetX,
-                            box.y + spacing + offsetY,
-                            gap + box.c + fieldLineLength + offsetX,
-                            box.y + spacing + offsetY);
-                    }
-                    fill(box.color);
-                    // left set of lines
-                    if (box.charge == "pos") {
-                        if (sides.includes("l")) {
-                            line(box.c - gap + offsetX,
-                                box.y + spacing + offsetY,
-                                box.c - fieldLineLength - gap + offsetX,
-                                box.y + spacing + offsetY);
-                        }
-                    }
-                    else if (box.charge == "neg") {
-                        if (sides.includes("l")) {
-                            line(-4 + box.c - gap + offsetX,
-                                box.y + spacing + offsetY,
-                                -4 + box.c - fieldLineLength - gap + offsetX,
-                                box.y + spacing + offsetY);
-                        }
-                        
-                        // if (sides.includes("l")) {
-                        //     line(-4 + box.c - gap + offsetX,
-                        //         box.y + spacing + offsetY,
-                        //         0,
-                        //         box.y + spacing + offsetY);
-                        // }
-                    }
 
-
-
-                    noStroke();
-                    let move = 36;
-                    (box.charge == "pos") ? fill(91, 149, 203, fillAmount) : fill(193, 81, 81, fillAmount);
-
-                    // ARROW HEADS
-
-                    if (box.charge == "pos") {
-                        // right triangles
-                        if (sides.includes("r")) {
-                            triangle(
-                                600 + offsetX, box.y + spacing + offsetY,
-                                600 - arrowSize + offsetX, box.y + arrowSize / 2 + spacing + offsetY,
-                                600 - arrowSize + offsetX, box.y - arrowSize / 2 + spacing + offsetY,
-                            )
-                        }
-                        // left triangles
-                        if (sides.includes("l")) {
-                            triangle(
-                                move + offsetX, box.y + spacing + offsetY,
-                                move + arrowSize + offsetX, box.y + arrowSize / 2 + spacing + offsetY,
-                                move + arrowSize + offsetX, box.y - arrowSize / 2 + spacing + offsetY,
-                            )
-                        }
-                    }
-
-                    else if (box.charge == "neg") {
-                        // left arrows +x
-                        if (sides.includes("l")) {
-                            // triangle(
-                            //     -20 + box.c - gap + offsetX, box.y + arrowSize / 2 + spacing + offsetY,
-                            //     -20 + box.c - gap + offsetX, box.y - arrowSize / 2 + spacing + offsetY,
-                            //     -20 - box.c - gap + offsetX + arrowSize, box.y + spacing + offsetY
-                            // )
-                            let off = -10;
-                            let follow = box.x - 300;
-
-                            triangle(
-                                box.c + off + offsetX, box.y + spacing + offsetY,
-                                box.c + off - arrowSize + offsetX, box.y + arrowSize / 2 + spacing + offsetY,
-                                box.c + off - arrowSize + offsetX, box.y - arrowSize / 2 + spacing + offsetY,
-                            )
-                        }
-                        // right arrow -x
-                        if (sides.includes("r")) {
-                            let m = 10;
-                            triangle(
-                                m + box.c + gap + offsetX, box.y - arrowSize / 2 + spacing + offsetY,
-                                m + box.c + gap + offsetX, box.y + arrowSize / 2 + spacing + offsetY,
-                                m + box.c + gap + offsetX - arrowSize, box.y + spacing + offsetY
-                            )
-                        }
-                    }
-
-
-                }
                 offsetX += 20;
                 offsetY -= 24;
-                // fillAmount -= 38;
-                fillAmount -= 255;
+                if (sceneCount == 1 || sceneCount == 2 || sceneCount == 3) {
+                    fillAmount -= 40;
+                }
+                else {
+                    if (r == 0) {
+                        if (i == 0) {
+                            fillAmount -= 200; // change for 3d // 40 - 255
+                        }
+                        else if (i == 1) {
+                            fillAmount -= 20; // change for 3d // 40 - 255
+                        }
+                        else if (i == 2) {
+                            fillAmount -= 20; // change for 3d // 40 - 255
+                        }
+                        else if (i == 3) {
+                            fillAmount -= 20; // change for 3d // 40 - 255
+                        }
+                        
+                    }
+                    else {
+                        fillAmount -= 255;
+                    }
+                }
+
+                // fillAmount -= 255;
             }
             spacing += spaceBetween;
             offsetX = 0;
             offsetY = 0;
-            fillAmount = 255;
+            zRow = 1;
+
+            // reset fillAmount
+            if (sceneCount == 1 || sceneCount == 2 || sceneCount == 3) {
+                fillAmount = 220; // 3d fillamount
+            }
+            else {
+                fillAmount = 240; // 2d fillamount
+            }
         }
-        spacing = spaceBetween;
+        spacing = spaceBetween - 6;
+        // lineSize = 260;
     }
 }
 
-function mousePressed() {
+mousePressed = () => {
     if (sceneCount == 1) {
         drawScene1 = true;
     }
-    // else if (mouseX > 0) {
-    //     toggleArrows();
-    // }
+    else if (mouseX > 0) {
+        toggleArrows();
+    }
 }
 
-
-function showBlueArrows() {
+showBlueArrows = () => {
     for (let i = 0; i < blueBoxes.length - 1; i++) {
         (blueBoxes[i].showArrows == true)?
             blueBoxes[i].showArrows = false:
@@ -803,7 +966,7 @@ function showBlueArrows() {
     }
 }
 
-function showRedArrows() {
+showRedArrows = () => {
     for (let i = 0; i < redBoxes.length - 1; i++) {
         (redBoxes[i].showArrows == true) ?
             redBoxes[i].showArrows = false :
@@ -811,10 +974,28 @@ function showRedArrows() {
     }
 }
 
-function showPurpleArrows() {
+showPurpleArrows = () => {
     // for (let i = 0; i < redBoxes.length - 1; i++) {
     //     (redBoxes[i].showArrows == true) ?
     //         redBoxes[i].showArrows = false :
     //         redBoxes[i].showArrows = true;
     // }
+}
+
+drawTriangle = (size, dir, x, y) => {
+    if (dir == "left") {
+        triangle(
+            x, y,
+            x + size, y - size/1.7,
+            x + size, y + size/1.7
+        )
+    }
+    else if (dir == "right") {
+        triangle(
+            x, y,
+            x - size, y - size / 1.7,
+            x - size, y + size / 1.7
+        )
+    }
+
 }

@@ -1,24 +1,25 @@
 class Box {
-    constructor(charge, dim3, chargeAmount, midzone, arrowLength, showArrows, sides, x, y, w, d) {
+    constructor(charge, dim3, chargeAmount, midzone, arrowLength, showArrows, sides, minusLine, x, y, w, d) {
         this.charge = charge;
         this.dim3 = dim3;
         this.arrowLength = arrowLength;
         this.showArrows = showArrows;
         this.chargeAmount = chargeAmount;
         this.midzone = midzone;
+        this.minusLine = minusLine
         this.sides = sides;
 
         this.x = x; // x position
         this.y = y; // y position 
         this.h = 300; // height
-        this.w = 6; // width
+        this.w = w; // width
 
         this.d = d; // depth
         this.a = -100; // angle
         this.c = this.x + this.w / 2;
 
         if (this.charge == "pos") {
-            blue = '#5B95CB';
+            blue = ('#5B95CB');
             this.color = blue;
             this.c = this.x + this.w / 2;
         }

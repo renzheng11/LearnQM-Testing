@@ -39,9 +39,9 @@
                 <h1>[SCENE 1]: 3D Field</h1>
                 
                 <p>
-                    Any positive or negative charge creates an electric field in the space surrounding it (typically represented by arrows). If we line up an array of electric fields, we have a screen (or sheet).
+                    Any positive or negative charge creates an electric field in the space surrounding it (typically represented by arrows). Let's assume we have an infinitely large surface (where the size of the plane in the y + z directions are much larger than in the x direction).
                 <br><br>
-                    Click on the right graphic to charge it with electrons.
+                    Click on the right graphic to charge this surface with electrons.
             </p>
             </div>
             
@@ -51,16 +51,12 @@
             <div class="col-lg-4">
                 <h1>[SCENE 2]: Change Electrons</h1>
                 <p>
-                    Here, we've simplified the graphic to show one array for visualization purposes.
-                    <br><br>
-                    
                     If we have an array of positive charges, for the side of the sheet facing left, the direction of the electric field (on
-                    x plane) is negative. For the side of the sheet facing right, the direction of the electric field is positive. Try changing the number of electrons and see how it affects the electric field vector.
-                    
+                    x plane) is negative. For the side of the sheet facing right, the direction of the electric field is positive. Use the slider to change the amount of charge and see how it affects the electric field vector.
+                    <br><br>
+                    The strength of the electric field depends on the amount of charge on the surface.
+                    <br><br>
                     Try changing the magnitude by dragging the arrows.</p>
-                <button type="button" onclick="reverseCharge()">Reverse Charge</button>
-                <button type="button" onclick="showBlueArrows()">Blue Arrows</button>
-                <!-- <button type="button" onclick="toggleArrows()">Toggle Arrows</button> -->
             </div>
             
         </div>
@@ -70,12 +66,11 @@
                 <h1>[SCENE 3]: Change Charge</h1>
                 
                 <p>
-What about an array of negative charges? What directions for the electric field would the left and right sides of the
-sheet be?</p>
+                    
+                    
+                What about an array of negative charges? What directions for the electric field would the left and right sides of the
+                sheet be?</p>
                 <button type="button" onclick="reverseCharge()">Reverse Charge</button>
-                <button type="button" onclick="changeChargeAmount()">Change Charge Amount</button>
-                <button type="button" onclick="showBlueArrows()">Blue Arrows</button>
-                <button type="button" onclick="showRedArrows()">Red Arrows</button>
             </div>
         </div>
         <div class="row row3" id="scene_4">
@@ -83,6 +78,8 @@ sheet be?</p>
                 <h1>[SCENE 4]</h1>
                 
                 <p>
+
+                    Here, we've simplified the graphic to show one array for visualization purposes.
                     
                 For the side of the sheet facing left, the direction of the electric field is positive. For the side of the sheet facing
                 right, the direction of the electric field is negative.
@@ -99,10 +96,9 @@ sheet be?</p>
 
                 </p>
                 <button type="button" onclick="showScreen()">Show Screen</button>
-                                <button type="button" onclick="showBlueArrows()">Blue Arrows</button>
-                                <button type="button" onclick="showRedArrows()">Red Arrows</button>
-                                <button type="button" onclick="showPurpleArrows()">Purple Arrows</button>
-                                <button type="button" onclick="changeChargeAmount()">Change Charge Amount</button>
+                <!-- <button type="button" onclick="showBlueArrows()">Blue Arrows</button>
+                <button type="button" onclick="showRedArrows()">Red Arrows</button>
+                <button type="button" onclick="showPurpleArrows()">Purple Arrows</button> -->
                 
             </div>
         </div>
@@ -117,8 +113,8 @@ sheet be?</p>
 
                 </p>
                 <button type="button" onclick="showScreen()">Show Screening</button>
-                                <button type="button" onclick="showBlueArrows()">Blue Arrows</button>
-                                <button type="button" onclick="showRedArrows()">Red Arrows</button>
+                <!-- <button type="button" onclick="showBlueArrows()">Blue Arrows</button> -->
+                <!-- <button type="button" onclick="showRedArrows()">Red Arrows</button> -->
             </div>
         </div>
         <div class="row row5" id="scene_6">
@@ -133,8 +129,8 @@ sheet be?</p>
                 doubled.
                 </p>
                 <button type="button" onclick="showScreen()">Show Screening</button>
-                                <button type="button" onclick="showBlueArrows()">Blue Arrows</button>
-                                <button type="button" onclick="showRedArrows()">Red Arrows</button>
+                <!-- <button type="button" onclick="showBlueArrows()">Blue Arrows</button> -->
+                <!-- <button type="button" onclick="showRedArrows()">Red Arrows</button> -->
                 <svg id="d3-viz">
 
                 </svg>
@@ -148,8 +144,8 @@ sheet be?</p>
                 will screen out the positive electric field over a distance.</p>
 
                 <button type="button" onclick="showScreening()">Show Screening</button>
-                                <button type="button" onclick="showBlueArrows()">Blue Arrows</button>
-                                <button type="button" onclick="showRedArrows()">Red Arrows</button>
+                <!-- <button type="button" onclick="showBlueArrows()">Blue Arrows</button> -->
+                <!-- <button type="button" onclick="showRedArrows()">Red Arrows</button> -->
                 <svg id="d3-viz-final">
 
                 </svg>
@@ -162,8 +158,8 @@ sheet be?</p>
                 <p>The graph can be represented like a slope...</p>
 
 
-                                <button type="button" onclick="showBlueArrows()">Blue Arrows</button>
-                                <button type="button" onclick="showRedArrows()">Red Arrows</button>
+                <!-- <button type="button" onclick="showBlueArrows()">Blue Arrows</button> -->
+                <!-- <button type="button" onclick="showRedArrows()">Red Arrows</button> -->
                 <svg id="d3-viz-final-2s">
 
                 </svg>
@@ -182,25 +178,6 @@ sheet be?</p>
                 <svg id="d3-viz-final-2p">
 
                 </svg>
-            </div>
-        </div>
-        <div class="row row9" id="scene_10">
-            <div class="col-lg-4">
-                
-                <h1>[SCENE 10]</h1>
-                <p>
-                </p>
-                <svg id="d3-viz-final-2p">
-
-                </svg>
-            </div>
-        </div>
-        <div class="row row10" id="scene_11">
-            <div class="col-lg-4">
-                <h1>[SCENE 11]</h1>
-                
-                <p>
-                </p>
             </div>
         </div>
         <div id="visualization">
