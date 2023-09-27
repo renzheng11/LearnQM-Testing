@@ -1,3 +1,5 @@
+
+
 let blueBox;
 let canvas;
 
@@ -39,7 +41,6 @@ let graphW;
 let graphX;
 let graphC;
 
-let chargeDecrease;
 let drawScene1;
 let drawScene2;
 
@@ -128,39 +129,23 @@ setup = () => {
     redboxScene5 = new Box("neg", true, 16, true, 440, true, "lrp", 0, 400, 152, boxThickness, 80);
 
     boxScene6 = new Box("pos", true, 36, false, 440, true, "lrp", 0, 310, 140, boxThickness, 80);
-    redboxScene6a = new Box("neg", true, 22, true, 440, true, "lrp", 120, 410, 150, boxThickness, 80);
-    redboxScene6b = new Box("neg", true, 14, true, 440, true, "lrp", 0, 510, 150, boxThickness, 80);
+    redboxScene6a = new Box("neg", true, 26, true, 440, true, "lrp", 120, 410, 150, boxThickness, 80);
+    redboxScene6b = new Box("neg", true, 10, true, 440, true, "lrp", 0, 510, 150, boxThickness, 80);
 
     boxScene7 = new Box("pos", true, 36, false, 440, true, "lrp", 0, 310, 140, boxThickness, 80);
-    redboxScene7a = new Box("neg", true, 24, true, 440, true, "lrp", 120, 370, 150, boxThickness, 80);
-    redboxScene7b = new Box("neg", true, 8, true, 440, true, "lrp", 0, 430, 150, boxThickness, 80);
-    redboxScene7c = new Box("neg", true, 4, true, 440, true, "lrp", 0, 490, 150, boxThickness, 80);
+    redboxScene7a = new Box("neg", true, 24, true, 440, true, "lrp", 120, 390, 150, boxThickness, 80);
+    redboxScene7b = new Box("neg", true, 8, true, 440, true, "lrp", 0, 470, 150, boxThickness, 80);
+    redboxScene7c = new Box("neg", true, 4, true, 440, true, "lrp", 0, 540, 150, boxThickness, 80);
 
     boxScene9 = new Box("pos", true, 36, false, 440, true, "lrp", 0, 310, 140, boxThickness, 80);
-    redboxScene9 = new Box("neg", true, 36, true, 440, true, "lrp", 0, 380, 150, 200, 80);
+    redboxScene9 = new Box("neg", true, 36, true, 440, true, "lrp", 0, 420, 150, 100, 80);
 
     blueBoxes = [boxScene1, boxScene2, boxScene4, boxScene5, boxScene6, boxScene7, boxScene9];
     redBoxes = [redboxScene4, redboxScene5, redboxScene6a, redboxScene6b, redboxScene7a, redboxScene7b, redboxScene7c, redboxScene9];
-
-    
-
-    chargeDecrease = true;
-
-    // Example: Returns a random integer from 1 to 100:
-    // Math.floor(Math.random() * 100) + 1;
-
-    // Populate charge array
-    for (let i = 0; i < 40; i++) {
-        chargeXArray.push(Math.floor(Math.random() * (64)) + boxScene1.x + 20)
-        chargeYArray.push(Math.floor(Math.random() * (boxScene1.h - 100)) + boxScene1.y)
-    }
-    for (let i = 0; i < 40; i++) {
-        chargeXRArray.push(Math.floor(Math.random() * (64)) + boxScene1.x + 20)
-        chargeYRArray.push(Math.floor(Math.random() * (boxScene1.h - 100)) + boxScene1.y)
-    }
 }
 
 draw = () => {
+
     background(bg);
 
     if (sceneCount == 1) {
@@ -208,20 +193,27 @@ function resetScene() {
 // SCENOS
 
 function scene1() { // 1scene
+
     drawBox(boxScene1, false, false, "lrs");
     if (drawScene1) {
+        drawCharges(boxScene1);
+        drawCorners(boxScene1);
         drawBox(boxScene1, true, true, "lrs");
         fill(grey)
-        text('EF (vector)', 90, 40);
+        text('vec E', 130, 50);
     }
 }
 
 function scene2() { // 2scene
     blueBox = boxScene2;
+
+    drawCharges(boxScene2);
+    drawCorners(boxScene2);
+
     drawBox(boxScene2, true, true, "lrs");
     drawGraph(boxScene2, null, false);
     // Set the position of slider on the canvas
-    chargeSlider.position(100, 1840);
+    chargeSlider.position(86, 1760);
     
     sliderCharge = chargeSlider.value();
     boxScene2.changeChargeAmount(sliderCharge);
@@ -233,12 +225,21 @@ function scene2() { // 2scene
 function scene3() { // 3scene
     blueBox = boxScene3;
     drawGraph(boxScene3, null, false);
+
+    drawCharges(boxScene3);
+    drawCorners(boxScene3);
+
     drawBox(boxScene3, true, true, "lrs");
 }
 
 function scene4() { // 4scene
     blueBox = boxScene4;
     drawGraph(boxScene4, redboxScene4, true);
+
+    drawCharges(boxScene4);
+    drawCorners(boxScene4);
+    drawCharges(redboxScene4);
+    drawCorners(redboxScene4);
     
     drawBox(boxScene4, true, true, "ls");
     drawBox(redboxScene4, true, true, "lrps");
@@ -256,8 +257,18 @@ function scene4() { // 4scene
 function scene5() { // 5scene
     blueBox = boxScene5;
 
+
+
     drawGraph(boxScene5, redboxScene5, true); 
     drawBox(boxScene5, true, true, "ls");
+
+    drawCharges(boxScene5);
+    drawCorners(boxScene5);
+
+    drawCharges(redboxScene5);
+    drawCorners(redboxScene5);
+
+    drawBox(boxScene5, true, true, "s");
 
     if (mouseX > graphC && mouseX < graphW) {
         redboxScene5.updateX(mouseX);
@@ -265,6 +276,9 @@ function scene5() { // 5scene
 
     drawBox(redboxScene5, true, true, "lrps");
     drawBox(boxScene5, true, true, "r");
+
+
+
 
     if (drawScreenScene5) {
         drawScreen(redboxScene5);
@@ -275,12 +289,22 @@ function scene6() { // 6scene
     blueBox = boxScene6;
 
     drawGraph(boxScene6, redboxScene6a, true);
+    drawGraph(boxScene6, redboxScene6b, true);
+
+    drawCharges(boxScene6);
+    drawCorners(boxScene6);
+
+    drawCharges(redboxScene6a);
+    drawCorners(redboxScene6a);
+
+    drawCharges(redboxScene6b);
+    drawCorners(redboxScene6b);
 
     // show charge
     drawBox(boxScene6, true, true, "ls");
     drawBox(redboxScene6a, true, true, "lps");
     drawBox(redboxScene6b, true, true, "lrps");
-    drawBox(boxScene4, true, true, "r");
+    drawBox(boxScene6, true, true, "r");
 
     // drawBox(boxScene6, false, true, "ls");
     // drawBox(redboxScene6a, false, true, "lps");
@@ -291,6 +315,20 @@ function scene6() { // 6scene
 function scene7() { // 7scene
     blueBox = boxScene7;
     drawGraph(boxScene7, redboxScene7a, true);
+    drawGraph(boxScene6, redboxScene7b, true);
+    drawGraph(boxScene6, redboxScene7c, true);
+
+    drawCharges(boxScene7);
+    drawCorners(boxScene7);
+
+    drawCharges(redboxScene7a);
+    drawCorners(redboxScene7a);
+
+    drawCharges(redboxScene7b);
+    drawCorners(redboxScene7b);
+
+    drawCharges(redboxScene7c);
+    drawCorners(redboxScene7c);
 
     drawBox(boxScene7, true, true, "ls");
     drawBox(redboxScene7a, true, true, "lps");
@@ -306,9 +344,20 @@ function scene7() { // 7scene
 
 }
 
-function scene8() {
+function scene8() { //8scene
     blueBox = boxScene8;
     drawGraph(boxScene7, redboxScene7a, true);
+
+
+    drawCharges(redboxScene7a);
+    drawCorners(redboxScene7a);
+
+    drawCharges(redboxScene7b);
+    drawCorners(redboxScene7b);
+
+    drawCharges(redboxScene7c);
+    drawCorners(redboxScene7c);
+
     drawBox(boxScene, true, true, "ls");
     drawBox(redboxScene7a, true, true, "lrps");
     drawBox(redboxScene7b, true, true, "lrs");
@@ -316,22 +365,20 @@ function scene8() {
     drawBox(boxScene7, true, true, "r");
 }
 
-function scene9() {
-    // Populate charge array
-    // for (let i = 0; i < 40; i++) {
-    //     chargeXArray.push(Math.floor(Math.random() * (64)) + boxScene1.x + 20)
-    //     chargeYArray.push(Math.floor(Math.random() * (boxScene1.h - 100)) + boxScene1.y)
-    // }
-    // for (let i = 0; i < 40; i++) {
-    //     chargeXRArray.push(Math.floor(Math.random() * (300)) + boxScene1.x + 20)
-    //     chargeYRArray.push(Math.floor(Math.random() * (boxScene1.h - 100)) + boxScene1.y)
-    // }
-    
+function scene9() { //9scene
     blueBox = boxScene9;
     drawGraph(boxScene9, redboxScene9, true);
-    drawBox(boxScene9, true, true, "s");
+
+    drawCharges(boxScene9);
+    drawCorners(boxScene9);
+
+    drawCharges(redboxScene9);
+    drawCorners(redboxScene9);
+
+    drawBox(boxScene9, true, true, "sl");
     redboxScene5.updateX(mouseX, true, true);
-    drawBox(redboxScene9, true, true, "s");
+    drawBox(redboxScene9, true, true, "plrs");
+    drawBox(boxScene9, true, true, "r");
 }
 
 drawAxis = () => {
@@ -347,7 +394,7 @@ drawAxis = () => {
     noStroke();
 
     fill(grey);
-    text('EF (vector)', graphC - 26, graphY + 80);
+    text('vec E', graphC - 26, graphY + 80);
     text('x', graphW + 10, graphY);
 
     
@@ -499,6 +546,54 @@ showScreen = () => {
     }
 }
 
+drawCorners = (box) => {
+    let yOffset = 0;
+    if (box.charge == "neg" && sceneCount != 3) {
+        yOffset = -10;
+    }
+    noStroke();
+    
+    fill(bg);
+
+    if (box.charge == "pos") {
+        // fill('blue');
+
+        // top
+        beginShape();
+        vertex(box.x, box.y + box.h + yOffset - box.h - 3); // left bottom
+        vertex(box.x, box.y + yOffset + box.a - 3); // left top
+        vertex(box.x + box.d, box.y + box.a + yOffset - 3); // right top
+        endShape(CLOSE);
+
+        // bottom
+        beginShape();
+        vertex(box.x, box.y + box.h + yOffset - box.h + 3 + box.h); // left bottom
+        vertex(box.x - box.a - 18, box.y + yOffset + box.a + 3 + box.h - box.a); // right bottom
+        vertex(box.x + box.d, box.y + box.a + yOffset + 3 + box.h); // right top
+
+        endShape(CLOSE);
+    }
+
+    if (box.charge == "neg") {
+        // fill('red');
+        // top
+        beginShape();
+        vertex(box.x, box.y + box.h + yOffset - box.h - 3); // left bottom
+        vertex(box.x, box.y + yOffset + box.a - 3); // left top
+        vertex(box.x + box.d, box.y + box.a + yOffset - 3); // right top
+        endShape(CLOSE);
+
+        // bottom
+        beginShape();
+        vertex(box.x + box.w, box.y + box.h + yOffset - box.h + 3 + box.h); // left bottom
+        vertex(box.x + box.w - box.a - 18, box.y + yOffset + box.a + 3 + box.h - box.a); // right bottom
+        vertex(box.x + box.w + box.d, box.y + box.a + yOffset + 3 + box.h); // right top
+
+        endShape(CLOSE);
+    }
+
+}
+
 drawSurface = (box) => {
     strokeWeight(1.4);
     // stroke(box.color);
@@ -516,15 +611,15 @@ drawSurface = (box) => {
 
     if (sceneCount == 1 || sceneCount == 2 || sceneCount == 3 || sceneCount == 9) {
         // (box.charge == "pos") ? fill(blueSurface) : fill(redSurface);
-        fill(bg);
         (box.charge == "pos") ? stroke(blue) : stroke(red);
     }
     else {
-        fill(bg);
         // (box.charge == "pos") ? fill(54, 78, 99, 180 - surfaceOpacity) : fill(111, 67, 67, 180 - surfaceOpacity);
         // (box.charge == "pos") ? stroke(91, 149, 203, 120 - surfaceOpacity) : stroke(191, 81, 81, 120 - surfaceOpacity);
         (box.charge == "pos") ? stroke(91, 149, 203, 120) : stroke(191, 81, 81, 120);
     }
+
+    noFill();
 
     let yOffset = 0;
     if (box.charge == "neg" && sceneCount != 3) {
@@ -590,23 +685,19 @@ drawBox = (box, showCharges, showArrows, sides) => {
     fill(grey);
 
     if (sceneCount != 1) {
-        text('EF (vector)', 90, 40);
+        text('EF (vector)', 130, 50);
     }
-    
 
-    if (showArrows && (box.sides).includes("l") && sides.includes("l")) {
-        drawArrows(box, "l");
+    if (sides.includes("s")) {
+        drawSurface(box);
     }
 
     if (showArrows && (box.sides).includes("p") && sides.includes("p")) {
         drawArrows(box, "p");
     }
 
-    if (sides.includes("s")) {
-        drawSurface(box);
-        if (showCharges) {
-            drawCharges(box);
-        }
+    if (showArrows && (box.sides).includes("l") && sides.includes("l")) {
+        drawArrows(box, "l");
     }
     
     if (showArrows & (box.sides).includes("r") && sides.includes("r")) {
@@ -615,10 +706,39 @@ drawBox = (box, showCharges, showArrows, sides) => {
 }
 
 drawCharges = (box) => {
+    frameRate(60);
+    chargeXArray = [];
+    chargeYArray = [];
+    chargeXRArray = [];
+    chargeYRArray = [];
+
+    // populate arrays
+    if (sceneCount == 9) { // scene 9
+        for (let i = 0; i < 40; i++) {
+            chargeXArray.push(Math.floor(Math.random() * (60)) + boxScene1.x + 20)
+            chargeYArray.push(Math.floor(Math.random() * (boxScene1.h + 60)) + boxScene1.y - 80)
+        }
+        for (let i = 0; i < 40; i++) {
+            chargeXRArray.push(Math.floor(Math.random() * (160)) + boxScene1.x + 20)
+            chargeYRArray.push(Math.floor(Math.random() * (boxScene1.h + 70)) + boxScene1.y - 110)
+        }
+    } else { // all other scenes
+        for (let i = 0; i < 40; i++) {
+            chargeXArray.push(Math.floor(Math.random() * (60)) + boxScene1.x + 20)
+            chargeYArray.push(Math.floor(Math.random() * (boxScene1.h + 60)) + boxScene1.y - 70)
+        }
+        for (let i = 0; i < 40; i++) {
+            chargeXRArray.push(Math.floor(Math.random() * (60)) + boxScene1.x + 20)
+            chargeYRArray.push(Math.floor(Math.random() * (boxScene1.h + 60)) + boxScene1.y - 80)
+        }
+    }
+
+    
+
     let chargeSize = 12;
     let signSize = chargeSize - 4;
-    let chargeOpacity = 70;
-    let signOpacity = 72;
+    let chargeOpacity = 100;
+    let signOpacity = 100;
 
     for (let i = 0; i < box.chargeAmount; i++) {
         noStroke();
@@ -653,7 +773,7 @@ drawCharges = (box) => {
         }
         else if (box.charge == "neg") {
             if (sceneCount == 1 || sceneCount == 2 || sceneCount == 3) {
-                fill(245, 112, 112);
+                fill(245, 112, 112, chargeOpacity + 60);
             }
             else {
                 fill(245, 112, 112, chargeOpacity);
@@ -680,18 +800,23 @@ drawCharges = (box) => {
 }
 
 drawScreen = (box) => {
-    // fill(18, 18, 18, 180);
+    fill(18, 18, 18, 150);
     noStroke();
     let gap = 20;
 
+    if (sceneCount == 5) {
+        fill(18, 18, 18, 56);
+    }
+
     // right
     beginShape();
-    vertex(box.x + gap, box.y); // left top
-    vertex(box.x + gap, box.y + box.h); // left bottom
+    vertex(box.x + box.w, box.y); // left top
+    vertex(box.x + box.w, box.y + box.h); // left bottom
     vertex(windowWidth, box.y + box.h); // right bottom
     vertex(windowWidth, box.y); // right top
     endShape(CLOSE);
 
+    fill(18, 18, 18, 150);
     // left
     beginShape();
     vertex(0, box.y); // left top
@@ -711,8 +836,6 @@ drawArrows = (box, sides) => {
     let triangleSize = 12;
     let lineSize = 255;
 
-    // 3D Field
-    if (box.dim3) {
         let offsetX = 0;
         let offsetY = 0;
         let fillAmount;
@@ -726,10 +849,8 @@ drawArrows = (box, sides) => {
             fillAmount = 240; // 2d fillamount
         }
         
-        
         // for each row
         for (let r = 0; r < rows; r++) {
-            let zRow = 1;
             // for each set in z axis
             for (let i = 0; i < 5; i++) {
                 (box.charge == "pos") ? stroke(91, 149, 203, fillAmount) : stroke(193, 81, 81, fillAmount);
@@ -766,6 +887,7 @@ drawArrows = (box, sides) => {
                 
                 else if (box.charge == "neg") {
                     
+                    
                     gap = 12;
                     // red right lines
                     if (sides.includes("r")) {
@@ -780,13 +902,16 @@ drawArrows = (box, sides) => {
                             // 2D
                             let redRightGap = 0;
                             if (sceneCount == 9) {
-                                redRightGap = 24;
+                                redRightGap = 50;
                             }
 
+                            if (sceneCount == 6 || sceneCount == 7 || sceneCount == 8 ) {
+                                strokeWeight(boxScene7.chargeAmount * thickScale);
+                            }
                             
-                            line(gap + box.c + box.w + offsetX - 4, // left x
+                            line(gap + box.c + box.w + offsetX - 4 - redRightGap, // left x
                                 box.y + spacing + offsetY + btwLine, // left y
-                                gap + blueBox.c + lineSize + offsetX + redRightGap - box.minusLine, // right x
+                                gap + blueBox.c + lineSize + offsetX - box.minusLine, // right x
                                 box.y + spacing + offsetY + btwLine); // right y
                         }
                         
@@ -884,7 +1009,7 @@ drawArrows = (box, sides) => {
                         let off = -7;
                         noStroke();
                         fill(91, 149, 203, 100);
-                        drawTriangle(triangleSize, "right", 7 + box.c + off, box.y + spacing + yOffset);
+                        drawTriangle(triangleSize, "right", 7 + box.x + off, box.y + spacing + yOffset);
                     }
 
                     let off = -4;
@@ -946,7 +1071,7 @@ drawArrows = (box, sides) => {
         }
         spacing = spaceBetween - 6;
         // lineSize = 260;
-    }
+    
 }
 
 mousePressed = () => {

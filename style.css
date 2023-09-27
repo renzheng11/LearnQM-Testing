@@ -21,7 +21,6 @@
     font-size: 48px;
     line-height: 96px;
     /* identical to box height */
-
     text-align: center;
 
     color: #FFF7AE;
@@ -70,15 +69,28 @@
 .row8 h1,
 .row9 h1,
 .row10 h1
-
  {
-
     font-family: Agency FB;
     font-style: normal;
     font-weight: normal;
     font-size: 36px;
     line-height: 72px;
+    color: #FFF7AE;
+}
 
+.button {
+    background-color: #FFF7AE;
+    /* Green */
+    border: none;
+    color: black;
+    padding: 12px 16px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+}
+
+.highlight {
     color: #FFF7AE;
 }
 
@@ -96,7 +108,7 @@
     font-family: Bai Jamjuree;
     font-style: normal;
     font-weight: normal;
-    font-size: 18px;
+    font-size: 16px;
     line-height: 27px;
 
     color: #FFFFFF;

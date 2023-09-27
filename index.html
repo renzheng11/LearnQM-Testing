@@ -14,6 +14,7 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.7/ScrollMagic.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.7/plugins/debug.addIndicators.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.15.1/d3.min.js"></script>
+    <script src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"></script>
 
     <script src="./scroll.js"></script>
     <script src="./sketch.js"></script>
@@ -36,12 +37,12 @@
         </div>
         <div class="row row1" id="scene_1">
             <div class="col-lg-4">
-                <h1>[SCENE 1]: 3D Field</h1>
+                <h1>[1] 3D Field</h1>
                 
                 <p>
                     Any positive or negative charge creates an electric field in the space surrounding it (typically represented by arrows). Let's assume we have an infinitely large surface (where the size of the plane in the y + z directions are much larger than in the x direction).
                 <br><br>
-                    Click on the right graphic to charge this surface with electrons.
+                    <span class="highlight">Click on the right graphic to charge this surface with electrons.</span>
             </p>
             </div>
             
@@ -49,88 +50,82 @@
 
         <div class="row row2" id="scene_2">
             <div class="col-lg-4">
-                <h1>[SCENE 2]: Change Electrons</h1>
+                <h1>[2] Change Electrons</h1>
                 <p>
                     If we have an array of positive charges, for the side of the sheet facing left, the direction of the electric field (on
                     x plane) is negative. For the side of the sheet facing right, the direction of the electric field is positive. Use the slider to change the amount of charge and see how it affects the electric field vector.
                     <br><br>
                     The strength of the electric field depends on the amount of charge on the surface.
                     <br><br>
-                    Try changing the magnitude by dragging the arrows.</p>
+                    <span class="highlight">Try changing the magnitude by dragging the arrows.</span></p>
             </div>
             
         </div>
 
         <div class="row row2" id="scene_3">
             <div class="col-lg-4">
-                <h1>[SCENE 3]: Change Charge</h1>
+                <h1>[3] Change Charge</h1>
                 
                 <p>
                     
                     
                 What about an array of negative charges? What directions for the electric field would the left and right sides of the
                 sheet be?</p>
-                <button type="button" onclick="reverseCharge()">Reverse Charge</button>
+                <button class="button" type="button" onclick="reverseCharge()">Reverse Charge</button>
             </div>
         </div>
         <div class="row row3" id="scene_4">
             <div class="col-lg-4">
-                <h1>[SCENE 4]</h1>
-                
+                <h1>[4] </h1>
+            
                 <p>
-
-                    Here, we've simplified the graphic to show one array for visualization purposes.
-                    
                 For the side of the sheet facing left, the direction of the electric field is positive. For the side of the sheet facing
                 right, the direction of the electric field is negative.
-                <br><br>
                 
-                Let’s look at what happens when we put two sheets of opposite charges together. We can see that the left and right sides
-                of the charges cancel each other except the middle section.
                 
+                Let’s look at what happens when we put two sheets of opposite charges together. We can see that the left and right sides of the charges cancel each other except the middle section. This effect is called screening.
+
                 <br><br>
-                Drag your mouse to move the sheet to see the effect.
-                <br><br>
+
+                That leaves us with an intersecting portion, where the positive and negative charges add to double the strength of the electric field. 
+<br><br>
+
+                <span class="highlight">Drag your mouse to move the sheet to see the effect.</span>
 
                 Use the button below to show the screening effect.
 
                 </p>
-                <button type="button" onclick="showScreen()">Show Screen</button>
-                <!-- <button type="button" onclick="showBlueArrows()">Blue Arrows</button>
-                <button type="button" onclick="showRedArrows()">Red Arrows</button>
-                <button type="button" onclick="showPurpleArrows()">Purple Arrows</button> -->
+                <button class="button" type="button" onclick="showScreen()">Show Screen</button>
                 
             </div>
         </div>
         <div class="row row4" id="scene_5">
             <div class="col-lg-4">
                 
-                <h1>[SCENE 5]: Imperfect Screening</h1>
-                <p> We put a negative sheet on the right side of the positive sheet. The negative charges “screen” (cancel) the positive
-                charges. The positive charges screen the negative charges. That leaves us with an intersecting portion creates a doubled
-                electric field that is of negative charge and doubled. (Try the slider and see what happens when you move the negative
-                array). This effect is called screening.
+                <h1>[5] Imperfect Screening</h1>
+                <p> 
+                In screening, the strength of the electric charges in the two arrays may not always match exactly. In that case, the charges are not fully cancelled.
+                
+                If we have a negatively charged surface with less charge, the charge of the intersecting portion is no longer double, but still stronger.
 
                 </p>
-                <button type="button" onclick="showScreen()">Show Screening</button>
-                <!-- <button type="button" onclick="showBlueArrows()">Blue Arrows</button> -->
-                <!-- <button type="button" onclick="showRedArrows()">Red Arrows</button> -->
+                <button class="button" type="button" onclick="showScreen()">Show Screening</button>
             </div>
         </div>
         <div class="row row5" id="scene_6">
             <div class="col-lg-4">
                 
-                <h1>[SCENE 6]: More Sheets</h1>
-                <p>
-                The process screening is not perfect. The strength of the electric charges in the two arrays may not match exactly, so
-                the charges are not fully cancelled.
+                <h1>[6] More Sheets</h1>
 
-                If we have a negative array with less strength, the negative charge of the middle portion is still stronger but not
-                doubled.
+                <p>
+                Let's try adding another sheet. What do you notice? 
+
+                <br><br>
+
+                We can see that the second negative surface creates another portion where the electric field amount is less than the first portion. Both of the negative surfaces' electric fields in the -x direction work together to cancel out all of the positive surface's electric field in the x direction. 
+
                 </p>
-                <button type="button" onclick="showScreen()">Show Screening</button>
-                <!-- <button type="button" onclick="showBlueArrows()">Blue Arrows</button> -->
-                <!-- <button type="button" onclick="showRedArrows()">Red Arrows</button> -->
+                <button class="button" type="button" onclick="showScreen()">Show Screening</button>
                 <svg id="d3-viz">
 
                 </svg>
@@ -139,13 +134,14 @@
         <div class="row row6" id="scene_7">
             <div class="col-lg-4">
                 
-                <h1>[SCENE 7]: Multiple Sheets</h1>
-                <p>What if we try using multiple sheets? We can put multiple sheets, with charges of varying (strengths). Then the sheets
-                will screen out the positive electric field over a distance.</p>
+                <h1>[7] Multiple Sheets</h1>
+                <p>
+                    
+                    What if we try using multiple sheets? We can put multiple sheets, with charges of varying (strengths). Then the sheets
+                    will screen out the positive electric field over a distance.
+                </p>
 
-                <button type="button" onclick="showScreening()">Show Screening</button>
-                <!-- <button type="button" onclick="showBlueArrows()">Blue Arrows</button> -->
-                <!-- <button type="button" onclick="showRedArrows()">Red Arrows</button> -->
+                <button class="button" type="button" onclick="showScreening()">Show Screening</button>
                 <svg id="d3-viz-final">
 
                 </svg>
@@ -153,13 +149,9 @@
         </div>
         <div class="row row7" id="scene_8">
             <div class="col-lg-4">
-                <h1>[SCENE 8]: Slope</h1>
+                <h1>[8] Slope</h1>
                 
                 <p>The graph can be represented like a slope...</p>
-
-
-                <!-- <button type="button" onclick="showBlueArrows()">Blue Arrows</button> -->
-                <!-- <button type="button" onclick="showRedArrows()">Red Arrows</button> -->
                 <svg id="d3-viz-final-2s">
 
                 </svg>
@@ -167,7 +159,7 @@
         </div>
         <div class="row row8" id="scene_9">
             <div class="col-lg-4">
-                <h1>[SCENE 9]: Volume</h1>
+                <h1>[9] Volume</h1>
                 
                 <p>
                     The negative charge is then distributed over a distance where eventually, total positive charge = total negative charge.
