@@ -51,6 +51,11 @@ StartScroll = () => {
         .on('start', () => {
             if (sceneCount == 3) {
                 sceneCount = 4;
+                document.getElementById("screen4").checked = false;
+                document.getElementById("blueToggle4").checked = true;
+                document.getElementById("redToggle4").checked = true;
+                document.getElementById("purpleToggle4").checked = true;
+                // bluebox4.toggleArrows(true);
             } else {
                 sceneCount = 3;
             }
@@ -64,6 +69,10 @@ StartScroll = () => {
         .on('start', () => {
             if (sceneCount == 4) {
                 sceneCount = 5;
+                document.getElementById("screen5").checked = false;
+                document.getElementById("blueToggle5").checked = true;
+                document.getElementById("redToggle5").checked = true;
+                document.getElementById("purpleToggle5").checked = true;
             } else {
                 sceneCount = 4;
             }
@@ -83,6 +92,12 @@ StartScroll = () => {
         .on('start', () => {
             if (sceneCount == 5) {
                 sceneCount = 6;
+                document.getElementById("screen6").checked = false;
+                document.getElementById("blueToggle6").checked = true;
+                // document.getElementById("redToggle6").checked = true;
+                document.getElementById("redToggle6a").checked = true;
+                document.getElementById("redToggle6b").checked = true;
+                document.getElementById("purpleToggle6").checked = true;
             } else {
                 sceneCount = 5;
             }
@@ -96,6 +111,12 @@ StartScroll = () => {
         .on('start', () => {
             if (sceneCount == 6) {
                 sceneCount = 7;
+                document.getElementById("screen7").checked = false;
+                document.getElementById("blueToggle7").checked = true;
+                document.getElementById("redToggle7a").checked = true;
+                document.getElementById("redToggle7b").checked = true;
+                document.getElementById("redToggle7c").checked = true;
+                document.getElementById("purpleToggle7").checked = true;
             } else {
                 sceneCount = 6;
             }

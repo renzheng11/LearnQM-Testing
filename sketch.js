@@ -3,35 +3,32 @@
 let blueBox;
 let canvas;
 
-// scene 1
+let drawScreen4;
+let drawScreen5;
+let drawScreen6;
+let drawScreen7;
+let drawScreen8;
+
+
 let box1;
 
-// scene 2 / 3
 let box2; 
 
-// scene 4
 let box4;
 let redbox4;
 
-// scene 5
 let box5;
 let redbox5;
 
-let drawScreenScene4;
-let drawScreenScene5;
-
-// scene 6
 let box6;
 let redbox6a;
 let redbox6b;
 
-// scene 7
 let box7;
 let redbox7a;
 let redbox7b;
 let redbox7c;
 
-// scene 9
 let box9;
 let redbox9;
 
@@ -52,12 +49,6 @@ let chargeYRArray;
 let blueBoxes;
 let redBoxes;
 
-let chargeSlider;
-let sliderCharge;
-
-let volumeSlider;
-let volumeWidth;
-
 let shiftRed;
 
 // COLORS
@@ -75,12 +66,19 @@ let redSign;
 
 let chargeDivisor;
 
+let scene6RedBoxes;
+
+let flowDirection;
+let togglePairs;
+
+
 setup = () => {
     canvas = createCanvas(2 * windowWidth / 4 + 40, windowHeight);
     canvas.parent('visualization');
 
     showBlue = false;
     chargeDivisor = 4;
+    flowDirection = "right";
 
     color = [0, 0, 0];
     grey = [113, 113, 133];
@@ -106,45 +104,46 @@ setup = () => {
     graphC = graphW / 2 + leftPadding;
     graphX = graphC - graphW / 2 + leftPadding;
 
-
-
-    chargeSlider = createSlider(3, 60, 30, 1);
-    sliderCharge = 20;
-
-    volumeSlider = createSlider(40, 142, 100, 1);
     volumeWidth = 100;
 
-    drawScreenScene5 = false;
+    drawScreen4 = false;
+    drawScreen5 = false;
+    drawScreen6 = false;
+    drawScreen7 = false;
+    drawScreen8 = false;
+
     drawScene1 = false;
     drawScene2 = false;
+
+    
 
     boxThickness = 1;
 
     // instantiate boxes
-    box1 = new Box("pos", true, 60, false, 440, true, true, "lrp", 0, 310, 140, boxThickness, 80);
+    box1 = new Box(true, "pos", true, 60, false, 440, true, true, "lrp", true, 310, 140, boxThickness, 80);
     blueBox = box1;
 
-    box2 = new Box("pos", true, 60, false, 440, true, true, "lrp", 0, 310, 140, boxThickness, 80);
+    box2 = new Box(true, "pos", true, 60, false, 440, true, true, "lrp", true, 310, 140, boxThickness, 80);
 
-    box3 = new Box("pos", true, 60, false, 440, true, true, "lrp", 0, 310, 140, boxThickness, 80);
+    box3 = new Box(true, "pos", true, 60, false, 440, true, true, "lrp", true, 310, 140, boxThickness, 80);
 
-    box4 = new Box("pos", true, 60, false, 440, true, false, "lrp", 0, 310, 140, boxThickness, 80);
-    redbox4 = new Box("neg", true, 60, true, 440, true, true, "lrp", 0, 400, 150, boxThickness, 80);
+    box4 = new Box(true, "pos", true, 60, false, 440, true, false, "lrp", true, 310, 140, boxThickness, 80);
+    redbox4 = new Box(true, "neg", true, 60, true, 440, true, true, "lrp", true, 400, 150, boxThickness, 80);
 
-    box5 = new Box("pos", true, 60, false, 440, true, true, "lrp", 0, 310, 140, boxThickness, 80);
-    redbox5 = new Box("neg", true, 42, true, 440, true, true, "lrp", 0, 400, 152, boxThickness, 80);
+    box5 = new Box(true, "pos", true, 60, false, 440, true, true, "lrp", true, 310, 140, boxThickness, 80);
+    redbox5 = new Box(true, "neg", true, 42, true, 440, true, true, "lrp", true, 400, 152, boxThickness, 80);
 
-    box6 = new Box("pos", true, 60, false, 440, true, true, "lrp", 0, 310, 140, boxThickness, 80);
-    redbox6a = new Box("neg", true, 26, true, 440, true, true, "lrp", 120, 400, 150, boxThickness, 80);
-    redbox6b = new Box("neg", true, 10, true, 440, true, true, "lrp", 0, 490, 150, boxThickness, 80);
+    box6 = new Box(true, "pos", true, 70, false, 440, true, true, "lrp", true, 310, 140, boxThickness, 80);
+    redbox6a = new Box(true, "neg", true, 50, true, 440, true, true, "lrp", true, 400, 150, boxThickness, 80);
+    redbox6b = new Box(false, "neg", true, 20, true, 440, true, true, "lrp", true, 490, 150, boxThickness, 80);
 
-    box7 = new Box("pos", true, 60, false, 440, true, true, "lrp", 0, 310, 140, boxThickness, 80);
-    redbox7a = new Box("neg", true, 30, true, 440, true, true, "lrp", 120, 370, 150, boxThickness, 80);
-    redbox7b = new Box("neg", true, 20, true, 440, true, true, "lrp", 0, 430, 150, boxThickness, 80);
-    redbox7c = new Box("neg", true, 10, true, 440, true, true, "lrp", 0, 490, 150, boxThickness, 80);
+    box7 = new Box(true, "pos", true, 90, false, 440, true, true, "lrp", true, 310, 140, boxThickness, 80);
+    redbox7a = new Box(true, "neg", true, 10, true, 440, true, true, "lrp", true, 380, 150, boxThickness, 80);
+    redbox7b = new Box(true, "neg", true, 30, true, 440, true, true, "lrp", true, 450, 150, boxThickness, 80);
+    redbox7c = new Box(true, "neg", true, 50, true, 440, true, true, "lrp", true, 520, 150, boxThickness, 80);
 
-    box9 = new Box("pos", true, 60, false, 440, true, true, "lrp", 0, 310, 140, boxThickness, 80);
-    redbox9 = new Box("neg", true, 60, true, 440, true, true, "lrp", 0, 420, 150, 100, 80);
+    box9 = new Box(true, "pos", true, 60, false, 440, true, true, "lrp", true, 310, 140, boxThickness, 80);
+    redbox9 = new Box(true, "neg", true, 60, true, 440, true, true, "lrp", true, 380, 150, 142, 80);
 
     blueBoxes = [box1, box2, box4, box5, box6, box7, box9];
     redBoxes = [redbox4, redbox5, redbox6a, redbox6b, redbox7a, redbox7b, redbox7c, redbox9];
@@ -180,26 +179,59 @@ setup = () => {
 
     // less random array
     // let num = 20;
-    // let col = Math.floor(num / 13);
-    // let row = Math.floor(num / 4);
+    // let col = Math.floor(num / 5);
+    // let row = Math.floor(num / 2);
 
     // for (let r = 0; r < row; r++) {
     //     for (let c = 0; c < col; c++) {
-    //         chargeXArray.push(box1.x + c * 23 + Math.random() * (12) + 16);
-    //         chargeYArray.push(box1.y + r * 23 + Math.random() * (12));
+    //         chargeXArray.push(box1.x + c * 23 + Math.random() * (2) +20);
+    //         chargeYArray.push(box1.y + r * 23 + Math.random() * (2));
     //     }
     // }
 
     // for (let r = 0; r < row; r++) {
     //     for (let c = 0; c < col; c++) {
-    //         chargeXRArray.push(box1.x + c * 23 + Math.random() * (12) + 16);
-    //         chargeYRArray.push(box1.y + r * 23 + Math.random() * (12));
+    //         chargeXRArray.push(box1.x + c * 23 + Math.random() * (2) + 20);
+    //         chargeYRArray.push(box1.y + r * 23 + Math.random() * (2));
     //     }
     // }
+
+    scene6RedBoxes = [redbox6a];
+    img = loadImage('vecE.png');
+    img2 = loadImage('vecEGrey.png');
+
+    togglePairs = {
+        // "blueToggle4": box1
+        // "blueToggle2": box2
+
+        "blueToggle4": box4,
+        "redToggle4": redbox4,
+
+        "blueToggle5": box5,
+        "redToggle5": redbox5,
+
+        "blueToggle6": box6,
+        "redToggle6a": redbox6a,
+        "redToggle6b": redbox6b,
+
+        "blueToggle7": box7,
+        "redToggle7a": redbox7a,
+        "redToggle7b": redbox7b,
+        "redToggle7c": redbox7c,
+
+        "blueToggle9": box9,
+        "redToggle9": redbox9,
+
+        // "blueToggle7": redbox9,
+        // // document.getElementById("redToggle7").checked = true;
+        // "redToggle7a": redbox9,
+        // "redToggle7b": redbox9,
+        // "redToggle7c": redbox9,
+        // "purpleToggle7": redbox9,
+    }
 }
 
 draw = () => {
-
     background(bg);
 
     if (sceneCount == 1) {
@@ -252,6 +284,7 @@ function resetScene() {
 
 // SCENOS
 function scene1() { // 1scene
+    // resetToggles();
     drawBox(box1, false, false, "lrs");
     if (drawScene1) {
         drawBox(box1, true, true, "lr");
@@ -260,31 +293,28 @@ function scene1() { // 1scene
         
         fill(grey);
         noStroke();
-        text('vec E', 130, 50);
+        // text('vec E', 130, 50);
+        image(img, 120, 90, img.width / 1.5, img.height / 1.5);
+        
     }
 }
 
 function scene2() { // 2scene
+    // resetToggles();
     blueBox = box2;
 
     drawBox(box2, true, true, "lr");
     drawBox(box2, true, true, "s");
-    drawGraph(box2, null, false);
+    drawGraph(box2, null);
     
     drawCharges(box2);
-
-    // Set the position of slider on the canvas
-    chargeSlider.position(86, 1760);
-    
-    sliderCharge = chargeSlider.value();
-    box2.changeChargeAmount(sliderCharge);
-
-    // background(18);
+    // box2.updateCharge(sliderCharge);
 }
 
 function scene3() { // 3scene
+    // resetToggles();
     blueBox = box3;
-    drawGraph(box3, null, false);
+    drawGraph(box3, null);
 
     drawBox(box3, true, true, "lr");
     drawBox(box3, true, true, "s");
@@ -294,8 +324,16 @@ function scene3() { // 3scene
 }
 
 function scene4() { // 4scene
+    // resetToggles();
+
+    // document.getElementById(Object.keys(togglePairs)[0]).checked ? Object.values(togglePairs)[0].toggleArrows(true): null;
+    document.getElementById("blueToggle4").checked ? box4.toggleArrows(true): null;
+    document.getElementById("redToggle4").checked ? redbox4.toggleArrows(true) : null;
+    document.getElementById("purpleToggle4").checked ? redbox4.togglePurple(true) : null;
+    !document.getElementById("screen4").checked ? drawScreen4 = false : null;
+
     blueBox = box4;
-    drawGraph(box4, [redbox4], true);
+    drawGraph(box4, [redbox4]);
 
     drawCharges(box4);
     drawCharges(redbox4);
@@ -310,15 +348,21 @@ function scene4() { // 4scene
 
     (mouseX > graphC && mouseX < graphW - 10)? redbox4.updateX(mouseX): null;
     
-    drawScreenScene4? drawScreen(redbox4): null;
+    drawScreen4? drawScreen(redbox4): null;
 }
 
 function scene5() { // 5scene
+    // resetToggles();
+    document.getElementById("blueToggle5").checked ? box5.toggleArrows(true) : null;
+    document.getElementById("redToggle5").checked ? redbox5.toggleArrows(true) : null;
+    document.getElementById("purpleToggle5").checked ? redbox5.togglePurple(true) : null;
+    !document.getElementById("screen5").checked ? drawScreen5 = false : null;
+
     blueBox = box5;
 
-    drawGraph(box5, [redbox5], true); 
+    drawGraph(box5, [redbox5]); 
 
-    box5.showArrows? drawBox(box5, true, true, "ls"): null;
+    box5.showArrows? drawBox(box5, true, true, "l"): null;
     
     drawCharges(box5);
     drawCharges(redbox5);
@@ -330,32 +374,53 @@ function scene5() { // 5scene
     redbox5.showArrows? drawBox(redbox5, true, true, "lr"): null;
     redbox5.showPurple? drawBox(redbox5, true, true, "p"): null;
     box5.showArrows?    drawBox(box5, true, true, "r"): null;
-    drawScreenScene5?        drawScreen(redbox5): null;
+    drawScreen5?        drawScreen(redbox5): null;
 }
 
 function scene6() { // 6scene
+    // resetToggles();
+    document.getElementById("blueToggle6").checked ? box6.toggleArrows(true) : null;
+    document.getElementById("redToggle6a").checked ? redbox6a.toggleArrows(true) : null;
+    document.getElementById("redToggle6b").checked ? redbox6b.toggleArrows(true) : null;
+    document.getElementById("purpleToggle6").checked ? redbox6a.togglePurple(true) : null;
+    !document.getElementById("screen6").checked ? drawScreen6 = false : null;
+
     blueBox = box6;
 
-    drawGraph(box6, [redbox6a, redbox6b], true);
+    drawGraph(box6, scene6RedBoxes);
+
     drawCharges(box6);
     drawCharges(redbox6a);
-    drawCharges(redbox6b);
 
-    // show charge
     drawBox(box6, true, true, "s")
     box6.showArrows? drawBox(box6, true, true, "l"): null;
     drawBox(redbox6a, true, true, "s");
     redbox6a.showArrows? drawBox(redbox6a, true, true, "lr"): null;
     redbox6a.showPurple ? drawBox(redbox6a, true, true, "p") : null;
-    drawBox(redbox6b, true, true, "s");
-    redbox6b.showArrows? drawBox(redbox6b, true, true, "lr"): null;
-    redbox6b.showPurple? drawBox(redbox6b, true, true, "p") : null;
+
+    if (redbox6b.showBox) {
+        scene6RedBoxes.push(redbox6b);
+        drawCharges(redbox6b);
+        drawBox(redbox6b, true, true, "s");
+        redbox6b.showArrows? drawBox(redbox6b, true, true, "lr"): null;
+        redbox6b.showPurple? drawBox(redbox6b, true, true, "p") : null;
+    }
+
     box6.showArrows? drawBox(box6, true, true, "r"): null;
+    drawScreen6 ? drawScreen(redbox6a): null;
 }
 
 function scene7() { // 7scene
+    // resetToggles();
     blueBox = box7;
-    drawGraph(box7, [redbox7a, redbox7b, redbox7c], true);
+    drawGraph(box7, [redbox7a, redbox7b, redbox7c]);
+
+    document.getElementById("blueToggle7").checked ? box7.toggleArrows(true) : null;
+    document.getElementById("redToggle7a").checked ? redbox7a.toggleArrows(true) : null;
+    document.getElementById("redToggle7b").checked ? redbox7b.toggleArrows(true) : null;
+    document.getElementById("redToggle7c").checked ? redbox7c.toggleArrows(true) : null;
+    document.getElementById("purpleToggle7").checked ? redbox7a.togglePurple(true) : null;
+    !document.getElementById("screen7").checked ? drawScreen7 = false : null;
 
     drawCharges(box7);
     drawCharges(redbox7a);
@@ -374,11 +439,14 @@ function scene7() { // 7scene
     drawBox(redbox7c, true, true, "lr");
     drawBox(redbox7c, true, true, "p");
     drawBox(box7, true, true, "r");
+
+    drawScreen7 ? drawScreen(redbox7a): null;
 }
 
 function scene8() { //8scene
+    resetToggles();
     // blueBox = box8;
-    // drawGraph(box7, [redbox7a], true);
+    // drawGraph(box7, [redbox7a]);
 
 
     // drawCharges(redbox7a);
@@ -390,8 +458,6 @@ function scene8() { //8scene
     // drawBox(redbox7b, true, true, "lrs");
     // drawBox(redbox7c, true, true, "lrs");
     // drawBox(box7, true, true, "r");
-    volumeSlider.position(86, 6400);
-    redbox9.updateW(volumeSlider.value());
 
     blueBox = box9;
     drawGraph(box9, [redbox9], true);
@@ -405,11 +471,16 @@ function scene8() { //8scene
 }
 
 function scene9() { //9scene
-    volumeSlider.position(86, 6400);
-    redbox9.updateW(volumeSlider.value());
-
+    resetToggles();
+    for (i = 0; i < blueBoxes.length; i++) {
+        blueBoxes[i].toggleArrows(true);
+    }
+    for (i = 0; i < redBoxes.length; i++) {
+        redBoxes[i].toggleArrows(true);
+        redBoxes[i].togglePurple(true);
+    }
     blueBox = box9;
-    drawGraph(box9, [redbox9], true);
+    drawGraph(box9, [redbox9]);
 
     drawCharges(box9);
     drawCharges(redbox9);
@@ -417,6 +488,42 @@ function scene9() { //9scene
     drawBox(box9, true, true, "sl");
     drawBox(redbox9, true, true, "plrs");
     drawBox(box9, true, true, "r");
+}
+
+resetToggles = () => {
+    console.log("reset toggles");
+    for (let index = 0; index < togglePairs.length; index++) {
+        console.log(document.getElementById(Object.keys(togglePairs)[i]).checked);
+        document.getElementById(Object.keys(togglePairs)[i]).checked ? Object.values(togglePairs)[i].toggleArrows(true) : null;
+    }
+    // for (let key in togglePairs) {
+    //     // console.log(key, yourobject[key]);
+
+    // }
+}
+
+addBox = () => {
+    redbox6b.toggleShowBox(true);
+}
+
+flowCharges = () => {
+    if (flowDirection == "right") {
+        redbox7a.updateCharge(10);
+        redbox7b.updateCharge(20);
+        redbox7c.updateCharge(30);
+        flowDirection = "left";
+    }
+    else if (flowDirection == "left") {
+        redbox7a.updateCharge(30);
+        redbox7b.updateCharge(20);
+        redbox7c.updateCharge(10);
+        flowDirection = "right";
+    }
+
+    // redbox7a = new Box(true, "neg", true, 30, true, 440, true, true, "lrp", 120, 370, 150, boxThickness, 80);
+    // redbox7b = new Box(true, "neg", true, 20, true, 440, true, true, "lrp", 0, 430, 150, boxThickness, 80);
+    // redbox7c = new Box(true, "neg", true, 10, true, 440, true, true, "lrp", 0, 490, 150, boxThickness, 80);
+
 }
 
 drawAxis = () => {
@@ -432,7 +539,9 @@ drawAxis = () => {
     noStroke();
 
     fill(grey);
-    text('vec E', graphC - 26, graphY + 80);
+    // text('vec E', graphC - 26, graphY + 80);
+    image(img2, graphC - 10, graphY + 66, img.width / 2, img.height / 2);
+
     text('x', graphW + 10, graphY);
 
     canvas.drawingContext.setLineDash([]);
@@ -449,7 +558,7 @@ drawAxis = () => {
     line(graphW, graphY, graphW - size, graphY + size);
 }
 
-drawGraph = (box, redBoxes, purple) => {
+drawGraph = (box, redBoxes) => {
     let graphDivisor = 2;
     drawAxis();
     strokeWeight(2);
@@ -488,23 +597,43 @@ drawGraph = (box, redBoxes, purple) => {
     // red graph lines
     if (redBoxes) {
         if (redBoxes[0].showArrows) {
-            points = [graphX];
-            heights = [redLeftY + graphY];
-            for (i = 0; i < redBoxes.length; i++) {
-                points.push(redBoxes[i].x);
+            if (sceneCount != 8) {
+                points = [graphX];
+                heights = [redLeftY + graphY];
+                for (i = 0; i < redBoxes.length; i++) {
+                    points.push(redBoxes[i].x);
+                }
+                for (i = 0; i < redBoxes.length; i++) {
+                    heights.push((unit * redBoxes[i].chargeAmount) + graphY);
+                }
+                drawLines(points, heights, red, false, false);
+            } else {
+                let graphEnd = graphC + graphW / 2 - 46;
+                points = [
+                    graphX,
+                    graphC,
+                    graphC,
+                    redbox9.x,
+                    redbox9.x + redbox9.w,
+                ];
+                heights = [
+                    purpleLeftY + graphY,
+                    graphY,
+                    graphY - (unit * redbox9.chargeAmount),
+                    graphY - (unit * redbox9.chargeAmount),
+                    graphY + (unit * redbox9.chargeAmount),
+                ];
+                drawSlope(points, heights, red);
             }
-            for (i = 0; i < redBoxes.length; i++) {
-                heights.push((unit * redBoxes[i].chargeAmount) + graphY);
-            }
-            drawLines(points, heights, red, false, false);
         }   
         // purple graph lines
         if (redBoxes[0].showPurple) {
             purpleLeftY = (redLeftY-  blueLeftY);
-            points = [graphX, graphC];
-            heights = [purpleLeftY + graphY, graphY - (unit * redBoxes[0].chargeAmount) - (unit * box.chargeAmount)];
 
-            if (sceneCount != 9) {
+
+            if (sceneCount != 8) {
+                points = [graphX, graphC];
+                heights = [purpleLeftY + graphY, graphY - (unit * redBoxes[0].chargeAmount) - (unit * box.chargeAmount)];
                 for (i = 0; i < redBoxes.length; i++) {
                     points.push(redBoxes[i].x);
                 }
@@ -513,14 +642,36 @@ drawGraph = (box, redBoxes, purple) => {
                 }
                 drawLines(points, heights, purpleColor, true, false);
             } else {
-                drawLines(points, heights, purpleColor, true, true);
+                let graphEnd = graphC + graphW / 2 - 46;
+                points = [
+                    graphX,
+                    graphC,
+                    graphC,
+                    redbox9.x,
+                    redbox9.x + redbox9.w,
+                ];
+                heights = [
+                    purpleLeftY + graphY,
+                    graphY,
+                    graphY - (unit * redbox9.chargeAmount) - (unit * box.chargeAmount),
+                    graphY - (unit * redbox9.chargeAmount) - (unit * box.chargeAmount),
+                    graphY,
+                ];
+                drawSlope(points, heights, purpleColor);
             }
 
         }   
     }
 }
 
-drawLines = (points, heights, color, drawMid, slope) => {
+drawSlope = (points, heights, color) => {
+    stroke(color);
+    for (i = 0; i < points.length; i++) {
+        line(points[i], heights[i], points[i + 1], heights[i + 1]); // line
+    }
+}
+
+drawLines = (points, heights, color, drawMid) => {
     let graphEnd = graphC + graphW / 2 - 46;
     stroke(color);
     // if () {
@@ -554,23 +705,22 @@ drawLines = (points, heights, color, drawMid, slope) => {
     // }
 }
 
-
-changeChargeAmount = () => {
-    if (sceneCount == 2) {
-        box2.changeChargeAmount(sliderCharge);
-    }
-}
-
 reverseCharge = () => {
     box3.reverseCharge();
 }
 
 showScreen = () => {
     if (sceneCount == 4) {
-        drawScreenScene4 = !(drawScreenScene4);
+        drawScreen4 = !(drawScreen4);
     }
     if (sceneCount == 5) {
-        drawScreenScene5 = !(drawScreenScene5);
+        drawScreen5 = !(drawScreen5);
+    }
+    if (sceneCount == 6) {
+        drawScreen6 = !(drawScreen6);
+    }
+    if (sceneCount == 7) {
+        drawScreen7 = !(drawScreen7);
     }
 }
 
@@ -589,7 +739,7 @@ drawSurface = (box) => {
         surfaceOpacity = surfaceOpacity + 80;
     }
 
-    if (sceneCount == 1 || sceneCount == 2 || sceneCount == 3 || sceneCount == 8) {
+    if (sceneCount == 1 || sceneCount == 2 || sceneCount == 3) {
         // (box.charge == "pos") ? fill(blueSurface) : fill(redSurface);
         (box.charge == "pos") ? stroke(blue) : stroke(red);
         fill(18, 18, 18, 200);
@@ -632,7 +782,7 @@ drawSurface = (box) => {
 drawMidzone = (box) => {
     if (box.midzone) {
         // Mid Zone
-        color = purple;
+        color = purpleColor;
         fill(color[0], color[1], color[2]); // purple
         noStroke();
 
@@ -666,7 +816,19 @@ drawBox = (box, showCharges, showArrows, sides) => {
     fill(grey);
 
     if (sceneCount != 1) {
-        text('vec E', 130, 50);
+        // let mathContent = "\\(x^2 + y^2 = r^2\\)";
+        // let mathDiv = createDiv(mathContent);
+        // mathDiv.position(10, 10);
+        // MathJax.Hub.Queue(["Typeset", MathJax.Hub, mathDiv.elt]);
+        // // var mathContent = '\\vec E';
+
+        // let mathDiv = createDiv(mathContent);
+        // mathDiv.position(10, 10);
+
+        // text(math, 130, 50);
+        image(img, 120, 90, img.width / 1.5, img.height / 1.5);
+        // Displays the image at point (0, height/2) at half size
+        // image(img, 0, height / 2, img.width / 2, img.height / 2);
     }
 
     if (showArrows && (box.sides).includes("p") && sides.includes("p") && box.showPurple) {
@@ -691,7 +853,7 @@ drawCharges = (box) => {
 
     let chargeSize = 12;
     let signSize = chargeSize - 4;
-    let chargeOpacity = 50;
+    let chargeOpacity = 60;
     let signOpacity = 50;
 
     for (let i = 0; i < box.chargeAmount; i++) {
@@ -755,17 +917,16 @@ drawCharges = (box) => {
             // cross line
             line(chargeX + moveCharge - signSize / 2, chargeY + 20, chargeX + moveCharge + signSize / 2, chargeY + 20)
         }
-
     }
 }
 
 drawScreen = (box) => {
-    fill(18, 18, 18, 150);
+    fill(18, 18, 18, 255);
     noStroke();
     let gap = 20;
 
     if (sceneCount == 5) {
-        fill(18, 18, 18, 56);
+        fill(18, 18, 18, 180); // 56 opacity
     }
 
     // right
@@ -775,8 +936,6 @@ drawScreen = (box) => {
     vertex(windowWidth, box.y + box.h); // right bottom
     vertex(windowWidth, box.y); // right top
     endShape(CLOSE);
-
-    fill(18, 18, 18, 150);
     // left
     beginShape();
     vertex(0, box.y); // left top
@@ -799,7 +958,7 @@ drawArrows = (box, sides) => {
         let offsetX = 0;
         let offsetY = 0;
         let fillAmount;
-        let thickScale = .18;
+        let thickScale = .20;
 
 
         if (sceneCount == 1 || sceneCount == 2 || sceneCount == 3) {
@@ -860,14 +1019,14 @@ drawArrows = (box, sides) => {
                             // 3D
                             line(gap + box.x + box.w + offsetX + moveRed,
                                 box.y + spacing + offsetY,
-                                gap + box.x + lineSize + offsetX + moveRed,
+                                gap + box.x + lineSize + offsetX + moveRed - 50,
                                 box.y + spacing + offsetY);
                         }
                         else {
                             // 2D
                             let redRightGap = 0;
                             if (sceneCount == 8) {
-                                redRightGap = 50;
+                                redRightGap = 70;
                             }
 
                             // if (sceneCount == 6 || sceneCount == 7 || sceneCount == 8 ) {
@@ -876,7 +1035,7 @@ drawArrows = (box, sides) => {
                             
                             line(gap + box.c + box.w + offsetX - 4 - redRightGap, // left x
                                 box.y + spacing + offsetY + btwLine, // left y
-                                gap + blueBox.c + lineSize + offsetX - box.minusLine, // right x
+                                gap + blueBox.c + lineSize + offsetX, // right x
                                 box.y + spacing + offsetY + btwLine); // right y
                         }
                         
@@ -887,7 +1046,7 @@ drawArrows = (box, sides) => {
                         if (sceneCount == 1 || sceneCount == 2 || sceneCount == 3) {
                             line(box.x - gap + offsetX - moveRed,
                                 box.y + spacing + offsetY,
-                                gap + box.x - lineSize - gap + offsetX - triangleSize - moveRed,
+                                50 + gap + box.x - lineSize - gap + offsetX - triangleSize - moveRed,
                                 box.y + spacing + offsetY);
                         }
                         else {
@@ -913,7 +1072,7 @@ drawArrows = (box, sides) => {
 
                     let movePurple = 0;
                     if (box == redbox6b) {
-                        movePurple = 100;
+                        movePurple = 90;
                     }
                     if (box == redbox7b) {
                         movePurple = 60;
@@ -965,7 +1124,6 @@ drawArrows = (box, sides) => {
 
             
                 else if (box.charge == "neg") {
-                    // console.log(box.charge);
                     // // mid blue triangle
                     // if (sides.includes("p")) {
                     //     let yOffset = -11;
@@ -1049,24 +1207,53 @@ mousePressed = () => {
     // }
 }
 
-toggleBlue = () => {
-    for (i = 0; i < blueBoxes.length; i++) {
-        blueBoxes[i].showArrows = !blueBoxes[i].showArrows;
+toggleArrows = (value) => {
+    if (value == "blue") {
+        for (i = 0; i < blueBoxes.length; i++) {
+            blueBoxes[i].toggleArrows(!blueBoxes[i].showArrows);
+            // blueBoxes[i].showArrows = !blueBoxes[i].showArrows;
+        }
+    }
+    else if (value == "red") {
+        for (i = 0; i < redBoxes.length; i++) {
+            // redBoxes[i].toggleArrows("");
+            redBoxes[i].toggleArrows(!redBoxes[i].showArrows);
+        }
+    }
+    else if (value == "purple") {
+        for (i = 0; i < redBoxes.length; i++) {
+            // redBoxes[i].togglePurple("");
+            redBoxes[i].togglePurple(!redBoxes[i].showPurple);
+        }
+    }
+    else if (value == "red6a") {
+        redbox6a.toggleArrows(!redbox6a.showArrows);
+    }
+    else if (value == "red6b") {
+        redbox6b.toggleArrows(!redbox6b.showArrows);
+    }
+    else if (value == "red7a") {
+        redbox7a.toggleArrows(!redbox7a.showArrows);
+    }
+    else if (value == "red7b") {
+        redbox7b.toggleArrows(!redbox7b.showArrows);
+    }
+    else if (value == "red7c") {
+        redbox7c.toggleArrows(!redbox7c.showArrows);
     }
 }
 
-toggleRed = () => {
-    console.log("toggle red");
-    for (i = 0; i < redBoxes.length; i++) {
-        redBoxes[i].showArrows = !redBoxes[i].showArrows;
-    }
-}
+// toggleRed = () => {
+//     for (i = 0; i < redBoxes.length; i++) {
+//         redBoxes[i].showArrows = !redBoxes[i].showArrows;
+//     }
+// }
 
-togglePurple = () => {
-    for (i = 0; i < redBoxes.length; i++) {
-        redBoxes[i].showPurple = !redBoxes[i].showPurple;
-    }
-}
+// togglePurple = () => {
+//     for (i = 0; i < redBoxes.length; i++) {
+//         redBoxes[i].showPurple = !redBoxes[i].showPurple;
+//     }
+// }
 
 drawTriangle = (size, dir, x, y) => {
     if (dir == "left") {
@@ -1083,5 +1270,12 @@ drawTriangle = (size, dir, x, y) => {
             x - size, y + size / 1.7
         )
     }
+}
 
+updateCharge = (value) => {
+    box2.updateCharge(value);
+}
+
+updateWidth = (value) => {
+    redbox9.updateW(int(value));
 }

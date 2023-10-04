@@ -1,5 +1,6 @@
 class Box {
-    constructor(charge, dim3, chargeAmount, midzone, arrowLength, showArrows, showPurple, sides, minusLine, x, y, w, d) {
+    constructor(showBox, charge, dim3, chargeAmount, midzone, arrowLength, showArrows, showPurple, sides, showCharges, x, y, w, d) {
+        this.showBox = showBox;
         this.charge = charge;
         this.dim3 = dim3;
         this.arrowLength = arrowLength;
@@ -7,8 +8,9 @@ class Box {
         this.showPurple = showPurple;
         this.chargeAmount = chargeAmount;
         this.midzone = midzone;
-        this.minusLine = minusLine
+        this.showCharges = showCharges;
         this.sides = sides;
+        
 
         this.x = x; // x position
         this.y = y; // y position 
@@ -33,7 +35,7 @@ class Box {
         }
     }
 
-    changeChargeAmount(num) {
+    updateCharge(num) {
         this.chargeAmount = num;
     }
 
@@ -70,8 +72,22 @@ class Box {
         this.sides.replace(str, "");
     }
 
-    toggleArrows() {
-        this.showArrows = !(this.showArrows);
+    toggleArrows(value) {
+        this.showArrows = value;
+        // console.log(this.showArrows);
+        // value == ""? this.showArrows = !(this.showArrows): null;
+        // value == true ? this.showArrows = true: null;
+        // value == false ? this.showArrows = false : null;
+        // console.log("after toggle arrows");
+        // console.log(this.showArrows);
+    }
+
+    togglePurple(value) {
+        this.showPurple = value;
+    }
+
+    toggleShowBox(value) {
+        this.showBox = value;
     }
 }
 

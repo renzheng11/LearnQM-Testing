@@ -7,6 +7,20 @@
     <title>Chapter 1: Understanding the Hydrogen Atom</title>
 
     <link href="./style.css" rel="stylesheet" />
+
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
+
+    <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({ tex2jax: { inlineMath: [['\\(', '\\)']] } });
+    </script>
+
+
+
+    </script>
+
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@400;700&display=swap" rel="stylesheet">
 
@@ -57,7 +71,8 @@
                     <br><br>
                     The strength of the electric field depends on the amount of charge on the surface.
                     <br><br>
-                    <span class="highlight">Try changing the magnitude by dragging the arrows.</span></p>
+                    <span class="highlight">Try changing the amount of charge.</span></p>
+                    <input style="width: 300" type="range" min="3" max="60" value="30" onchange="updateCharge(this.value)">
             </div>
             
         </div>
@@ -95,14 +110,19 @@
                 Use the buttons below to show the screening effect or hide arrows.
 
                 </p>
-                <input type="checkbox" id="blueToggle4" name="blueToggle"  onclick="toggleBlue()">
+
+                <input type="checkbox" id="screen4" name="screen4" value="blue" onclick="showScreen()">
+                <label for="screen4" class="labels">Screen</label><br>
+
+                <!-- <button class="button" type="button" onclick="showScreen()">Screen</button> -->
+                <input type="checkbox" id="blueToggle4" name="" value="blue" checked onclick="toggleArrows(this.value)">
                 <label for="blueToggle4" class="labels">Blue</label><br>
-
-                <input type="checkbox" id="redToggle4" name="redToggle"  onclick="toggleRed()">
+                
+                <input type="checkbox" id="redToggle4" name="" value="red" checked onclick="toggleArrows(this.value)">
                 <label for="redToggle4" class="labels">Red</label><br>
-
-                <input type="checkbox" id="purpleToggle4" name="purpleToggle"  onclick="togglePurple()">
-                <label for="purpleToggle4" class="labels">Purple</label>
+                
+                <input type="checkbox" id="purpleToggle4" name="" checked value="purple" onclick="toggleArrows(this.value)">
+                <label for="purpleToggle4" class="labels">Purple</label><br>
                 
             </div>
         </div>
@@ -116,14 +136,17 @@
                 If we have a negatively charged surface with less charge, the charge of the intersecting portion is no longer double, but still stronger.
 
                 </p>
-                <input type="checkbox" id="blueToggle5" name="redToggle" value="" onclick="toggleBlue()">
-                <label for="blueToggle5" class="labels">Blue</label><br>
+                <input type="checkbox" id="screen5" name="screen5" value="blue" onclick="showScreen()">
+                <label for="screen5" class="labels">Screen</label><br>
+
+                <input type="checkbox" id="blueToggle5" name="blueToggle5" value="blue" checked onclick="toggleArrows(this.value)">
+                <label for="blueToggle5" class="labels">Positive</label><br>
                 
-                <input type="checkbox" id="redToggle5" name="blueToggle" value="" onclick="toggleRed()">
-                <label for="redToggle5" class="labels">Red</label><br>
+                <input type="checkbox" id="redToggle5" name="redToggle5" value="red" checked onclick="toggleArrows(this.value)">
+                <label for="redToggle5" class="labels">Negative</label><br>
                 
-                <input type="checkbox" id="purpleToggle5" name="purpleToggle" value=""  onclick="togglePurple()">
-                <label for="purpleToggle5" class="labels">Purple</label><br>
+                <input type="checkbox" id="purpleToggle5" name="purpleToggle5" checked value="purple" onclick="toggleArrows(this.value)">
+                <label for="purpleToggle5" class="labels">Electric Field</label><br>
             </div>
         </div>
         <div class="row row5" id="scene_6">
@@ -139,16 +162,24 @@
                 We can see that the second negative surface creates another portion where the electric field amount is less than the first portion. Both of the negative surfaces' electric fields in the -x direction work together to cancel out all of the positive surface's electric field in the x direction. 
 
                 </p>
-                <button class="button" type="button" onclick="showScreen()">Screen</button>
+
+                <button class="button" type="button" onclick="addBox()">Add Surface</button>
+
                 <br><br>
-                <input type="checkbox" id="blueToggle6" name="redToggle" value="" unchecked onclick="toggleBlue()">
-                <label for="blueToggle6" class="labels">Blue</label><br>
+                <input type="checkbox" id="screen6" name="screen6" value="blue" onclick="showScreen()">
+                <label for="screen6" class="labels">Screen</label><br>
+
+                <input type="checkbox" id="blueToggle6" name="blueToggle6" value="blue" checked onclick="toggleArrows(this.value)">
+                <label for="blueToggle6" class="labels">Positive</label><br>
+
+                <input type="checkbox" id="redToggle6a" name="" value="red6a" checked onclick="toggleArrows(this.value)">
+                <label for="redToggle6a" class="labels">Negative 1</label><br>
+
+                <input type="checkbox" id="redToggle6b" name="" value="red6b" checked  onclick="toggleArrows(this.value)">
+                <label for="redToggle6b" class="labels">Negative 2</label><br>
                 
-                <input type="checkbox" id="redToggle6" name="blueToggle" value="" unchecked onclick="toggleRed()">
-                <label for="redToggle6" class="labels">Red</label><br>
-                
-                <input type="checkbox" id="purpleToggle6" name="purpleToggle" value="" unchecked onclick="togglePurple()">
-                <label for="purpleToggle6" class="labels">Purple</label><br>
+                <input type="checkbox" id="purpleToggle6" name="purpleToggle6" checked value="purple"  onclick="toggleArrows(this.value)">
+                <label for="purpleToggle6" class="labels">Electric Field</label><br>
                 <svg id="d3-viz">
 
                 </svg>
@@ -164,7 +195,33 @@
                     will screen out the positive electric field over a distance.
                 </p>
 
-                <button class="button" type="button" onclick="showScreening()">Screen</button>
+                <!-- <button class="button" type="button" onclick="showScreening()">Screen</button>
+                <button class="button" type="button" onclick="showScreen()">Screen</button>
+                <br><br> -->
+
+                <button class="button" type="button" onclick="flowCharges()">Flow Charges</button>
+                <br><br>
+
+                <input type="checkbox" id="screen7" name="screen7" value="blue" onclick="showScreen()">
+                <label for="screen7" class="labels">Screen</label><br>
+
+                <input type="checkbox" id="blueToggle7" name="" value="blue" checked onclick="toggleArrows(this.value)">
+                <label for="blueToggle7" class="labels">Positive</label><br>
+                
+                <input type="checkbox" id="redToggle7a" name="" value="red7a" checked onclick="toggleArrows(this.value)">
+                <label for="redToggle7a" class="labels">Negative 1</label><br>
+                
+                <input type="checkbox" id="redToggle7b" name="" value="red7b" checked onclick="toggleArrows(this.value)">
+                <label for="redToggle7b" class="labels">Negative 2</label><br>
+
+                <input type="checkbox" id="redToggle7c" name="" value="red7c" checked onclick="toggleArrows(this.value)">
+                <label for="redToggle7c" class="labels">Negative 3</label><br>
+                
+                <input type="checkbox" id="purpleToggle7" name="purpleToggle7" checked value="purple"
+                    onclick="toggleArrows(this.value)">
+                <label for="purpleToggle7" class="labels">Electric Field</label><br>
+                <svg id="d3-viz">
+
                 <svg id="d3-viz-final">
 
                 </svg>
@@ -182,6 +239,7 @@
                 </p>
 
                 <p>The graph can be represented like a slope...</p>
+                <input style="width: 300" type="range" min="40" max="142" value="142" onchange="updateWidth(this.value)">
                 <svg id="d3-viz-final-2s">
 
                 </svg>
