@@ -178,14 +178,14 @@ setup = () => {
     }
 
     // less random array
-    // let num = 20;
+    // let num = 24;
     // let col = Math.floor(num / 5);
     // let row = Math.floor(num / 2);
 
     // for (let r = 0; r < row; r++) {
     //     for (let c = 0; c < col; c++) {
-    //         chargeXArray.push(box1.x + c * 23 + Math.random() * (2) +20);
-    //         chargeYArray.push(box1.y + r * 23 + Math.random() * (2));
+    //         chargeXArray.push(box1.x + c * 18 + Math.random() * (2) +18);
+    //         chargeYArray.push(box1.y + r * 18 + Math.random() * (2));
     //     }
     // }
 
@@ -288,7 +288,7 @@ function scene1() { // 1scene
     drawBox(box1, false, false, "lrs");
     if (drawScene1) {
         drawBox(box1, true, true, "lr");
-        drawBox(box1, true, true, "s");
+        // drawBox(box1, true, true, "s");
         drawCharges(box1);
         
         fill(grey);
@@ -742,12 +742,15 @@ drawSurface = (box) => {
     if (sceneCount == 1 || sceneCount == 2 || sceneCount == 3) {
         // (box.charge == "pos") ? fill(blueSurface) : fill(redSurface);
         (box.charge == "pos") ? stroke(blue) : stroke(red);
-        fill(18, 18, 18, 200);
+        (box.charge == "pos") ? fill(54, 78, 99, 80) : fill(111, 67, 67, 80);
+        // fill(18, 18, 18, 80);
         // noFill();
+        
     }
     else {
         (box.charge == "pos") ? stroke(91, 149, 203, 120) : stroke(191, 81, 81, 120);
-        noFill();
+        // noFill();
+        (box.charge == "pos") ? fill(54, 78, 99, 80) : fill(111, 67, 67, 80);
     }
 
     let yOffset = 0;
@@ -849,21 +852,37 @@ drawBox = (box, showCharges, showArrows, sides) => {
 }
 
 drawCharges = (box) => {
-    frameRate(60);    
-
     let chargeSize = 12;
     let signSize = chargeSize - 4;
     let chargeOpacity = 60;
-    let signOpacity = 50;
+    let signOpacity = 60;
+    
+    // grid charges
+    // Returns a random integer from 1 to 100:
+    // Example: Returns a random integer from 1 to 100:
+    // Math.floor(Math.random() * 100) + 1;
 
+    // for (let i = 0; i < box.chargeAmount; i++) {
+    //     noStroke(); 
+    //     fill(66, 117, 166, chargeOpacity + 60); // blueCharge
+    //     // moveCharge = box.x - 316;
+
+    //     let xPos = Math.floor(Math.random() * chargeXArray.length);
+    //     let yPos = Math.floor(Math.random() * chargeYArray.length);
+
+    //     let chargeX = chargeXArray[xPos];
+    //     let chargeY = chargeYArray[i];
+
+    // }
+
+    // random location charges
     for (let i = 0; i < box.chargeAmount; i++) {
-        noStroke();
         noStroke();
         moveCharge = box.x - 316;
 
         if (box.charge == "pos") {
             if (sceneCount == 1 || sceneCount == 2 || sceneCount == 3) {
-                fill(66, 117, 166, chargeOpacity + 60); // blueCharge
+                fill(66, 117, 166, chargeOpacity + 30); // blueCharge
             }
             else {
                 fill(66, 117, 166, chargeOpacity); //redCharge
@@ -877,7 +896,7 @@ drawCharges = (box) => {
             strokeWeight(1);
 
             if (sceneCount == 1 || sceneCount == 2 || sceneCount == 3) {
-                stroke(183, 220, 255, signOpacity + 60); // blueSign
+                stroke(183, 220, 255, signOpacity + 30); // blueSign
             }
             else {
                 stroke(183, 220, 255, signOpacity); // blueSign
@@ -889,10 +908,10 @@ drawCharges = (box) => {
         }
         else if (box.charge == "neg") {
             if (sceneCount == 1 || sceneCount == 2) {
-                fill(245, 112, 112, chargeOpacity + 60);
+                fill(245, 112, 112, chargeOpacity + 30);
             }
             else if (sceneCount == 3) {
-                fill(245, 112, 112, chargeOpacity + 60);
+                fill(245, 112, 112, chargeOpacity + 30);
             }
             else {
                 fill(245, 112, 112, chargeOpacity);
@@ -1075,10 +1094,10 @@ drawArrows = (box, sides) => {
                         movePurple = 90;
                     }
                     if (box == redbox7b) {
-                        movePurple = 60;
+                        movePurple = 70;
                     }
                     if (box == redbox7c) {
-                        movePurple = 120;
+                        movePurple = 140;
                     }
 
                     line( offsetX + box.x - 12, // x1
