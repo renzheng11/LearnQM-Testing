@@ -1,9 +1,10 @@
 class Box {
-    constructor(charge, dim3, chargeAmount, midzone, arrowLength, showArrows, sides, minusLine, x, y, w, d) {
+    constructor(charge, dim3, chargeAmount, midzone, arrowLength, showArrows, showPurple, sides, minusLine, x, y, w, d) {
         this.charge = charge;
         this.dim3 = dim3;
         this.arrowLength = arrowLength;
         this.showArrows = showArrows;
+        this.showPurple = showPurple;
         this.chargeAmount = chargeAmount;
         this.midzone = midzone;
         this.minusLine = minusLine
@@ -55,6 +56,10 @@ class Box {
     updateX(x) {
         this.x = x;
         this.c = this.x + this.w / 2;
+    }
+
+    updateW(w) {
+        this.w = w;
     }
 
     addSide(str) {

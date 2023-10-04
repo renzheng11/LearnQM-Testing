@@ -115,16 +115,16 @@ StartScroll = () => {
         })
         .addTo(controller);
 
-    let scene_9 = new ScrollMagic.Scene({
-        triggerElement: '#scene_9'
-    })
-        .setClassToggle('#scene_9', 'fade-in')
-        .on('start', () => {
-            if (sceneCount == 8) {
-                sceneCount = 9;
-            } else {
-                sceneCount = 8;
-            }
-        })
-        .addTo(controller);
+    // let scene_9 = new ScrollMagic.Scene({
+    //     triggerElement: '#scene_9'
+    // })
+    //     .setClassToggle('#scene_9', 'fade-in')
+    //     .on('start', () => {
+    //         if (sceneCount == 8) {
+    //             sceneCount = 9;
+    //         } else {
+    //             sceneCount = 8;
+    //         }
+    //     })
+    //     .addTo(controller);
 }

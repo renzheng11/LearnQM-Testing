@@ -90,12 +90,19 @@
                 That leaves us with an intersecting portion, where the positive and negative charges add to double the strength of the electric field. 
 <br><br>
 
-                <span class="highlight">Drag your mouse to move the sheet to see the effect.</span>
+                <span class="highlight">Drag your mouse to move the negatively charged sheet.</span>
 
-                Use the button below to show the screening effect.
+                Use the buttons below to show the screening effect or hide arrows.
 
                 </p>
-                <button class="button" type="button" onclick="showScreen()">Show Screen</button>
+                <input type="checkbox" id="blueToggle4" name="blueToggle"  onclick="toggleBlue()">
+                <label for="blueToggle4" class="labels">Blue</label><br>
+
+                <input type="checkbox" id="redToggle4" name="redToggle"  onclick="toggleRed()">
+                <label for="redToggle4" class="labels">Red</label><br>
+
+                <input type="checkbox" id="purpleToggle4" name="purpleToggle"  onclick="togglePurple()">
+                <label for="purpleToggle4" class="labels">Purple</label>
                 
             </div>
         </div>
@@ -109,7 +116,14 @@
                 If we have a negatively charged surface with less charge, the charge of the intersecting portion is no longer double, but still stronger.
 
                 </p>
-                <button class="button" type="button" onclick="showScreen()">Show Screening</button>
+                <input type="checkbox" id="blueToggle5" name="redToggle" value="" onclick="toggleBlue()">
+                <label for="blueToggle5" class="labels">Blue</label><br>
+                
+                <input type="checkbox" id="redToggle5" name="blueToggle" value="" onclick="toggleRed()">
+                <label for="redToggle5" class="labels">Red</label><br>
+                
+                <input type="checkbox" id="purpleToggle5" name="purpleToggle" value=""  onclick="togglePurple()">
+                <label for="purpleToggle5" class="labels">Purple</label><br>
             </div>
         </div>
         <div class="row row5" id="scene_6">
@@ -125,7 +139,16 @@
                 We can see that the second negative surface creates another portion where the electric field amount is less than the first portion. Both of the negative surfaces' electric fields in the -x direction work together to cancel out all of the positive surface's electric field in the x direction. 
 
                 </p>
-                <button class="button" type="button" onclick="showScreen()">Show Screening</button>
+                <button class="button" type="button" onclick="showScreen()">Screen</button>
+                <br><br>
+                <input type="checkbox" id="blueToggle6" name="redToggle" value="" unchecked onclick="toggleBlue()">
+                <label for="blueToggle6" class="labels">Blue</label><br>
+                
+                <input type="checkbox" id="redToggle6" name="blueToggle" value="" unchecked onclick="toggleRed()">
+                <label for="redToggle6" class="labels">Red</label><br>
+                
+                <input type="checkbox" id="purpleToggle6" name="purpleToggle" value="" unchecked onclick="togglePurple()">
+                <label for="purpleToggle6" class="labels">Purple</label><br>
                 <svg id="d3-viz">
 
                 </svg>
@@ -141,7 +164,7 @@
                     will screen out the positive electric field over a distance.
                 </p>
 
-                <button class="button" type="button" onclick="showScreening()">Show Screening</button>
+                <button class="button" type="button" onclick="showScreening()">Screen</button>
                 <svg id="d3-viz-final">
 
                 </svg>
@@ -150,28 +173,30 @@
         <div class="row row7" id="scene_8">
             <div class="col-lg-4">
                 <h1>[8] Slope</h1>
+                <p>
+                    The negative charge is then distributed over a distance where eventually, total positive charge = total negative
+                    charge.
+                    The set of negative sheets can be considered a volume.
                 
+                    The volume might be a sheet of metal that is a semiconductor.
+                </p>
+
                 <p>The graph can be represented like a slope...</p>
                 <svg id="d3-viz-final-2s">
 
                 </svg>
             </div>
         </div>
-        <div class="row row8" id="scene_9">
+        <!-- <div class="row row8" id="scene_9">
             <div class="col-lg-4">
                 <h1>[9] Volume</h1>
                 
-                <p>
-                    The negative charge is then distributed over a distance where eventually, total positive charge = total negative charge.
-                    The set of negative sheets can be considered a volume.
-                    
-                    The volume might be a sheet of metal that is a semiconductor.
-                </p>
+
                 <svg id="d3-viz-final-2p">
 
                 </svg>
             </div>
-        </div>
+        </div> -->
         <div id="visualization">
 
         </div>
