@@ -1215,7 +1215,7 @@ function drawArrowSet(box, type, fillAmount, showScreen, screenAmount, spacing, 
     if (type == "pos") {
         let lineWeight = currPosBox.lineWeight / chargeDivisor * thickScale;
         // pos right lines
-        if (sides.includes("r")) {
+        if (sides.includes("r") && box.chargeAmount != 0) {
             let x1 = gap + currPosBox.c + offsetX;
             let x2 = gap + currPosBox.c + lineSize + offsetX;
             let y = currPosBox.y + spacing + offsetY;
@@ -1224,7 +1224,7 @@ function drawArrowSet(box, type, fillAmount, showScreen, screenAmount, spacing, 
         }
 
         // pos left lines
-        if (sides.includes("l")) {
+        if (sides.includes("l") && box.chargeAmount != 0) {
             let x1 = currPosBox.c - lineSize - gap + offsetX;
             let x2 = currPosBox.c - gap + offsetX - 2;
             let y = currPosBox.y + spacing + offsetY;
