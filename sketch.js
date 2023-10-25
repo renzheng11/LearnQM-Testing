@@ -739,6 +739,8 @@ function showScreen() {
         animateNegBox5 = true;
     }
 
+    console.log(currPosBox.lineWeight);
+
     if (negbox5animated == false) {
         setTimeout(() => {
             currPosBox.updateMinusLineWeight(-negbox5.lineWeight);
@@ -746,6 +748,7 @@ function showScreen() {
     }
 
     negbox5animated = true;
+    console.log(currPosBox.lineWeight);
 }
 
 function drawSurface(box) {
@@ -988,8 +991,12 @@ function drawCharges(box) {
 
                         // cross line
                         line(chargeX - signSize / 2, chargeY, chargeX + signSize / 2, chargeY)
-                        // up line
-                        line(chargeX, chargeY - signSize / 2, chargeX, chargeY + signSize / 2)
+
+                        if (box.charge == "pos") {
+
+                            // up line
+                            line(chargeX, chargeY - signSize / 2, chargeX, chargeY + signSize / 2)
+                        }
                     }
                 }
             }
@@ -1215,7 +1222,7 @@ function drawArrowSet(box, type, fillAmount, showScreen, screenAmount, spacing, 
     if (type == "pos") {
         let lineWeight = currPosBox.lineWeight / chargeDivisor * thickScale;
         // pos right lines
-        if (sides.includes("r") && box.chargeAmount != 0) {
+        if (sides.includes("r") && currPosBox.chargeAmount != 0 && lineWeight != 0) {
             let x1 = gap + currPosBox.c + offsetX;
             let x2 = gap + currPosBox.c + lineSize + offsetX;
             let y = currPosBox.y + spacing + offsetY;
@@ -1224,7 +1231,7 @@ function drawArrowSet(box, type, fillAmount, showScreen, screenAmount, spacing, 
         }
 
         // pos left lines
-        if (sides.includes("l") && box.chargeAmount != 0) {
+        if (sides.includes("l") && currPosBox.chargeAmount != 0 && lineWeight != 0) {
             let x1 = currPosBox.c - lineSize - gap + offsetX;
             let x2 = currPosBox.c - gap + offsetX - 2;
             let y = currPosBox.y + spacing + offsetY;
@@ -1332,7 +1339,7 @@ function drawArrowSet(box, type, fillAmount, showScreen, screenAmount, spacing, 
         let x2 = currPosBox.c - gap; // right x
         let y = currNegBoxes[0].y + spacing + purpleOffsetY; // right y
 
-        if (totalNegCharge != 0 && totalNegCharge != currPosBox.lineWeight) {
+        if (totalNegCharge != 0 && totalNegCharge != currPosBox.chargeAmount) { //  && currPoxBox
             drawArrow(x1, x2, y, "l", "l", purpleColor, lineWeight, fillAmount);
         }
     }  
