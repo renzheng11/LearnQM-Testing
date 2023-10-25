@@ -856,7 +856,7 @@ function drawBox (box, sides) {
 
 function drawCharges(box) {
     let showCharges = box.showChargeGrid;
-    let chargeSize = 9;
+    let chargeSize = 11;
     let signSize = chargeSize - 4;
     let chargeOpacity = 40;
     let signOpacity = 40;
@@ -1242,25 +1242,32 @@ function drawArrowSet(box, type, fillAmount, showScreen, screenAmount, spacing, 
         // (box.sceneOrder == 1) ? offsetY = 14 : null;
         // (box.sceneOrder == 2) ? offsetY = 14 * 2 : null;
         // (box.sceneOrder == 3) ? offsetY = 14 * 3 : null;
-        offsetY = box.arrowOffsetY;
+        
 
         if (sceneCount == 1 || sceneCount == 2 || sceneCount == 3) { // 3D
-            // drawArrow(currPosBox.x + currPoxBox.w, currPosBox.x, currPosBox.y, spacing, offsetX, offsetY);
-            let x1 = gap + box.x + box.w + offsetX;
-            let x2 = gap + box.x + lineSize + offsetX;
-            let y = box.y + spacing + offsetY;
+            if (sides.includes("r")) {
+                // drawArrow(currPosBox.x + currPoxBox.w, currPosBox.x, currPosBox.y, spacing, offsetX, offsetY);
+                let x1 = gap + box.x + box.w + offsetX;
+                let x2 = gap + box.x + lineSize + offsetX;
+                let y = box.y + spacing + offsetY;
+    
+                // neg right line
+                drawArrow(x1, x2, y, "r", "l", negColor, lineWeight, fillAmount);
 
-            // neg right line
-            drawArrow(x1, x2, y, "r", "l", negColor, lineWeight, fillAmount);
+            }
 
-            x1 = box.x - lineSize + offsetX;
-            x2 = box.x + offsetX + 8;
-            y = box.y + spacing + offsetY;
+            if (sides.includes("l")) {
+                x1 = box.x - lineSize + offsetX;
+                x2 = box.x + offsetX + 8;
+                y = box.y + spacing + offsetY;
+    
+                drawArrow(x1, x2, y, "l", "r", negColor, lineWeight, fillAmount);
 
-            drawArrow(x1, x2, y, "l", "r", negColor, lineWeight, fillAmount);
+            }
         }
         
         else { // 2d
+            offsetY = box.arrowOffsetY;
             if (sides.includes("r")) {
                 let x1 = gap + box.x + box.w;
                 let x2 = 567;
