@@ -5,36 +5,39 @@ let scenes = []
 StartScroll = () => {
     let controller = new ScrollMagic.Controller();
 
-    let scene_1 = new ScrollMagic.Scene({
-        triggerElement: '#scene_1'
+    let scene1 = new ScrollMagic.Scene({
+        triggerElement: '#scene1'
     })
-        .setClassToggle('#scene_1', 'fade-in')
+        .setClassToggle('#scene1', 'fade-in')
         .on('start', () => {
             if (sceneCount == 0) {
                 sceneCount = 1;
+                updateTotalCharge();
             } else {
                 sceneCount = 0;
             }
         })
         .addTo(controller);
 
-    let scene_2 = new ScrollMagic.Scene({
-        triggerElement: '#scene_2'
+    let scene2 = new ScrollMagic.Scene({
+        triggerElement: '#scene2'
     })
-        .setClassToggle('#scene_2', 'fade-in')
+        .setClassToggle('#scene2', 'fade-in')
         .on('start', () => {
             if (sceneCount == 1) {
                 sceneCount = 2;
+                box2.resetCharges();
+                updateTotalCharge();
             } else {
                 sceneCount = 1;
             }
         })
         .addTo(controller);
 
-    let scene_3 = new ScrollMagic.Scene({
-        triggerElement: '#scene_3'
+    let scene3 = new ScrollMagic.Scene({
+        triggerElement: '#scene3'
     })
-        .setClassToggle('#scene_3', 'fade-in')
+        .setClassToggle('#scene3', 'fade-in')
         .on('start', () => {
             if (sceneCount == 2) {
                 sceneCount = 3;
@@ -44,37 +47,44 @@ StartScroll = () => {
         })
         .addTo(controller);
 
-    let scene_4 = new ScrollMagic.Scene({
-        triggerElement: '#scene_4'
+    let scene4 = new ScrollMagic.Scene({
+        triggerElement: '#scene4'
     })
-        .setClassToggle('#scene_4', 'fade-in')
+        .setClassToggle('#scene4', 'fade-in')
         .on('start', () => {
             if (sceneCount == 3) {
                 sceneCount = 4;
-                document.getElementById("screen4").checked = false;
-                document.getElementById("blueToggle4").checked = true;
-                document.getElementById("redToggle4").checked = true;
+                // document.getElementById("screen4").checked = false;
+                document.getElementById("posToggle4").checked = true;
+                document.getElementById("negToggle4").checked = true;
                 document.getElementById("purpleToggle4").checked = true;
-                // bluebox4.toggleArrows(true);
+                box4.resetCharges();
+                negbox4.resetCharges();
+                currNegBoxes = [negbox4];
+                updateTotalCharge();
             } else {
                 sceneCount = 3;
             }
         })
         .addTo(controller);
 
-    let scene_5 = new ScrollMagic.Scene({
-        triggerElement: '#scene_5'
+    let scene5 = new ScrollMagic.Scene({
+        triggerElement: '#scene5'
     })
-        .setClassToggle('#scene_5', 'fade-in')
+        .setClassToggle('#scene5', 'fade-in')
         .on('start', () => {
             if (sceneCount == 4) {
                 sceneCount = 5;
-                document.getElementById("screen5").checked = false;
-                document.getElementById("blueToggle5").checked = true;
-                document.getElementById("redToggle5").checked = true;
+                // document.getElementById("screen5").checked = false;
+                document.getElementById("posToggle5").checked = true;
+                document.getElementById("negToggle5").checked = true;
                 document.getElementById("purpleToggle5").checked = true;
+                box5.resetCharges();
+                negbox5.resetCharges();
+                updateTotalCharge();
             } else {
                 sceneCount = 4;
+
             }
         })
         .addTo(controller);
@@ -85,67 +95,71 @@ StartScroll = () => {
         .setClassToggle('#d3-viz', 'fade-in')
         .addTo(controller);
 
-    let scene_6 = new ScrollMagic.Scene({
-        triggerElement: '#scene_6'
+    let scene6 = new ScrollMagic.Scene({
+        triggerElement: '#scene6'
     })
-        .setClassToggle('#scene_6', 'fade-in')
+        .setClassToggle('#scene6', 'fade-in')
         .on('start', () => {
             if (sceneCount == 5) {
                 sceneCount = 6;
-                document.getElementById("screen6").checked = false;
-                document.getElementById("blueToggle6").checked = true;
-                // document.getElementById("redToggle6").checked = true;
-                document.getElementById("redToggle6a").checked = true;
-                document.getElementById("redToggle6b").checked = true;
+                // document.getElementById("screen6").checked = false;
+
+                document.getElementById("posToggle6").checked = true;
+                // document.getElementById("negToggle6").checked = true;
+                document.getElementById("negToggle6").checked = true;
+                // document.getElementById("negToggle6b").checked = true;
                 document.getElementById("purpleToggle6").checked = true;
+
+                box6.resetCharges();
+                negbox6a.resetCharges();
+                negbox6b.resetCharges();
+                updateTotalCharge();
+                // negbox6c.resetCharges();
             } else {
                 sceneCount = 5;
             }
         })
         .addTo(controller);
 
-    let scene_7 = new ScrollMagic.Scene({
-        triggerElement: '#scene_7'
+    let scene7 = new ScrollMagic.Scene({
+        triggerElement: '#scene7'
     })
-        .setClassToggle('#scene_7', 'fade-in')
+        .setClassToggle('#scene7', 'fade-in')
         .on('start', () => {
             if (sceneCount == 6) {
                 sceneCount = 7;
-                document.getElementById("screen7").checked = false;
-                document.getElementById("blueToggle7").checked = true;
-                document.getElementById("redToggle7a").checked = true;
-                document.getElementById("redToggle7b").checked = true;
-                document.getElementById("redToggle7c").checked = true;
+                // document.getElementById("screen7").checked = false;
+                document.getElementById("posToggle7").checked = true;
+                // document.getElementById("negToggle7a").checked = true;
+                // document.getElementById("negToggle7b").checked = true;
+                document.getElementById("negToggle7").checked = true;
                 document.getElementById("purpleToggle7").checked = true;
+                // document.getElementById("purpleToggle7").checked = true;
+
+                box7.resetCharges();
+                negbox7a.resetCharges();
+                negbox7b.resetCharges();
+                negbox7c.resetCharges();
+                updateTotalCharge();
             } else {
                 sceneCount = 6;
             }
         })
         .addTo(controller);
 
-    let scene_8 = new ScrollMagic.Scene({
-        triggerElement: '#scene_8'
+    let scene8 = new ScrollMagic.Scene({
+        triggerElement: '#scene8'
     })
-        .setClassToggle('#scene_8', 'fade-in')
+        .setClassToggle('#scene8', 'fade-in')
         .on('start', () => {
             if (sceneCount == 7) {
                 sceneCount = 8;
+                box8.resetCharges();
+                negbox8.resetCharges();
+                updateTotalCharge();
             } else {
                 sceneCount = 7;
             }
         })
         .addTo(controller);
-
-    // let scene_9 = new ScrollMagic.Scene({
-    //     triggerElement: '#scene_9'
-    // })
-    //     .setClassToggle('#scene_9', 'fade-in')
-    //     .on('start', () => {
-    //         if (sceneCount == 8) {
-    //             sceneCount = 9;
-    //         } else {
-    //             sceneCount = 8;
-    //         }
-    //     })
-    //     .addTo(controller);
 }

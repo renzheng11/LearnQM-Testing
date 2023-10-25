@@ -31,10 +31,9 @@
     <script src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"></script>
 
     <script src="./scroll.js"></script>
-    <script src="./sketch.js"></script>
     <script src="./box.js"></script>
-    <script src="./prob.js"></script>
-    <script src="./graph.js"></script>
+    <script src="./sketch.js"></script>
+    
 </head>
 
 <body id="body_parent" onload="StartScroll()">
@@ -49,7 +48,7 @@
             </p>
             <div class="col-lg-1"></div>
         </div>
-        <div class="row row1" id="scene_1">
+        <div class="row row1" id="scene1">
             <div class="col-lg-4">
                 <h1>[1] 3D Field</h1>
                 
@@ -62,7 +61,7 @@
             
         </div>
 
-        <div class="row row2" id="scene_2">
+        <div class="row row2" id="scene2">
             <div class="col-lg-4">
                 <h1>[2] Change Electrons</h1>
                 <p>
@@ -72,12 +71,12 @@
                     The strength of the electric field depends on the amount of charge on the surface.
                     <br><br>
                     <span class="highlight">Try changing the amount of charge.</span></p>
-                    <input style="width: 300" type="range" min="3" max="60" value="30" onchange="updateCharge(this.value)">
+                    <input style="width: 300" type="range" min="3" max="80" value="30" onchange="updatebox2(this.value)">
             </div>
             
         </div>
 
-        <div class="row row2" id="scene_3">
+        <div class="row row2" id="scene3">
             <div class="col-lg-4">
                 <h1>[3] Change Charge</h1>
                 
@@ -89,7 +88,7 @@
                 <button class="button" type="button" onclick="reverseCharge()">Reverse Charge</button>
             </div>
         </div>
-        <div class="row row3" id="scene_4">
+        <div class="row row3" id="scene4">
             <div class="col-lg-4">
                 <h1>[4] </h1>
             
@@ -111,22 +110,28 @@
 
                 </p>
 
-                <input type="checkbox" id="screen4" name="screen4" value="blue" onclick="showScreen()">
-                <label for="screen4" class="labels">Screen</label><br>
+
+                <!-- <input style="width: 300" type="range" min="310" max="520" value="310" onchange="updateNegBox4(this.value)"> -->
+
+                <!-- <input type="checkbox" class="onoffswitch-checkbox" id="inline" checked> -->
+
+
+                <!-- <input type="checkbox" id="screen4" onclick="showScreen()">
+                <label for="screen4" class="labels">Screen</label><br> -->
 
                 <!-- <button class="button" type="button" onclick="showScreen()">Screen</button> -->
-                <input type="checkbox" id="blueToggle4" name="" value="blue" checked onclick="toggleArrows(this.value)">
-                <label for="blueToggle4" class="labels">Blue</label><br>
+                <input type="checkbox" id="negToggle4" value="pos" onclick="toggleArrows(this.value)">
+                <label for="negToggle4" class="labels">Positive</label><br>
+
+                <input type="checkbox" id="posToggle4" value="neg" onclick="toggleArrows(this.value)">
+                <label for="posToggle4" class="labels">Negative</label><br>
                 
-                <input type="checkbox" id="redToggle4" name="" value="red" checked onclick="toggleArrows(this.value)">
-                <label for="redToggle4" class="labels">Red</label><br>
-                
-                <input type="checkbox" id="purpleToggle4" name="" checked value="purple" onclick="toggleArrows(this.value)">
-                <label for="purpleToggle4" class="labels">Purple</label><br>
+                <input type="checkbox" id="purpleToggle4" value="purple" onclick="toggleArrows(this.value)">
+                <label for="purpleToggle4" class="labels">Electric Field</label><br>
                 
             </div>
         </div>
-        <div class="row row4" id="scene_5">
+        <div class="row row4" id="scene5">
             <div class="col-lg-4">
                 
                 <h1>[5] Imperfect Screening</h1>
@@ -136,20 +141,29 @@
                 If we have a negatively charged surface with less charge, the charge of the intersecting portion is no longer double, but still stronger.
 
                 </p>
-                <input type="checkbox" id="screen5" name="screen5" value="blue" onclick="showScreen()">
-                <label for="screen5" class="labels">Screen</label><br>
+                <!-- <input type="checkbox" id="screen5" name="screen5" value="pos" onclick="showScreen()">
+                <label for="screen5" class="labels">Screen</label><br> -->
 
-                <input type="checkbox" id="blueToggle5" name="blueToggle5" value="blue" checked onclick="toggleArrows(this.value)">
-                <label for="blueToggle5" class="labels">Positive</label><br>
+                <input type="checkbox" id="posToggle5" name="posToggle5" value="pos" checked onclick="toggleArrows(this.value)">
+                <label for="posToggle5" class="labels">Positive</label><br>
                 
-                <input type="checkbox" id="redToggle5" name="redToggle5" value="red" checked onclick="toggleArrows(this.value)">
-                <label for="redToggle5" class="labels">Negative</label><br>
+                <input type="checkbox" id="negToggle5" name="negToggle5" value="neg" checked onclick="toggleArrows(this.value)">
+                <label for="negToggle5" class="labels">Negative</label><br>
                 
-                <input type="checkbox" id="purpleToggle5" name="purpleToggle5" checked value="purple" onclick="toggleArrows(this.value)">
-                <label for="purpleToggle5" class="labels">Electric Field</label><br>
+                <input type="checkbox" id="purpleToggle5" name="purple" checked value="purple" onclick="toggleArrows(this.value)">
+                <label for="purpleToggle5" class="labels">Purple</label>
+                
+                <br><br>
+
+                <!-- Negative Charge Amount -->
+                <input id="slider5" style="width: 300" type="range" min="0" max="60" value="42" onchange="updateNegbox5(this.value)">
+                <label for="slider5" class="labels">Negative Charge Amount</label><br>
+
+
+                <button class="button" type="button" id="showScreen" onclick="showScreen()">Show Screening</button>
             </div>
         </div>
-        <div class="row row5" id="scene_6">
+        <div class="row row5" id="scene6">
             <div class="col-lg-4">
                 
                 <h1>[6] More Sheets</h1>
@@ -163,20 +177,20 @@
 
                 </p>
 
-                <button class="button" type="button" onclick="addBox()">Add Surface</button>
+                <button class="button" type="button" id ="shownegbox6" onclick="addBox()">Add Surface</button>
 
                 <br><br>
-                <input type="checkbox" id="screen6" name="screen6" value="blue" onclick="showScreen()">
-                <label for="screen6" class="labels">Screen</label><br>
+                <!-- <input type="checkbox" id="screen6" name="screen6" value="pos" onclick="showScreen()">
+                <label for="screen6" class="labels">Screen</label><br> -->
 
-                <input type="checkbox" id="blueToggle6" name="blueToggle6" value="blue" checked onclick="toggleArrows(this.value)">
-                <label for="blueToggle6" class="labels">Positive</label><br>
+                <input type="checkbox" id="posToggle6" name="posToggle6" value="pos" checked onclick="toggleArrows(this.value)">
+                <label for="posToggle6" class="labels">Positive</label><br>
 
-                <input type="checkbox" id="redToggle6a" name="" value="red6a" checked onclick="toggleArrows(this.value)">
-                <label for="redToggle6a" class="labels">Negative 1</label><br>
+                <input type="checkbox" id="negToggle6" name="" value="neg" checked onclick="toggleArrows(this.value)">
+                <label for="negToggle6" class="labels">Negative</label><br>
 
-                <input type="checkbox" id="redToggle6b" name="" value="red6b" checked  onclick="toggleArrows(this.value)">
-                <label for="redToggle6b" class="labels">Negative 2</label><br>
+                <!-- <input type="checkbox" id="negToggle6b" name="" value="neg6b" checked  onclick="toggleArrows(this.value)">
+                <label for="negToggle6b" class="labels">Negative 2</label><br> -->
                 
                 <input type="checkbox" id="purpleToggle6" name="purpleToggle6" checked value="purple"  onclick="toggleArrows(this.value)">
                 <label for="purpleToggle6" class="labels">Electric Field</label><br>
@@ -185,7 +199,7 @@
                 </svg>
             </div>
         </div>
-        <div class="row row6" id="scene_7">
+        <div class="row row6" id="scene7">
             <div class="col-lg-4">
                 
                 <h1>[7] Multiple Sheets</h1>
@@ -201,21 +215,24 @@
 
                 <button class="button" type="button" onclick="flowCharges()">Flow Charges</button>
                 <br><br>
+<!-- 
+                <input type="checkbox" id="screen7" name="screen7" value="screen" onclick="showScreen()">
+                <label for="screen7" class="labels">Screen</label><br> -->
 
-                <input type="checkbox" id="screen7" name="screen7" value="blue" onclick="showScreen()">
-                <label for="screen7" class="labels">Screen</label><br>
+                <input type="checkbox" id="posToggle7" name="" value="pos" checked onclick="toggleArrows(this.value)">
+                <label for="posToggle7" class="labels">Positive</label><br>
 
-                <input type="checkbox" id="blueToggle7" name="" value="blue" checked onclick="toggleArrows(this.value)">
-                <label for="blueToggle7" class="labels">Positive</label><br>
+                <input type="checkbox" id="negToggle7" name="" value="neg" checked onclick="toggleArrows(this.value)">
+                <label for="negToggle7" class="labels">Negative</label><br>
                 
-                <input type="checkbox" id="redToggle7a" name="" value="red7a" checked onclick="toggleArrows(this.value)">
-                <label for="redToggle7a" class="labels">Negative 1</label><br>
+                <!-- <input type="checkbox" id="negToggle7a" name="" value="neg7a" checked onclick="toggleArrows(this.value)">
+                <label for="negToggle7a" class="labels">Negative 1</label><br>
                 
-                <input type="checkbox" id="redToggle7b" name="" value="red7b" checked onclick="toggleArrows(this.value)">
-                <label for="redToggle7b" class="labels">Negative 2</label><br>
+                <input type="checkbox" id="negToggle7b" name="" value="neg7b" checked onclick="toggleArrows(this.value)">
+                <label for="negToggle7b" class="labels">Negative 2</label><br>
 
-                <input type="checkbox" id="redToggle7c" name="" value="red7c" checked onclick="toggleArrows(this.value)">
-                <label for="redToggle7c" class="labels">Negative 3</label><br>
+                <input type="checkbox" id="negToggle7c" name="" value="neg7c" checked onclick="toggleArrows(this.value)">
+                <label for="negToggle7c" class="labels">Negative 3</label><br> -->
                 
                 <input type="checkbox" id="purpleToggle7" name="purpleToggle7" checked value="purple"
                     onclick="toggleArrows(this.value)">
@@ -227,7 +244,7 @@
                 </svg>
             </div>
         </div>
-        <div class="row row7" id="scene_8">
+        <div class="row row7" id="scene8">
             <div class="col-lg-4">
                 <h1>[8] Slope</h1>
                 <p>
@@ -239,7 +256,7 @@
                 </p>
 
                 <p>The graph can be represented like a slope...</p>
-                <input style="width: 300" type="range" min="40" max="142" value="142" onchange="updateWidth(this.value)">
+                <input style="width: 300" type="range" min="52" max="152" value="130" onchange="updateWidth(this.value)">
                 <svg id="d3-viz-final-2s">
 
                 </svg>

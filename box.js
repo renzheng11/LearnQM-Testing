@@ -1,8 +1,8 @@
 class Box {
-    constructor(showBox, charge, dim3, chargeAmount, midzone, arrowLength, showArrows, showPurple, sides, showCharges, x, y, w, d) {
+    constructor(showBox, foward, charge, sceneOrder, arrowOffsetY, chargeAmount, midzone, arrowLength, showArrows, showPurple, sides, showCharges, x, y, w, d) {
         this.showBox = showBox;
+        this.foward = foward;
         this.charge = charge;
-        this.dim3 = dim3;
         this.arrowLength = arrowLength;
         this.showArrows = showArrows;
         this.showPurple = showPurple;
@@ -10,16 +10,69 @@ class Box {
         this.midzone = midzone;
         this.showCharges = showCharges;
         this.sides = sides;
+        this.showChargeGrid = [];
+        this.sceneOrder = sceneOrder;
+        this.arrowOffsetY = arrowOffsetY;
         
-
         this.x = x; // x position
         this.y = y; // y position 
         this.h = 300; // height
         this.w = w; // width
 
         this.d = d; // depth
-        this.a = -100; // angle
+        this.a = -86; // angle
         this.c = this.x + this.w / 2;
+
+        this.lineWeight = this.chargeAmount;
+        this.minusLineWeight = 0;
+
+        // this.showChargeGrid = [ // 5 x 20
+        //     [0, 0, 0, 1], // 1
+        //     [0, 0, 1, 1], // 2
+        //     [0, 1, 1, 1], // 3
+        //     [1, 1, 1, 1], // 4
+        //     [1, 1, 1, 1], // 5
+        //     [1, 1, 1, 1], // 6
+        //     [1, 1, 1, 1], // 7
+        //     [1, 1, 1, 1], // 8
+        //     [1, 1, 1, 1], // 9
+        //     [1, 1, 1, 1], // 10
+        //     [1, 1, 1, 1], // 11
+        //     [1, 1, 1, 1], // 12
+        //     [1, 1, 1, 1], // 13
+        //     [1, 1, 1, 1], // 14
+        //     [1, 1, 1, 1], // 15
+        //     [1, 1, 1, 0], // 16
+        //     [1, 1, 0, 0], // 17
+        //     [1, 0, 0, 0]  // 18
+        // ]
+
+        this.showChargeGrid = [ // 5 x 20
+            [0, 0, 0, 0, 1], // 1
+            [0, 0, 0, 1, 1], // 1
+            [0, 0, 1, 1, 1], // 2
+            [0, 1, 1, 1, 1], // 3
+            [1, 1, 1, 1, 1], // 4
+            [1, 1, 1, 1, 1], // 5
+            [1, 1, 1, 1, 1], // 6
+            [1, 1, 1, 1, 1], // 7
+            [1, 1, 1, 1, 1], // 8
+            [1, 1, 1, 1, 1], // 9
+            [1, 1, 1, 1, 1], // 10
+            [1, 1, 1, 1, 1], // 11
+            [1, 1, 1, 1, 1], // 12
+            [1, 1, 1, 1, 1], // 13
+            [1, 1, 1, 1, 1], // 14
+            [1, 1, 1, 1, 1], // 15
+            [1, 1, 1, 1, 1], // 16
+            [1, 1, 1, 1, 1], // 17
+            [1, 1, 1, 1, 0], // 18
+            [1, 1, 1, 0, 0],  // 19
+            [1, 1, 0, 0, 0],  // 20
+            [1, 0, 0, 0, 0]  // 21
+        ]
+
+        this.resetCharges();
 
         if (this.charge == "pos") {
             blue = ('#5B95CB');
@@ -35,8 +88,44 @@ class Box {
         }
     }
 
+    resetCharges() {
+        for (let r = 0; r < chargeCoordinates.length; r++) {
+            for (let c = 0; c < 5; c++) {
+
+                // positive charges
+                let chance = Math.floor(Math.random() * 100);
+                if (chance <= this.chargeAmount) {
+                    this.showChargeGrid[r][c] = 1;
+                } else {
+                    this.showChargeGrid[r][c] = 0;
+                }
+
+                // negative charges
+                chance = Math.floor(Math.random() * 100);
+                if (chance <= this.chargeAmount) {
+                    this.showChargeGrid[r][c] = 1;
+                } else {
+                    this.showChargeGrid[r][c] = 0;
+                }
+            }
+        }
+    }
+
     updateCharge(num) {
         this.chargeAmount = num;
+        this.lineWeight = num - this.minusLineWeight;
+    }
+
+    updateMinusLineWeight(num) {
+        console.log(this.lineWeight);
+        console.log("minus: ", num);
+        this.minusLineWeight -= num;
+        this.lineWeight -= this.minusLineWeight;
+        console.log(this.lineWeight);
+    }
+
+    updateArrowOffsetY(num) {
+        this.arrowOffsetY += num;
     }
 
     reverseCharge() {
@@ -74,12 +163,6 @@ class Box {
 
     toggleArrows(value) {
         this.showArrows = value;
-        // console.log(this.showArrows);
-        // value == ""? this.showArrows = !(this.showArrows): null;
-        // value == true ? this.showArrows = true: null;
-        // value == false ? this.showArrows = false : null;
-        // console.log("after toggle arrows");
-        // console.log(this.showArrows);
     }
 
     togglePurple(value) {
