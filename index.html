@@ -55,6 +55,10 @@
                 <p>
                     Any positive or negative charge creates an electric field in the space surrounding it (typically represented by arrows). Let's assume we have an infinitely large surface (where the size of the plane in the y + z directions are much larger than in the x direction).
                 <br><br>
+                The amount of charges on the surface is for representation purposes. In reality, there are many more charges by orders of magnitude.
+
+                <br><br>
+
                     <span class="highlight">Click on the right graphic to charge this surface with electrons.</span>
             </p>
             </div>
@@ -71,7 +75,7 @@
                     The strength of the electric field depends on the amount of charge on the surface.
                     <br><br>
                     <span class="highlight">Try changing the amount of charge.</span></p>
-                    <input style="width: 300" type="range" min="0" max="80" value="30" onchange="updatebox2(this.value)">
+                    <input style="width: 300" type="range" min="0" max="80" value="80" onchange="updatebox2(this.value)">
             </div>
             
         </div>
@@ -102,6 +106,10 @@
                 <br><br>
 
                 That leaves us with an intersecting portion, where the positive and negative charges add to double the strength of the electric field. 
+
+                <br><br>
+
+                These two surfaces that generate an electric field is the basis of a capacitor. 
 <br><br>
 
                 <span class="highlight">Drag your mouse to move the negatively charged sheet.</span>
@@ -120,14 +128,16 @@
                 <label for="screen4" class="labels">Screen</label><br> -->
 
                 <!-- <button class="button" type="button" onclick="showScreen()">Screen</button> -->
-                <input type="checkbox" id="negToggle4" value="pos" onclick="toggleArrows(this.value)">
-                <label for="negToggle4" class="labels">Positive</label><br>
+                <input type="checkbox" id="posToggle4" value="pos" onclick="toggleArrows(this.value)">
+                <label for="posToggle4" class="labels">Positive</label><br>
 
-                <input type="checkbox" id="posToggle4" value="neg" onclick="toggleArrows(this.value)">
-                <label for="posToggle4" class="labels">Negative</label><br>
+                <input type="checkbox" id="negToggle4" value="neg" onclick="toggleArrows(this.value)">
+                <label for="negToggle4" class="labels">Negative</label><br>
                 
                 <input type="checkbox" id="purpleToggle4" value="purple" onclick="toggleArrows(this.value)">
                 <label for="purpleToggle4" class="labels">Electric Field</label><br>
+
+                <button class="button" type="button" id="showScreen4" onclick="animateScreen()">Show Screening</button>
                 
             </div>
         </div>
@@ -160,7 +170,7 @@
                 <label for="slider5" class="labels">Negative Charge Amount</label><br>
 
 
-                <button class="button" type="button" id="showScreen" onclick="showScreen()">Show Screening</button>
+                <button class="button" type="button" id="showScreen5" onclick="animateScreen()">Show Screening</button>
             </div>
         </div>
         <div class="row row5" id="scene6">
@@ -175,9 +185,13 @@
 
                 We can see that the second negative surface creates another portion where the electric field amount is less than the first portion. Both of the negative surfaces' electric fields in the -x direction work together to cancel out all of the positive surface's electric field in the x direction. 
 
+                <br><br>
+
+                You can hover over each surface to see its charges better.
+
                 </p>
 
-                <button class="button" type="button" id ="shownegbox6" onclick="addBox()">Add Surface</button>
+                <button class="button" type="button" id ="negbox6" onclick="toggleBox()">Add Surface</button>
 
                 <br><br>
                 <!-- <input type="checkbox" id="screen6" name="screen6" value="pos" onclick="showScreen()">
@@ -193,6 +207,7 @@
                 <label for="negToggle6b" class="labels">Negative 2</label><br> -->
                 
                 <input type="checkbox" id="purpleToggle6" name="purpleToggle6" checked value="purple"  onclick="toggleArrows(this.value)">
+                
                 <label for="purpleToggle6" class="labels">Electric Field</label><br>
                 <svg id="d3-viz">
 
@@ -207,13 +222,19 @@
                     
                     What if we try using multiple sheets? We can put multiple sheets, with charges of varying (strengths). Then the sheets
                     will screen out the positive electric field over a distance.
+                    <br><br>
+                    
+                    You can hover over each surface to see its charges better.
                 </p>
 
                 <!-- <button class="button" type="button" onclick="showScreening()">Screen</button>
                 <button class="button" type="button" onclick="showScreen()">Screen</button>
                 <br><br> -->
 
-                <button class="button" type="button" onclick="flowCharges()">Flow Charges</button>
+                <!-- <button class="button" type="button" onclick="flowCharges()">Flow Charges</button> -->
+                <input style="width: 300;" type="range" min="0" max="1" value="0" id="flow" onchange="flowCharges()">
+                <label for="flow" class="labels">Flow charge amount left to right</label><br>
+
                 <br><br>
 <!-- 
                 <input type="checkbox" id="screen7" name="screen7" value="screen" onclick="showScreen()">
@@ -257,21 +278,13 @@
 
                 <p>The graph can be represented like a slope...</p>
                 <input style="width: 300" type="range" min="52" max="152" value="130" onchange="updateWidth(this.value)">
-                <svg id="d3-viz-final-2s">
-
-                </svg>
             </div>
         </div>
-        <!-- <div class="row row8" id="scene_9">
+        <div class="row row8" id="scene9">
             <div class="col-lg-4">
-                <h1>[9] Volume</h1>
-                
-
-                <svg id="d3-viz-final-2p">
-
-                </svg>
+                <h1>[9] Capacitors</h1>
             </div>
-        </div> -->
+        </div>
         <div id="visualization">
 
         </div>

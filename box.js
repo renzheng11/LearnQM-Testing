@@ -72,7 +72,7 @@ class Box {
             [1, 0, 0, 0, 0]  // 21
         ]
 
-        this.resetCharges();
+        // this.resetCharges();
 
         if (this.charge == "pos") {
             blue = ('#5B95CB');
@@ -88,28 +88,30 @@ class Box {
         }
     }
 
-    resetCharges() {
-        for (let r = 0; r < chargeCoordinates.length; r++) {
-            for (let c = 0; c < 5; c++) {
+    // resetCharges() {
+    //     // console.log("resetcharges");
+    //     // console.log(sceneCount);
+    //     for (let r = 0; r < chargeCoordinates.length; r++) {
+    //         for (let c = 0; c < 5; c++) {
 
-                // positive charges
-                let chance = Math.floor(Math.random() * 100);
-                if (chance <= this.chargeAmount) {
-                    this.showChargeGrid[r][c] = 1;
-                } else {
-                    this.showChargeGrid[r][c] = 0;
-                }
+    //             // positive charges
+    //             let chance = Math.floor(Math.random() * 100);
+    //             if (chance <= this.chargeAmount) {
+    //                 this.showChargeGrid[r][c] = 1;
+    //             } else {
+    //                 this.showChargeGrid[r][c] = 0;
+    //             }
 
-                // negative charges
-                chance = Math.floor(Math.random() * 100);
-                if (chance <= this.chargeAmount) {
-                    this.showChargeGrid[r][c] = 1;
-                } else {
-                    this.showChargeGrid[r][c] = 0;
-                }
-            }
-        }
-    }
+    //             // negative charges
+    //             chance = Math.floor(Math.random() * 100);
+    //             if (chance <= this.chargeAmount) {
+    //                 this.showChargeGrid[r][c] = 1;
+    //             } else {
+    //                 this.showChargeGrid[r][c] = 0;
+    //             }
+    //         }
+    //     }
+    // }
 
     updateCharge(num) {
         this.chargeAmount = num;
@@ -117,11 +119,8 @@ class Box {
     }
 
     updateMinusLineWeight(num) {
-        console.log(this.lineWeight);
-        console.log("minus: ", num);
-        this.minusLineWeight -= num;
-        this.lineWeight -= this.minusLineWeight;
-        console.log(this.lineWeight);
+        this.minusLineWeight += num;
+        this.lineWeight += this.minusLineWeight;
     }
 
     updateArrowOffsetY(num) {
