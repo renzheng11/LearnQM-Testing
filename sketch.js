@@ -1754,7 +1754,7 @@ function drawSets(box, type, fillAmount, showScreen, screenAmount, spacing, side
                     // calculate line weights up to now
                     let lineWeight = purpleChargeAmount[i + 1] / chargeDivisor * thickScale;
                     let x1 = currNegBoxes[i - 1].x + gap; // right x
-                    let x2 = currNegBoxes[i].x + purpleOffsetX - gap; // left x
+                    let x2 = currNegBoxes[i].x + purpleOffsetX + 3; // left x
                     let y = currNegBoxes[i].y + spacing + purpleOffsetY; // left y
 
 
