@@ -1100,8 +1100,8 @@ function drawCharges(box) {
     let showCharges = box.showChargeGrid;
     let chargeSize = 11;
     let signSize = chargeSize - 4;
-    let chargeOpacity = 76;
-    let signOpacity = 60;
+    let chargeOpacity = 100;
+    let signOpacity = 80;
 
     noStroke();
 
