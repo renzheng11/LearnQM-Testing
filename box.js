@@ -72,8 +72,6 @@ class Box {
             [1, 0, 0, 0, 0]  // 21
         ]
 
-        // this.resetCharges();
-
         if (this.charge == "pos") {
             blue = ('#5B95CB');
             this.color = blue;
@@ -88,31 +86,6 @@ class Box {
         }
     }
 
-    // resetCharges() {
-    //     // console.log("resetcharges");
-    //     // console.log(sceneCount);
-    //     for (let r = 0; r < chargeCoordinates.length; r++) {
-    //         for (let c = 0; c < 5; c++) {
-
-    //             // positive charges
-    //             let chance = Math.floor(Math.random() * 100);
-    //             if (chance <= this.chargeAmount) {
-    //                 this.showChargeGrid[r][c] = 1;
-    //             } else {
-    //                 this.showChargeGrid[r][c] = 0;
-    //             }
-
-    //             // negative charges
-    //             chance = Math.floor(Math.random() * 100);
-    //             if (chance <= this.chargeAmount) {
-    //                 this.showChargeGrid[r][c] = 1;
-    //             } else {
-    //                 this.showChargeGrid[r][c] = 0;
-    //             }
-    //         }
-    //     }
-    // }
-
     updateCharge(num) {
         this.chargeAmount = num;
         this.lineWeight = num - this.minusLineWeight;
@@ -125,6 +98,10 @@ class Box {
 
     updateArrowOffsetY(num) {
         this.arrowOffsetY += num;
+    }
+
+    resetArrowOffsetY(num) {
+        this.arrowOffsetY = num;
     }
 
     reverseCharge() {

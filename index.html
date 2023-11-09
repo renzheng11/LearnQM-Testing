@@ -7,33 +7,28 @@
     <title>Electric Field</title>
 
     <link href="./style.css" rel="stylesheet" />
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.11/addons/p5.dom.min.js"></script>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
-
-
+    <script type="text/javascript" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
-    <script type="text/x-mathjax-config">
-      MathJax.Hub.Config({ tex2jax: { inlineMath: [['\\(', '\\)']] } });
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.11/addons/p5.dom.min.js">
     </script>
+        </script>
 
+        <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@400;700&display=swap" rel="stylesheet">
 
+        <script src="https://cdn.jsdelivr.net/npm/p5@1.0.0/lib/p5.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.7/ScrollMagic.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.7/plugins/debug.addIndicators.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.15.1/d3.min.js"></script>
+        <script src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"></script>
 
-    </script>
-
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@400;700&display=swap" rel="stylesheet">
-
-    <script src="https://cdn.jsdelivr.net/npm/p5@1.0.0/lib/p5.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.7/ScrollMagic.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.7/plugins/debug.addIndicators.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.15.1/d3.min.js"></script>
-    <script src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"></script>
-
-    <script src="./scroll.js"></script>
-    <script src="./box.js"></script>
-    <script src="./sketch.js"></script>
-    
+        <script src="./scroll.js"></script>
+        <script src="./box.js"></script>
+        <script src="./sketch.js"></script>
 </head>
 
 <body id="body_parent" onload="StartScroll()">
@@ -50,214 +45,146 @@
         </div>
         <div class="row row1" id="scene1">
             <div class="col-lg-4">
-                <h1>[1] 3D Field</h1>
+                <h1>Electric Field</h1>
                 
                 <p>
-                    Any positive or negative charge creates an electric field in the space surrounding it (typically represented by arrows). Let's assume we have an infinitely large surface (where the size of the plane in the y + z directions are much larger than in the x direction).
+                    Any positive or negative charge generates an electric field in the space surrounding it (typically represented by arrows). Let's assume we have an infinitely large surface (where the size of the plane in the y + z directions are much larger than in the x direction).
+                <br><br>
+                <span class="highlight">Click on the surface to the right to charge it.</span>
                 <br><br>
                 The amount of charges on the surface is for representation purposes. In reality, there are many more charges by orders of magnitude.
-
                 <br><br>
-
-                    <span class="highlight">Click on the right graphic to charge this surface with electrons.</span>
             </p>
             </div>
-            
         </div>
 
         <div class="row row2" id="scene2">
             <div class="col-lg-4">
-                <h1>[2] Change Electrons</h1>
+                <h1>Charge Density</h1>
                 <p>
-                    If we have an array of positive charges, for the side of the sheet facing left, the direction of the electric field (on
-                    x plane) is negative. For the side of the sheet facing right, the direction of the electric field is positive. Use the slider to change the amount of charge and see how it affects the electric field vector.
+                    Here, we have an array of positive charges. For the side of the sheet facing left, the direction of the electric field (on the x plane) is negative. For the side of the sheet facing right, the direction of the electric field is positive. 
                     <br><br>
-                    The strength of the electric field depends on the amount of charge on the surface.
+                    <span class="highlight">Try changing the charge density and see how it affects the electric field vector.</span>
                     <br><br>
-                    <span class="highlight">Try changing the amount of charge.</span></p>
                     <input style="width: 300" type="range" min="0" max="80" value="80" onchange="updatebox2(this.value)">
+                    <br><br>
+                    We can see that the strength of the electric field depends on the amount of charge on the surface.
             </div>
             
         </div>
 
         <div class="row row2" id="scene3">
             <div class="col-lg-4">
-                <h1>[3] Change Charge</h1>
-                
+                <h1>Reverse Charge</h1>
                 <p>
-                    
-                    
                 What about an array of negative charges? What directions for the electric field would the left and right sides of the
                 sheet be?</p>
                 <button class="button" type="button" onclick="reverseCharge()">Reverse Charge</button>
+                <br><br>
+                <span class="highlight">Try changing the amount of charge and see how it affects the electric field
+                    vector.</span>
+                <br><br>
+                <input style="width: 300" type="range" min="0" max="80" value="80" onchange="updatebox3(this.value)">
             </div>
         </div>
         <div class="row row3" id="scene4">
             <div class="col-lg-4">
-                <h1>[4] </h1>
-            
+                <h1>Two Surfaces</h1>
                 <p>
-                For the side of the sheet facing left, the direction of the electric field is positive. For the side of the sheet facing
-                right, the direction of the electric field is negative.
-                
-                
-                Let’s look at what happens when we put two sheets of opposite charges together. We can see that the left and right sides of the charges cancel each other except the middle section. This effect is called screening.
-
+                Let’s look at what happens when we put two sheets of opposite charge together. We can see that the left and right sides of the electric fields cancel each other except for the area in between in the two sheets. This effect is called <em>screening</em>. In the area in between the two sheets, the electric field due to positive and negative charges add to double the strength of the net electric field. 
                 <br><br>
-
-                That leaves us with an intersecting portion, where the positive and negative charges add to double the strength of the electric field. 
-
-                <br><br>
-
-                These two surfaces that generate an electric field is the basis of a capacitor. 
-<br><br>
-
-                <span class="highlight">Drag your mouse to move the negatively charged sheet.</span>
-
-                Use the buttons below to show the screening effect or hide arrows.
-
+                <span class="highlight">You can click and drag to move the negatively charged sheet...</span>
+                <span class="highlight">Use the buttons below to show the screening effect or toggle the arrows.</span>
+                </p>
+                <p>
+                    These two surfaces that generate an electric field is the basis of a capacitor. 
                 </p>
 
-
-                <!-- <input style="width: 300" type="range" min="310" max="520" value="310" onchange="updateNegBox4(this.value)"> -->
-
-                <!-- <input type="checkbox" class="onoffswitch-checkbox" id="inline" checked> -->
-
-
-                <!-- <input type="checkbox" id="screen4" onclick="showScreen()">
-                <label for="screen4" class="labels">Screen</label><br> -->
-
-                <!-- <button class="button" type="button" onclick="showScreen()">Screen</button> -->
                 <input type="checkbox" id="posToggle4" value="pos" onclick="toggleArrows(this.value)">
-                <label for="posToggle4" class="labels">Positive</label><br>
+                <label for="posToggle4" class="labels">Show electric field due to positive charges</label><br>
 
                 <input type="checkbox" id="negToggle4" value="neg" onclick="toggleArrows(this.value)">
-                <label for="negToggle4" class="labels">Negative</label><br>
+                <label for="negToggle4" class="labels">Show electric field due to negative charges</label><br>
                 
                 <input type="checkbox" id="purpleToggle4" value="purple" onclick="toggleArrows(this.value)">
-                <label for="purpleToggle4" class="labels">Electric Field</label><br>
+                <label id="label4" for="purpleToggle4" class="labels">Show net electric field</label><br>
 
                 <button class="button" type="button" id="showScreen4" onclick="animateScreen()">Show Screening</button>
-                
             </div>
         </div>
         <div class="row row4" id="scene5">
             <div class="col-lg-4">
-                
-                <h1>[5] Imperfect Screening</h1>
+                <h1>Imperfect Screening</h1>
                 <p> 
-                In screening, the strength of the electric charges in the two arrays may not always match exactly. In that case, the charges are not fully cancelled.
-                
-                If we have a negatively charged surface with less charge, the charge of the intersecting portion is no longer double, but still stronger.
-
+                The charge density in the two arrays may not always match exactly. In that case, the electric field due to the positive and negative charges are not fully cancelled. If we have a negatively charged surface with less charge density, the net electric field in the area between in the two sheets is no longer double, but still stronger.
+                <span class="highlight">Use the buttons below to show the screening effect or toggle the arrows.</span>
                 </p>
-                <!-- <input type="checkbox" id="screen5" name="screen5" value="pos" onclick="showScreen()">
-                <label for="screen5" class="labels">Screen</label><br> -->
 
                 <input type="checkbox" id="posToggle5" name="posToggle5" value="pos" checked onclick="toggleArrows(this.value)">
-                <label for="posToggle5" class="labels">Positive</label><br>
+                <label for="posToggle5" class="labels">Show electric field due to positive charges</label><br>
                 
                 <input type="checkbox" id="negToggle5" name="negToggle5" value="neg" checked onclick="toggleArrows(this.value)">
-                <label for="negToggle5" class="labels">Negative</label><br>
+                <label for="negToggle5" class="labels">Show electric field due to negative charges</label><br>
                 
                 <input type="checkbox" id="purpleToggle5" name="purple" checked value="purple" onclick="toggleArrows(this.value)">
-                <label for="purpleToggle5" class="labels">Purple</label>
+                <label id="label5"for="purpleToggle5" class="labels">Show net electric field</label>
                 
                 <br><br>
 
                 <!-- Negative Charge Amount -->
-                <input id="slider5" style="width: 300" type="range" min="0" max="60" value="42" onchange="updateNegbox5(this.value)">
+                <input id="slider5" style="width: 300" type="range" min="0" max="80" value="42" onchange="updateNegbox5(this.value)">
                 <label for="slider5" class="labels">Negative Charge Amount</label><br>
-
-
                 <button class="button" type="button" id="showScreen5" onclick="animateScreen()">Show Screening</button>
             </div>
         </div>
         <div class="row row5" id="scene6">
             <div class="col-lg-4">
-                
-                <h1>[6] More Sheets</h1>
-
+                <h1>More Sheets</h1>
                 <p>
-                Let's try adding another sheet. What do you notice? 
-
-                <br><br>
-
-                We can see that the second negative surface creates another portion where the electric field amount is less than the first portion. Both of the negative surfaces' electric fields in the -x direction work together to cancel out all of the positive surface's electric field in the x direction. 
-
-                <br><br>
-
-                You can hover over each surface to see its charges better.
-
+                Let's try adding another sheet.
                 </p>
-
-                <button class="button" type="button" id ="negbox6" onclick="toggleBox()">Add Surface</button>
-
+                <button class="button" type="button" id="negbox6" onclick="toggleBox()">Add Surface</button>
+                <p>
+                We can see that the second negative sheet creates another in-between area where the electric field amount is less than the first in-between area. Both of the negative sheets' electric fields in the -x direction work together to cancel out all of the positive sheet's electric field in the +x direction. 
                 <br><br>
-                <!-- <input type="checkbox" id="screen6" name="screen6" value="pos" onclick="showScreen()">
-                <label for="screen6" class="labels">Screen</label><br> -->
+                <span class="highlight">You can hover over each sheet to see its charges more clearly.</span>
+                </p>
+                <br><br>
 
                 <input type="checkbox" id="posToggle6" name="posToggle6" value="pos" checked onclick="toggleArrows(this.value)">
-                <label for="posToggle6" class="labels">Positive</label><br>
+                <label for="posToggle6" class="labels">Show electric field due to positive charges</label><br>
 
                 <input type="checkbox" id="negToggle6" name="" value="neg" checked onclick="toggleArrows(this.value)">
-                <label for="negToggle6" class="labels">Negative</label><br>
-
-                <!-- <input type="checkbox" id="negToggle6b" name="" value="neg6b" checked  onclick="toggleArrows(this.value)">
-                <label for="negToggle6b" class="labels">Negative 2</label><br> -->
+                <label for="negToggle6" class="labels">Show electric field due to negative charges</label><br>
                 
                 <input type="checkbox" id="purpleToggle6" name="purpleToggle6" checked value="purple"  onclick="toggleArrows(this.value)">
                 
-                <label for="purpleToggle6" class="labels">Electric Field</label><br>
-                <svg id="d3-viz">
-
-                </svg>
+                <label for="purpleToggle6" class="labels">Show net electric field</label><br>
+                <svg id="d3-viz"></svg>
             </div>
         </div>
         <div class="row row6" id="scene7">
             <div class="col-lg-4">
-                
-                <h1>[7] Multiple Sheets</h1>
+                <h1>Multiple Sheets</h1>
                 <p>
-                    
-                    What if we try using multiple sheets? We can put multiple sheets, with charges of varying (strengths). Then the sheets
+                    We can also use multiple sheets, with charges of varying (strengths). Then the sheets
                     will screen out the positive electric field over a distance.
                     <br><br>
-                    
-                    You can hover over each surface to see its charges better.
+                    <span class="highlight">Use the slider to flow the higher charge density amount left and right.</span>
                 </p>
 
-                <!-- <button class="button" type="button" onclick="showScreening()">Screen</button>
-                <button class="button" type="button" onclick="showScreen()">Screen</button>
-                <br><br> -->
-
-                <!-- <button class="button" type="button" onclick="flowCharges()">Flow Charges</button> -->
-                <input style="width: 300;" type="range" min="0" max="1" value="0" id="flow" onchange="flowCharges()">
-                <label for="flow" class="labels">Flow charge amount left to right</label><br>
-
+                <input style="width: 300;" type="range" min="0" max="25" value="25" id="flow" onchange="flowCharges(value)">
                 <br><br>
-<!-- 
-                <input type="checkbox" id="screen7" name="screen7" value="screen" onclick="showScreen()">
-                <label for="screen7" class="labels">Screen</label><br> -->
 
                 <input type="checkbox" id="posToggle7" name="" value="pos" checked onclick="toggleArrows(this.value)">
-                <label for="posToggle7" class="labels">Positive</label><br>
+                <label for="posToggle7" class="labels">Show electric field due to positive charges</label><br>
 
                 <input type="checkbox" id="negToggle7" name="" value="neg" checked onclick="toggleArrows(this.value)">
-                <label for="negToggle7" class="labels">Negative</label><br>
-                
-                <!-- <input type="checkbox" id="negToggle7a" name="" value="neg7a" checked onclick="toggleArrows(this.value)">
-                <label for="negToggle7a" class="labels">Negative 1</label><br>
-                
-                <input type="checkbox" id="negToggle7b" name="" value="neg7b" checked onclick="toggleArrows(this.value)">
-                <label for="negToggle7b" class="labels">Negative 2</label><br>
-
-                <input type="checkbox" id="negToggle7c" name="" value="neg7c" checked onclick="toggleArrows(this.value)">
-                <label for="negToggle7c" class="labels">Negative 3</label><br> -->
+                <label for="negToggle7" class="labels">Show electric field due to negative charges</label><br>
                 
                 <input type="checkbox" id="purpleToggle7" name="purpleToggle7" checked value="purple"
                     onclick="toggleArrows(this.value)">
-                <label for="purpleToggle7" class="labels">Electric Field</label><br>
+                <label for="purpleToggle7" class="labels">Show net electric field</label><br>
                 <svg id="d3-viz">
 
                 <svg id="d3-viz-final">
@@ -267,28 +194,21 @@
         </div>
         <div class="row row7" id="scene8">
             <div class="col-lg-4">
-                <h1>[8] Slope</h1>
+                <h1>Volumes</h1>
                 <p>
-                    The negative charge is then distributed over a distance where eventually, total positive charge = total negative
-                    charge.
-                    The set of negative sheets can be considered a volume.
-                
-                    The volume might be a sheet of metal that is a semiconductor.
+                    When we use multiple negative sheets, the negative charge is then distributed over a distance where eventually - total electric field to due positive charge is equal to total electric field due to negative charge. This set of negative sheets can be considered a volume. The volume might be a sheet of metal that is a semiconductor.
                 </p>
 
-                <p>The graph can be represented like a slope...</p>
-                <input style="width: 300" type="range" min="52" max="152" value="130" onchange="updateWidth(this.value)">
-            </div>
-        </div>
-        <div class="row row8" id="scene9">
-            <div class="col-lg-4">
-                <h1>[9] Capacitors</h1>
+                <p>The graph for a volume can be represented as a slope.</p>
+                <span class="highlight">Use the slider to change the width of the volume.</span>
+                <br><br>
+                <input id="widthSlider" style="width: 300" type="range" min="36" max="150" value="75" onchange="updateWidth(this.value)">
+                <br><br>
+                <br><br>
             </div>
         </div>
         <div id="visualization">
-
         </div>
     </div>
 </body>
-
 </html>
