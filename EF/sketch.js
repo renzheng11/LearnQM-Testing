@@ -161,7 +161,7 @@ function setup() {
     negbox7c = new Box(true, false, "neg", 3, offsetY * 3, 40, true, 440, true, true, "lrp", true, 310 + boxPadding*3, 140, boxThickness, 80);
 
     box8 = new Box(true, false, "pos", 0, 0, 80, false, 440, true, true, "lrp", true, 310, 140, boxThickness, 80);
-    negbox8 = new Box(true, false, "neg", 1, offsetY, 80, true, 440, true, true, "lrp", true, 380, 140, 142, 80);
+    negbox8 = new Box(true, false, "neg", 1, offsetY, 80, true, 440, true, true, "lrp", true, 380, 140, 75, 80);
 
     volumeWidth = (negbox8.w) / 75;
 
@@ -291,6 +291,7 @@ function scene1() {
         drawBox(box1,   "l");
         drawBox(box1,   "s");
         drawBox(box1,   "r");
+
         drawCharges(box1);
         
         // E vec
@@ -310,7 +311,9 @@ function scene2() {
     drawGraph(box2);
     drawEqs(box2);
     
-    drawCharges(box2);
+    if (box2.chargeAmount > 0) {
+        drawCharges(box2);
+    }
 }
 
 function scene3() { 
@@ -322,7 +325,10 @@ function scene3() {
 
     drawBox(box3,   "l");
     drawBox(box3,  "s");
-    drawCharges(box3);
+    if (box3.chargeAmount > 0) {
+        drawCharges(box3);
+    }
+
     drawBox(box3,  "r");
 }
 
@@ -602,10 +608,15 @@ function drawEqs(box, loc) {
         text(`${sign}${chargeDensity} µC/cm^2`, box.x + 46, chargeDensityY);
     }
     else if (sceneCount ==8 && box.charge == "neg"){
-        text(`${sign}${chargeDensity} mC/cm^3`, box.x + 46, chargeDensityY);
+        text(`${sign}${chargeDensity} mC/cm^3`, box.x + negbox8.w / 2 + 46, chargeDensityY);
     }
 
-    text(`± ${eField} MV/cm`, box.x + 46, eFieldY);
+    if (sceneCount == 8) {
+        text(`± ${eField} MV/cm`, negbox8.x + negbox8.w/2 + 46, eFieldY);
+    }
+    else {
+        text(`± ${eField} MV/cm`, box.x + 46, eFieldY);
+    }
 }
 
 function drawAxis() {
@@ -1346,7 +1357,7 @@ function drawSets(box, type, fillAmount, showScreen, screenAmount, spacing, side
                     }
                 }
             }
-            else {  
+            else {   // 3d
                 let x1 = currPosBox.c - lineSize - gap + offsetX;
                 let x2 = currPosBox.c - gap + offsetX - 2;
                 let y = currPosBox.y + spacing + offsetY;
@@ -1405,7 +1416,9 @@ function drawSets(box, type, fillAmount, showScreen, screenAmount, spacing, side
                 let y = box.y + spacing + offsetY;
     
                 // neg right line
-                drawArrow(x1, x2, y, "r", "l", color.neg, lineWeight, fillAmount);
+                if (box.chargeAmount > 0) {
+                    drawArrow(x1, x2, y, "r", "l", color.neg, lineWeight, fillAmount);
+                }
             }
 
             if (sides.includes("l")) {
@@ -1413,7 +1426,9 @@ function drawSets(box, type, fillAmount, showScreen, screenAmount, spacing, side
                 x2 = box.x + offsetX + 8;
                 y = box.y + spacing + offsetY;
     
-                drawArrow(x1, x2, y, "l", "r", color.neg, lineWeight, fillAmount);
+                if (box.chargeAmount > 0) {
+                    drawArrow(x1, x2, y, "l", "r", color.neg, lineWeight, fillAmount);
+                }
             }
         }
         

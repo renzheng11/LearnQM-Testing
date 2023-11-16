@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Capacitors</title>
+
+    
+    
+    
+
+    <!-- <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script> -->
+    <!-- <script src="https://two-ticks.github.io/p5.teach.js/dist/p5.teach.js"></script> -->
+    <!-- <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script> -->
+    <!-- <script src="p5.pattern.js"></script> -->
+    <!-- <script src="teach.js"></script> -->
+    <!-- <script type="text/javascript" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script> -->
+
+
+    <!-- <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script> -->
+    <!-- <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({ tex2jax: { inlineMath: [['\\(', '\\)']] } });
+    </script> -->
+
+
+    <link href="./style.css" rel="stylesheet" />
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@400;700&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.0.0/lib/p5.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.7/ScrollMagic.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.7/plugins/debug.addIndicators.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.15.1/d3.min.js"></script>
+    <script src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"></script>
+
+    <script src="./scroll.js"></script>
+    <script src="./box.js"></script>
+    <script src="./charge.js"></script>
+    <script src="./sketch.js"></script>
+    <script src="./p5.tween.js"></script>
+
+    
+    
+</head>
+
+<body id="body_parent" onload="StartScroll()">
+    <a href="../index.html"><img id="back-icon" src="../images/arrow-left.svg" /></a>
+    <div class="container">
+        <div class="row title">
+            <h1 class="col-lg-12">CAPACITORS</h1>
+            <div class="col-lg-1"></div>
+            <p class="col-lg-10">
+                Introduction paragraph
+            </p>
+            <div class="col-lg-1"></div>
+        </div>
+        <div class="row row1" id="scene1">
+            <div class="col-lg-4">
+                <h1>[1] Two Metallic Layers</h1>
+                
+                <p>
+                    Paragraph
+
+                <br><br>
+                <span class="highlight">Directions</span>
+            </p>
+            <button class="button" type="button" id="replace" onclick="animateElectrons()">Button</button>
+            </div>
+            
+        </div>
+
+        <div class="row row2" id="scene2">
+            <div class="col-lg-4">
+                <h1>[2] Electric Field</h1>
+                <p>
+                    Title
+                    <br><br>
+                    <span class="highlight">Slider Directions</span></p>
+                    <input style="width: 300" type="range" min="0" max="80" value="80" onchange="updatebox2(this.value)">
+            </div>
+            
+        </div>
+
+        <div class="row row2" id="scene3">
+            <div class="col-lg-4">
+                <h1>[3] Charge Density</h1>
+                
+                <p>
+                    
+                    
+                Paragraph</p>
+                <button class="button" type="button" onclick="animateScanner(boxes.R3)">Button</button>
+            </div>
+        </div>
+        <div class="row row3" id="scene4">
+            <div class="col-lg-4">
+                <h1>[4] Semiconductors</h1>
+            
+                <p>
+                Paragraph
+
+                <br><br>
+                
+            </div>
+        </div>
+        <div class="row row4" id="scene5">
+            <div class="col-lg-4">
+                
+                <h1>[5] Dopant Amount</h1>
+                <p> 
+
+                </p>
+                <!-- <input type="checkbox" id="screen5" name="screen5" value="pos" onclick="showScreen()">
+                <label for="screen5" class="labels">Screen</label><br> -->
+
+                <input type="checkbox" id="replace" name="replace" value="pos" checked onclick="replaceFunc(this.value)">
+                <label for="posToggle5" class="labels">Toggle</label><br>
+            
+
+
+                <button class="button" type="button" id="replace" onclick="replaceFunc()">Button</button>
+            </div>
+        </div>
+        <div class="row row5" id="scene6">
+            <div class="col-lg-4">
+                
+                <h1>[6] Electric Field Over a Distance</h1>
+
+                <p>
+                Paragraph
+
+                </p>
+
+                <button class="button" type="button" id ="negbox6" onclick="toggleBox()">Add Surface</button>
+
+                <br><br>
+
+                </svg>
+            </div>
+        </div>
+        <div class="row row6" id="scene7">
+            <div class="col-lg-4">
+                
+                <h1>[7] Title</h1>
+                <p>
+                    
+                    Paragraphs
+                </p>
+
+                </svg>
+            </div>
+        </div>
+        <div class="row row7" id="scene8">
+            <div class="col-lg-4">
+                <h1>[8] Title</h1>
+                <p>
+                    Paragraph
+                </p>
+            </div>
+        </div>
+        <div class="row row8" id="scene9">
+            <div class="col-lg-4">
+                <h1>[9] Title</h1>
+            </div>
+        </div>
+        <div id="visualization">
+
+        </div>
+    </div>
+</body>
+
+</html>
