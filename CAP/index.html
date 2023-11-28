@@ -57,7 +57,7 @@
         </div>
         <div class="row row1" id="scene1">
             <div class="col-lg-4">
-                <h1>[1] Two Metallic Layers</h1>
+                <h1>[1] Two Metallic Layers - Transfer</h1>
                 
                 <p>
                     Paragraph
@@ -72,30 +72,31 @@
 
         <div class="row row2" id="scene2">
             <div class="col-lg-4">
-                <h1>[2] Electric Field</h1>
+                <h1>[2] Voltage</h1>
                 <p>
                     Title
                     <br><br>
                     <span class="highlight">Slider Directions</span></p>
-                    <input style="width: 300" type="range" min="0" max="80" value="80" onchange="updatebox2(this.value)">
+                    <input style="width: 300" type="range" min="0" max="120" value="18" onchange="updateNumTransfer(this.value)">
+                    <br><br>
+                    <button class="button" type="button" id="replace" onclick="animateElectrons()">Transfer</button>
             </div>
             
         </div>
 
         <div class="row row2" id="scene3">
             <div class="col-lg-4">
-                <h1>[3] Charge Density</h1>
-                
+                <h1>[3] Electric Field</h1>
                 <p>
-                    
-                    
                 Paragraph</p>
-                <button class="button" type="button" onclick="animateScanner(boxes.R3)">Button</button>
+                <input style="width: 300" type="range" min="0" max="120" value="18" onchange="updateNumTransfer(this.value)">
+                <br><br>
+                <button class="button" type="button" onclick="animateElectrons()">Transfer</button>
             </div>
         </div>
         <div class="row row3" id="scene4">
             <div class="col-lg-4">
-                <h1>[4] Semiconductors</h1>
+                <h1>[4] Charge Density - Metal</h1>
             
                 <p>
                 Paragraph
@@ -107,7 +108,7 @@
         <div class="row row4" id="scene5">
             <div class="col-lg-4">
                 
-                <h1>[5] Dopant Amount</h1>
+                <h1>[5] Charge Density - Semiconductor with Dopants</h1>
                 <p> 
 
                 </p>
@@ -125,7 +126,7 @@
         <div class="row row5" id="scene6">
             <div class="col-lg-4">
                 
-                <h1>[6] Electric Field Over a Distance</h1>
+                <h1>[6] Dopant Amount</h1>
 
                 <p>
                 Paragraph
@@ -133,6 +134,7 @@
                 </p>
 
                 <button class="button" type="button" id ="negbox6" onclick="toggleBox()">Add Surface</button>
+                <input style="width: 300" type="range" min="0" max="120" value="18" onchange="changeDopantAmount(this.value)">
 
                 <br><br>
 
@@ -142,7 +144,7 @@
         <div class="row row6" id="scene7">
             <div class="col-lg-4">
                 
-                <h1>[7] Title</h1>
+                <h1>[7] Electric Field over distance</h1>
                 <p>
                     
                     Paragraphs
@@ -153,7 +155,7 @@
         </div>
         <div class="row row7" id="scene8">
             <div class="col-lg-4">
-                <h1>[8] Title</h1>
+                <h1>[8] Reverse Polarity</h1>
                 <p>
                     Paragraph
                 </p>
@@ -161,7 +163,7 @@
         </div>
         <div class="row row8" id="scene9">
             <div class="col-lg-4">
-                <h1>[9] Title</h1>
+                <h1>[9] MOS Capacitor</h1>
             </div>
         </div>
         <div id="visualization">

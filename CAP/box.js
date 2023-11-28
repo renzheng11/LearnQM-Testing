@@ -32,10 +32,10 @@ class Box {
 
     populateElectrons() {
         for (let i = 0; i < this.numElectrons; i++) {
-            let xMin = this.x + 10;
-            let xMax = this.w + this.x - 10;
-            let yMin = this.y + 10;
-            let yMax = this.h + this.y - 10;
+            let xMin = this.x + 14;
+            let xMax = this.w + this.x - 14;
+            let yMin = this.y + 14;
+            let yMax = this.h + this.y - 14;
             let electron = new Electron(random(xMin, xMax), random(yMin, yMax), 5, this.x, this.y, this.w, this.h);
             this.electrons.push(electron);
         }
@@ -59,13 +59,13 @@ class Box {
     populateChargeMap() {
         let col = 1;
         // row = 1;
-        let xUnit = 30;
-        let yUnit = 30;
+        let xUnit = 19;
+        let yUnit = 18;
         let type = "pos";
         // for each row
-        for (let row = 0; row < 9; row++) {
+        for (let row = 0; row < 15; row++) {
             this.chargeMap[row] = [];
-            for (let col = 0; col < 5; col++) {
+            for (let col = 0; col < 8; col++) {
             // for each column
                 // this.chargeMap[row].push([xUnit * col, yUnit * row, `${type}`]);
                 // console.log(this.randomMap[row][col]);
@@ -74,7 +74,7 @@ class Box {
                 //     type = "both";
                 // }
 
-                this.chargeMap[row].push(new Charge(type, xUnit * col + this.x, xUnit * row + this.y));
+                this.chargeMap[row].push(new Charge(type, xUnit * col + this.x - 7, yUnit * row + this.y - 4));
             }
             // type = "none";
         }

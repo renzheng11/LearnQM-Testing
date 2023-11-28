@@ -640,10 +640,10 @@ function drawAxis() {
     textSize(16);
 
     if (sceneCount == 8) {
-        text("x (µm)", graphC + graphW / 2 - 38 + xAxisExtend, graphY + 3)
+        text("x (µm)", graphC + graphW / 2 - 34 + xAxisExtend, graphY + 3)
     }
     else {
-        text("x", graphC + graphW / 2 - 38 + xAxisExtend, graphY + 3)
+        text("x", graphC + graphW / 2 - 34 + xAxisExtend, graphY + 3)
     }
 
     textStyle(NORMAL);
@@ -661,6 +661,7 @@ function drawAxis() {
     text("-1.11 MV/cm —", graphC - 64, graphY + 54);
 
     // y axis arrow
+    stroke(color.grey[0], color.grey[1], color.grey[2]);
     line(graphC, graphY - 76, graphC - size, graphY - 76 + size);
     line(graphC, graphY - 76, graphC + size, graphY - 76 + size);
 
@@ -671,9 +672,10 @@ function drawAxis() {
     }
 
     if (sceneCount == 8) {
+        textStyle(NORMAL);
         // x axis arrow
-        line(graphW, graphY, graphW - size, graphY - size);
-        line(graphW, graphY, graphW - size, graphY + size);
+        line(graphW + 14, graphY, graphW - size + 14, graphY - size);
+        line(graphW + 14, graphY, graphW - size + 14, graphY + size);
 
         // tick 1
         text("|", graphC + 70, graphY + 7);
@@ -1444,10 +1446,14 @@ function drawSets(box, type, fillAmount, showScreen, screenAmount, spacing, side
 
                     // straight
                     beginShape();
-                    vertex(negbox8.x + negbox8.w + 46, negbox8.y + spacing - 3 + offsetY);
+                    // vertex(negbox8.x + negbox8.w + 46, negbox8.y + spacing - 3 + offsetY);
+                    // vertex(negbox8.x + negbox8.w, negbox8.y + spacing - 3 + offsetY);
+                    // vertex(negbox8.x + negbox8.w, negbox8.y + spacing + 3 + offsetY);
+                    // vertex(negbox8.x + negbox8.w + 46, negbox8.y + spacing + 3 + offsetY);
+                    vertex(568, negbox8.y + spacing - 3 + offsetY);
                     vertex(negbox8.x + negbox8.w, negbox8.y + spacing - 3 + offsetY);
                     vertex(negbox8.x + negbox8.w, negbox8.y + spacing + 3 + offsetY);
-                    vertex(negbox8.x + negbox8.w + 46, negbox8.y + spacing + 3 + offsetY);
+                    vertex(568, negbox8.y + spacing + 3 + offsetY);
                     endShape(CLOSE);
 
                     // sloping
