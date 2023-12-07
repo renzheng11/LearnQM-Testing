@@ -1360,23 +1360,27 @@ function drawSets(box, type, fillAmount, showScreen, screenAmount, spacing, side
         lineWeight = currPosBox.chargeAmount / chargeDivisor * thickScale;
         if (sides.includes("l") && currPosBox.chargeAmount != 0 && lineWeight != 0) {
             if (sceneCount == 4 || sceneCount == 5 || sceneCount == 6 || sceneCount == 7) {
-                if (!currAnimated) {
+                // if (!currAnimated) {
                     let x1 = currPosBox.c - lineSize - gap + offsetX;
                     let x2 = currPosBox.c - gap + offsetX - 2;
                     let y = currPosBox.y + spacing + offsetY;
 
-                    drawArrow(x1, x2, y, "l", "l", color.pos, lineWeight, fillAmount);
-                }
-                else if (currAnimated) {
-                    lineWeight = (currPosBox.chargeAmount - currNegBox.chargeAmount) / chargeDivisor * thickScale;
-                    let x1 = currPosBox.c - lineSize - gap + offsetX;
-                    let x2 = currPosBox.c - gap + offsetX - 2;
-                    let y = currPosBox.y + spacing + offsetY + animatedOffset;
-
-                    if (lineWeight > 0) {
-                        drawArrow(x1, x2, y, "l", "l", color.pos, lineWeight, fillAmount);
+                    if (currAnimated) {
+                        y += animatedOffset;
                     }
-                }
+
+                    drawArrow(x1, x2, y, "l", "l", color.pos, lineWeight, fillAmount);
+                // }
+                // else if (currAnimated) {
+                //     lineWeight = (currPosBox.chargeAmount - currNegBox.chargeAmount) / chargeDivisor * thickScale;
+                //     let x1 = currPosBox.c - lineSize - gap + offsetX;
+                //     let x2 = currPosBox.c - gap + offsetX - 2;
+                //     let y = currPosBox.y + spacing + offsetY + animatedOffset;
+
+                //     if (lineWeight > 0) {
+                //         drawArrow(x1, x2, y, "l", "l", color.pos, lineWeight, fillAmount);
+                //     }
+                // }
             }
             else {   // 3d
                 let x1 = currPosBox.c - lineSize - gap + offsetX;
@@ -1390,31 +1394,35 @@ function drawSets(box, type, fillAmount, showScreen, screenAmount, spacing, side
         // pos right lines
         if (sides.includes("r") && currPosBox.chargeAmount != 0 && lineWeight != 0) {
             if (sceneCount == 4 || sceneCount == 5 || sceneCount == 6 || sceneCount == 7) {
-                if (!currAnimated) {
+                // if (!currAnimated) {
                     lineWeight = currPosBox.chargeAmount / chargeDivisor * thickScale;
                     let x1 = gap + currPosBox.c + offsetX;
                     let x2 = gap + currPosBox.c + lineSize + offsetX;
                     let y = currPosBox.y + spacing + offsetY;
 
-                    drawArrow(x1, x2, y, "r", "r", color.pos, lineWeight, fillAmount);
-                }
-                else if (currAnimated) {
-                    lineWeight = (currPosBox.chargeAmount) / chargeDivisor * thickScale;
-                    let x1 = gap + currPosBox.c + offsetX;
-                    let x2 = gap + currNegBox.c + offsetX - 6;
-                    let y = currPosBox.y + spacing + offsetY + animatedOffset;
-
-                    drawArrow(x1, x2, y, "r", "r", color.pos, lineWeight, fillAmount);
-
-                    lineWeight = (currPosBox.chargeAmount - currNegBox.chargeAmount) / chargeDivisor * thickScale;
-                    x1 = gap + currPosBox.c + offsetX + 90;
-                    x2 = gap + currPosBox.c + lineSize + offsetX;
-                    y = currPosBox.y + spacing + offsetY + animatedOffset;
-
-                    if (lineWeight > 0) {
-                        drawArrow(x1, x2, y, "r", "r", color.pos, lineWeight, fillAmount);
+                    if (currAnimated) {
+                        y += animatedOffset;
                     }
-                }
+
+                    drawArrow(x1, x2, y, "r", "r", color.pos, lineWeight, fillAmount);
+                // }
+                // else if (currAnimated) {
+                //     lineWeight = (currPosBox.chargeAmount) / chargeDivisor * thickScale;
+                //     let x1 = gap + currPosBox.c + offsetX;
+                //     let x2 = gap + currNegBox.c + offsetX - 6;
+                //     let y = currPosBox.y + spacing + offsetY + animatedOffset;
+
+                //     drawArrow(x1, x2, y, "r", "r", color.pos, lineWeight, fillAmount);
+
+                //     lineWeight = (currPosBox.chargeAmount - currNegBox.chargeAmount) / chargeDivisor * thickScale;
+                //     x1 = gap + currPosBox.c + offsetX + 90;
+                //     x2 = gap + currPosBox.c + lineSize + offsetX;
+                //     y = currPosBox.y + spacing + offsetY + animatedOffset;
+
+                //     if (lineWeight > 0) {
+                //         drawArrow(x1, x2, y, "r", "r", color.pos, lineWeight, fillAmount);
+                //     }
+                // }
             }
             else {
                 let x1 = gap + currPosBox.c + offsetX;
@@ -1457,7 +1465,8 @@ function drawSets(box, type, fillAmount, showScreen, screenAmount, spacing, side
         else { // 2d
             offsetY = box.arrowOffsetY;
             // neg right side
-            if (sides.includes("r") && offsetY > 0 && box.chargeAmount > 0) {
+            if (sides.includes("r") && box.chargeAmount > 0) {
+            // if (sides.includes("r") && offsetY > 0 && box.chargeAmount > 0) {
                 // scene 8 sloped arrows
                 if (sceneCount == 8) {
                     fill(color.neg[0], color.neg[1], color.neg[2], fillAmount);
@@ -1465,10 +1474,7 @@ function drawSets(box, type, fillAmount, showScreen, screenAmount, spacing, side
 
                     // straight
                     beginShape();
-                    // vertex(negbox8.x + negbox8.w + 46, negbox8.y + spacing - 3 + offsetY);
-                    // vertex(negbox8.x + negbox8.w, negbox8.y + spacing - 3 + offsetY);
-                    // vertex(negbox8.x + negbox8.w, negbox8.y + spacing + 3 + offsetY);
-                    // vertex(negbox8.x + negbox8.w + 46, negbox8.y + spacing + 3 + offsetY);
+
                     vertex(568, negbox8.y + spacing - 3 + offsetY);
                     vertex(negbox8.x + negbox8.w, negbox8.y + spacing - 3 + offsetY);
                     vertex(negbox8.x + negbox8.w, negbox8.y + spacing + 3 + offsetY);
@@ -1492,6 +1498,10 @@ function drawSets(box, type, fillAmount, showScreen, screenAmount, spacing, side
                     let x1 = gap + box.x + box.w;
                     let x2 = 567;
                     let y = box.y + spacing + offsetY;
+
+                    if (currAnimated) {
+                        y += animatedOffset * 2;
+                    }
                     
                     drawArrow(x1, x2, y, "l", "l", color.neg, lineWeight, fillAmount);
                 }
@@ -1505,8 +1515,12 @@ function drawSets(box, type, fillAmount, showScreen, screenAmount, spacing, side
                     let x2 = box.x - gap;
                     let y = box.y + spacing + offsetY;
 
+                    // if (currAnimated) {
+                    //     x1 = currPosBox.x + gap;
+                    //     y += animatedOffset * 2;
+                    // }
+
                     if (currAnimated) {
-                        x1 = currPosBox.x + gap;
                         y += animatedOffset * 2;
                     }
 

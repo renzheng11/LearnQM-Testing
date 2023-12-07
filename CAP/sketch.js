@@ -379,10 +379,11 @@ function animateElectrons() {
         () => {
             if (sceneAnimated == false) {
                 setTimeout(() => {
-                    if (boxes.R9.numElectrons < totalElectrons) {
-                        sceneAnimated = true;
-                        showEF = true;
-                    }
+                    // if (boxes.L9.numElectrons < totalElectrons) {
+                    showEF = true;
+                    sceneAnimated = true;
+                    
+                    // }
                 }, "4000");
             }
         },
@@ -400,7 +401,8 @@ function animateElectrons() {
             boxes.R9.updateDopants(document.getElementById("dopantSlider9").value);
         })
 
-    controlHelper(10, 'voltageButton10', 'Apply Voltage',
+    // control 10
+    controlHelper(10, 'scanButton10', 'Scan',
         () => {
             if (sceneAnimated == false) { // hasn't animated yet
                 setTimeout(() => {
@@ -1001,6 +1003,7 @@ function drawGraph() {
     let noHeights = [0, 0, 0];
     let noHeightXPoints = [graphX, graphC, graphC + 80];
 
+    
     if (!showEF) {
         drawLines(noHeightXPoints, noHeights, color.purple);
     }
@@ -1014,7 +1017,9 @@ function drawGraph() {
         purpleHeights[i] = purpleHeights[i] / graphNorm;
     }
 
+    
     if (currButton && currButton.textContent == "Reset" && showEF) {
+        // console.log(object);
         drawLines(purpleXPoints, purpleHeights, color.purple);
         drawArrows();
     }
@@ -1044,9 +1049,20 @@ function drawLines(points, rawHeights, color) {
 
 function drawArrows() {
     if (showEF) {
-        let x1 = 262;
-        let x2 = 338;
-        let y = 112;
+        let x1;
+        let x2;
+        let y;
+
+        if (!reverse) {
+            x1 = 262;
+            x2 = 338;
+            y = 112;
+        } 
+        else if (reverse) {
+            x1 = 268;
+            x2 = 350;
+            y = 112;
+        }
 
         for (let i = 0; i < 7; i++) {
             strokeCap(SQUARE);
@@ -1060,11 +1076,21 @@ function drawArrows() {
             noStroke();
 
             if (weight > 0) {
-                triangle(
-                    x2, y,
-                    x2 - triangleSize, y - triangleSize / 1.7,
-                    x2 - triangleSize, y + triangleSize / 1.7
-                )
+                if (!reverse) {
+                    triangle(
+                        x2, y,
+                        x2 - triangleSize, y - triangleSize / 1.7,
+                        x2 - triangleSize, y + triangleSize / 1.7
+                    )
+                }
+                else if (reverse) {
+                    triangle(
+                        x1 - 8, y,
+                        x1 + triangleSize - 8, y + triangleSize / 1.7,
+                        x1 + triangleSize - 8, y - triangleSize / 1.7
+                    )
+                }
+
             }
             y += 40;
         }
@@ -1280,6 +1306,9 @@ function scene8() {
 }
 
 function scene9() {
+    currButton = document.getElementById("scanButton9");
+    currVoltageSlider = document.getElementById("voltageSlider9");
+    currDopantSlider = document.getElementById("dopantSlider9");
     background(18);
     currLeftBox = boxes.L9;
     currRightBox = boxes.R9;
