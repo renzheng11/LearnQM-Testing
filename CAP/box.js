@@ -1,19 +1,21 @@
 class Box {
-    constructor(x, y, w, h, numElectrons, dim) {
+    constructor(x, y, w, h, numElectrons, type, boxName) {
         this.x = x;
         this.y = y;
         this.w = w;
         this.h = h;
         this.numElectrons = numElectrons;
-        this.scannerX = this.x - 40;
+        this.scannerX = this.x;
         this.scannerY = this.y;
         this.chargeMap = [];
-        this.randomMap = [];
         this.electrons = [];
+        this.dopantIndices = [];
         this.dim = false;
+        this.type = type;
+        this.dopantAmount = 0;
+        this.boxName = boxName;
 
         // populate chargeMap
-        this.populateRandomMap();
         this.populateChargeMap();
         this.populateElectrons();
     }
@@ -31,52 +33,66 @@ class Box {
     }
 
     populateElectrons() {
+        this.electrons = [];
         for (let i = 0; i < this.numElectrons; i++) {
             let xMin = this.x + 14;
             let xMax = this.w + this.x - 14;
             let yMin = this.y + 14;
             let yMax = this.h + this.y - 14;
-            let electron = new Electron(random(xMin, xMax), random(yMin, yMax), 5, this.x, this.y, this.w, this.h);
-            this.electrons.push(electron);
-        }
-    }
 
-    populateRandomMap() {
-        for (let row = 0; row < 9; row++) {
-            // for each column
-            this.randomMap[row] = []
-            for (let col = 0; col < 5; col++) {
-                let chance = Math.floor(Math.random() * 45);
-                if (chance <= 20) {
-                    this.randomMap[row][col] = 0;
-                } else {
-                    this.randomMap[row][col] = 1;
-                }
+            let dim = false;
+            if (this.type == "s") {
+                dim = true;
             }
+
+            let electron = new Electron(random(xMin, xMax), random(yMin, yMax), 4.6, this.x, this.y, this.w, this.h, dim, this.boxName);
+
+            this.electrons.push(electron);
         }
     }
 
     populateChargeMap() {
         let col = 1;
         // row = 1;
-        let xUnit = 19;
-        let yUnit = 18;
+        let xUnit = 15; //19
+        let yUnit = 13.4; // 18
         let type = "pos";
-        // for each row
-        for (let row = 0; row < 15; row++) {
-            this.chargeMap[row] = [];
-            for (let col = 0; col < 8; col++) {
-            // for each column
-                // this.chargeMap[row].push([xUnit * col, yUnit * row, `${type}`]);
-                // console.log(this.randomMap[row][col]);
-                // (this.randomMap[row][col] == 1)? type = "both": null;
-                // if (this.randomMap[row][col] == 1) {
-                //     type = "both";
-                // }
 
-                this.chargeMap[row].push(new Charge(type, xUnit * col + this.x - 7, yUnit * row + this.y - 4));
+        if (this.type == "s") {
+            type = "dim";
+        }
+        // for each row
+
+        let index = 0;
+        for (let col = 0; col < cols; col++) {
+            for (let row = 0; row < rows; row++) {
+                this.chargeMap.push(new Charge(type, xUnit * col + this.x - 7, yUnit * row + this.y - 4));
             }
-            // type = "none";
+        }
+    }
+
+    updateDopants(value) {
+        let allCharges = rows * cols;
+        this.dopantAmount = value;
+        // this.numElectrons = this.dopantAmount;
+        this.populateElectrons();
+
+        // Reset the array of purple indices
+        this.dopantIndices = [];
+        for (let i = 0; i < this.chargeMap.length; i++) {
+            this.chargeMap[i].updateType("dim");
+        }
+
+        // Generate random indices for purple circles
+        for (let i = 0; i < this.dopantAmount; i++) {
+            this.electrons[this.numElectrons-i -1].updateDim(false);
+            
+            
+            let index = floor(random(allCharges));
+            while (this.dopantIndices.includes(index)) {
+                index = floor(random(allCharges));
+            }
+            this.dopantIndices.push(index);
         }
     }
 }

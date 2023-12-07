@@ -550,17 +550,24 @@ function flowCharges(value) {
     let chargeMapA = {}
     let chargeMapC = {}
 
+    // box A amount - starts with 40
     let start = 40;
-    for (let i = 0; i < 26; i++) {
+    for (let i = 0; i <= 40; i++) {
         chargeMapA[i] = start;
         start -= 1
     }
  
-    start = 15;
-    for (let i = 0; i < 26; i++) {
+    // boxC amount - starts with 15
+    start = 0;
+    for (let i = 0; i <= 40; i++) {
         chargeMapC[i] = start;
         start += 1;
     }
+
+    console.log("A");
+    console.log(chargeMapA);
+    console.log("C");
+    console.log(chargeMapC);
 
     negbox7a.updateCharge(chargeMapA[value]);
     negbox7c.updateCharge(chargeMapC[value]);
@@ -612,7 +619,13 @@ function drawEqs(box, loc) {
     }
 
     if (sceneCount == 8) {
-        text(`± ${eField} MV/cm`, negbox8.x + negbox8.w/2 + 46, eFieldY);
+        if (box.charge == "neg") {
+            // text(`± ${eField} MV/cm`, box.x + 46 + negbox8.w / 2, eFieldY);
+        }
+        else {
+            text(`± ${eField} MV/cm`, box.x + 46, eFieldY);
+        }
+        // text(`± ${eField} MV/cm`, negbox8.x + negbox8.w/2 + 46, eFieldY);
     }
     else {
         text(`± ${eField} MV/cm`, box.x + 46, eFieldY);
@@ -662,13 +675,22 @@ function drawAxis() {
 
     // y axis arrow
     stroke(color.grey[0], color.grey[1], color.grey[2]);
+    // up
     line(graphC, graphY - 76, graphC - size, graphY - 76 + size);
     line(graphC, graphY - 76, graphC + size, graphY - 76 + size);
 
+    // down
+    line(graphC, graphY + 61, graphC + size, graphY + 61 - size);
+    line(graphC, graphY + 61, graphC - size, graphY + 61 - size);
+
     if (sceneCount != 8) {
-        // x axis arrow
+        // x axis arrow - right
         line(graphW, graphY, graphW - size, graphY - size);
         line(graphW, graphY, graphW - size, graphY + size);
+
+        // x axis arrow - left
+        line(graphX, graphY, graphX + size, graphY + size);
+        line(graphX, graphY, graphX + size, graphY - size);
     }
 
     if (sceneCount == 8) {
@@ -676,6 +698,10 @@ function drawAxis() {
         // x axis arrow
         line(graphW + 14, graphY, graphW - size + 14, graphY - size);
         line(graphW + 14, graphY, graphW - size + 14, graphY + size);
+
+        // x axis arrow - left
+        line(graphX, graphY, graphX + size, graphY + size);
+        line(graphX, graphY, graphX + size, graphY - size);
 
         // tick 1
         text("|", graphC + 70, graphY + 7);
@@ -809,13 +835,6 @@ function drawGraph(box) {
     }
 }
 
-function drawSlope(points, heights, color) {
-    stroke(color[0], color[1], color[2]);
-    for (i = 0; i < points.length; i++) {
-        line(points[i], heights[i], points[i + 1], heights[i + 1]); // line
-    }
-}
-
 function drawLines(points, rawHeights, color, colorString, drawMid) {
     let graphDivisor = 2;
     let unit = 1 / graphDivisor;
@@ -837,10 +856,11 @@ function drawLines(points, rawHeights, color, colorString, drawMid) {
         if (i == points.length - 1) {
             if (sceneCount == 8 && (colorString == "neg" || colorString == "purple")) {
                 line(points[i], heights[i - 1], negbox8.x + negbox8.w, heights[i]); // line
+                line(negbox8.x + negbox8.w, heights[i], graphEnd + 17, heights[i]); // line
             }
             // last graph line
             else {
-                line(points[i], heights[i], graphEnd, heights[i]); // line
+                line(points[i], heights[i], graphEnd + 17, heights[i]); // line
             }
         }
         else {
@@ -878,7 +898,6 @@ function animateScreen() {
             animated.scene4 = false;
             currPosBox.updateMinusLineWeight(negbox4.chargeAmount);
             negbox4.resetArrowOffsetY(14);
-            console.log(negbox4.arrowOffsetY);
             document.getElementById('showScreen4').textContent = 'Show Screening';
 
             document.getElementById("purpleToggle4").style.display = "none";
@@ -1717,7 +1736,7 @@ function resetCharges(box) {
 function resetScene() {
     let idValues = [
         "posToggle4", "negToggle4", "posToggle5", "negToggle5", "posToggle6",
-        "negToggle6", "purpleToggle6", "posToggle7", "negToggle7", "purpleToggle7"
+        "negToggle6", "purpleToggle6", "posToggle7", "negToggle7", "purpleToggle7", "posToggle8", "negToggle8", "purpleToggle8"
     ]
 
     for (let i = 0; i < idValues.length; i++) {

@@ -57,7 +57,7 @@
         </div>
         <div class="row row1" id="scene1">
             <div class="col-lg-4">
-                <h1>[1] Two Metallic Layers - Transfer</h1>
+                <h1>[1] Metal - Apply Voltage</h1>
                 
                 <p>
                     Paragraph
@@ -65,105 +65,166 @@
                 <br><br>
                 <span class="highlight">Directions</span>
             </p>
-            <button class="button" type="button" id="replace" onclick="animateElectrons()">Button</button>
+            <button class="button" type="button" id="voltageButton1" onclick="animateElectrons()">Apply Voltage</button>
             </div>
             
         </div>
 
         <div class="row row2" id="scene2">
             <div class="col-lg-4">
-                <h1>[2] Voltage</h1>
+                <h1>[2] Metal - Change Voltage</h1>
                 <p>
                     Title
                     <br><br>
                     <span class="highlight">Slider Directions</span></p>
-                    <input style="width: 300" type="range" min="0" max="120" value="18" onchange="updateNumTransfer(this.value)">
+                    <input id="voltageSlider2" style="width: 300" type="range" min="0" max="16" value="12" onchange="updateNumTransfer(this.value)">
+                    <label for="voltageSlider2" class="labels">Voltage</label>
                     <br><br>
-                    <button class="button" type="button" id="replace" onclick="animateElectrons()">Transfer</button>
+                    <button class="button" type="button" id="voltageButton2" onclick="animateElectrons()">Apply Voltage</button>
             </div>
             
         </div>
 
-        <div class="row row2" id="scene3">
+        <div class="row row3" id="scene3">
             <div class="col-lg-4">
                 <h1>[3] Electric Field</h1>
                 <p>
                 Paragraph</p>
-                <input style="width: 300" type="range" min="0" max="120" value="18" onchange="updateNumTransfer(this.value)">
+
+                    <input id="voltageSlider3" style="width: 300" type="range" min="0" max="16" value="12"
+                        onchange="updateNumTransfer(this.value)">
+                <!-- <br><br> -->
+                <label for="voltageSlider3" class="labels">Voltage</label>
+
                 <br><br>
-                <button class="button" type="button" onclick="animateElectrons()">Transfer</button>
+                <button class="button" type="button" id="voltageButton3" onclick="animateElectrons()">Apply Voltage</button>
             </div>
         </div>
-        <div class="row row3" id="scene4">
+        <div class="row row4" id="scene4">
             <div class="col-lg-4">
-                <h1>[4] Charge Density - Metal</h1>
+                <h1>[4] Metal - Scanner</h1>
             
                 <p>
                 Paragraph
 
                 <br><br>
+
+                <input id="voltageSlider4" style="width: 300" type="range" min="0" max="16" value="12"
+                    onchange="updateNumTransfer(this.value)">
+                <label for="voltageSlider4" class="labels">Voltage</label>
+                <br><br>
+
+                <button class="button" type="button" id="scanButton4"  onclick="animateElectrons()">Scan</button>
                 
             </div>
         </div>
-        <div class="row row4" id="scene5">
+        <div class="row row5" id="scene5">
             <div class="col-lg-4">
                 
-                <h1>[5] Charge Density - Semiconductor with Dopants</h1>
+                <h1>[5] Semi - Apply Voltage</h1>
                 <p> 
 
                 </p>
-                <!-- <input type="checkbox" id="screen5" name="screen5" value="pos" onclick="showScreen()">
-                <label for="screen5" class="labels">Screen</label><br> -->
 
-                <input type="checkbox" id="replace" name="replace" value="pos" checked onclick="replaceFunc(this.value)">
-                <label for="posToggle5" class="labels">Toggle</label><br>
-            
+                <button class="button" type="button" id="voltageButton5" onclick="animateElectrons()">Apply Voltage</button>
 
 
-                <button class="button" type="button" id="replace" onclick="replaceFunc()">Button</button>
             </div>
         </div>
-        <div class="row row5" id="scene6">
+        <div class="row row6" id="scene6">
             <div class="col-lg-4">
                 
-                <h1>[6] Dopant Amount</h1>
+                <h1>[6] Semi - Change voltage</h1>
 
-                <p>
-                Paragraph
-
-                </p>
-
-                <button class="button" type="button" id ="negbox6" onclick="toggleBox()">Add Surface</button>
-                <input style="width: 300" type="range" min="0" max="120" value="18" onchange="changeDopantAmount(this.value)">
-
+                <input id="voltageSlider6" style="width: 300" type="range" min="0" max="16" value="12"
+                    onchange="updateNumTransfer(this.value)">
+                <label for="voltageSlider6" class="labels">Voltage</label>
                 <br><br>
+                <button class="button" type="button" id="voltageButton6" onclick="animateElectrons()">Apply Voltage</button>
 
-                </svg>
             </div>
         </div>
-        <div class="row row6" id="scene7">
+        <div class="row row7" id="scene7">
             <div class="col-lg-4">
                 
-                <h1>[7] Electric Field over distance</h1>
-                <p>
-                    
-                    Paragraphs
-                </p>
-
-                </svg>
-            </div>
-        </div>
-        <div class="row row7" id="scene8">
-            <div class="col-lg-4">
-                <h1>[8] Reverse Polarity</h1>
+                <h1>[7] Semi - Scanner</h1>
                 <p>
                     Paragraph
                 </p>
+                <!-- <button class="button" type="button" id ="negbox6" onclick="toggleBox()">Add Surface</button> -->
+                <br><br>
+
+                <input id="voltageSlider7" style="width: 300" type="range" min="0" max="16" value="12"
+                    onchange="updateNumTransfer(this.value)">
+                <label for="voltageSlider7" class="labels">Voltage</label>
+                
+                <button id="scanButton7" class="button" type="button" onclick="animateElectrons()">Scan</button>
+                
+                </svg>
+
+                </svg>
             </div>
         </div>
-        <div class="row row8" id="scene9">
+        <div class="row row8" id="scene8">
             <div class="col-lg-4">
-                <h1>[9] MOS Capacitor</h1>
+                <h1>[8] Semi - Change Dopants </h1>
+                <p>
+                    Paragraph
+                </p>
+
+                <input id="voltageSlider8" style="width: 300" type="range" min="0" max="16" value="12"
+                    onchange="updateNumTransfer(this.value)">
+                <label for="voltageSlider8" class="labels">Voltage</label>
+
+                <input id="dopantSlider8" style="width: 300" type="range" min="0" max="180" value="30"
+                    onchange="updateDopantAmount(this.value)">
+                <label for="dopantSlider8" class="labels">Dopant Amount</label>
+                <br><br>
+                <button id="scanButton8" class="button" type="button" onclick="animateElectrons()">Scan</button>
+
+
+
+            </div>
+        </div>
+        <div class="row row9" id="scene9">
+            <div class="col-lg-4">
+                <h1>[9] Electric field over a distance</h1>
+                <p>
+                    Content
+                </p>
+                <input id="voltageSlider9" style="width: 300" type="range" min="0" max="16" value="12"
+                    onchange="updateNumTransfer(this.value)">
+                <label for="voltageSlider9" class="labels">Voltage</label>
+                
+                <input id="dopantSlider9" style="width: 300" type="range" min="0" max="180" value="30"
+                    onchange="updateDopantAmount(this.value)">
+                <label for="dopantSlider9" class="labels">Dopant Amount</label>
+                <br><br>
+                <button id="scanButton9" class="button" type="button" onclick="animateElectrons()">Scan</button>
+            </div>
+        </div>
+        <div class="row row10" id="scene10">
+            <div class="col-lg-4">
+                <h1>[10] Reverse polarity</h1>
+                <p>
+                    Content
+                </p>
+                <input id="voltageSlider10" style="width: 300" type="range" min="0" max="16" value="12"
+                    onchange="updateNumTransfer(this.value)">
+                <label for="voltageSlider10" class="labels">Voltage</label>
+                
+                <button id="scanButton10" class="button" type="button" onclick="animateElectrons()">Scan</button>
+            </div>
+        </div>
+        <div class="row row11" id="scene11">
+            <div class="col-lg-4">
+                <h1>[11] MOS </h1>
+                <p>
+                    Content
+                </p>
+                <br><br>
+                <br><br>
+                <br><br>
             </div>
         </div>
         <div id="visualization">

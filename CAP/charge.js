@@ -1,8 +1,7 @@
 class Electron {
-    constructor(x, y, radius, boxX, boxY, boxW, boxH) {
-        // console.log("constructor");
+    constructor(x, y, radius, boxX, boxY, boxW, boxH, dim, boxName) {
         this.position = createVector(x, y);
-        this.velocity = p5.Vector.random2D().mult(4); // Initial random velocity
+        this.velocity = p5.Vector.random2D().mult(2.5); // Initial random velocity
         this.radius = radius;
         this.boxX = boxX;
         this.boxY = boxY;
@@ -12,12 +11,17 @@ class Electron {
         this.show = true;
         this.passedDest = [0];
         this.pushed = false;
-        this.dim = false;
+        this.dim = dim;
         this.message = "instance"
         this.moveBool = false;
+        this.boxName = boxName;
     }
     updateMove(value) {
         this.moveBool = value;
+    }
+
+    updateBoxName(value) {
+        this.boxName = value;
     }
 
     updateMessage(str) {
@@ -32,6 +36,10 @@ class Electron {
 
     updatePushed(value) {
         this.pushed = value;
+    }
+
+    updateDim(value) {
+        this.dim = value;
     }
 
     updatePassed(value) {
@@ -50,21 +58,21 @@ class Electron {
         this.dim = value;
     }
 
-    updateVelocity() {
-        this.position.x += random(-60, 60);
-        this.position.y += random(-60, 60);
-        this.velocity = p5.Vector.random2D().mult(3); // random velocity
-        this.position.add(this.velocity);
+    updateVelocity(value) {
+        this.velocity = value;
     }
 
     update() {
-        // Move the ball
+        // Move the charge
         this.position.add(this.velocity);
 
-        let left = this.boxX + 10;
-        let right = this.boxX + this.boxW - 10;
-        let top = this.boxY + 10;
-        let bottom = this.boxY + this.boxH - 10;
+        let buffer = 6;
+
+        let left = this.boxX + buffer;
+
+        let right = this.boxX + this.boxW - buffer;
+        let top = this.boxY + buffer;
+        let bottom = this.boxY + this.boxH - buffer;
 
         if (this.position.x < left || this.position.x > right - this.radius) {
             this.velocity.x *= -1;
@@ -73,8 +81,6 @@ class Electron {
             this.velocity.y *= -1;
         }
     }
-
-
 
     move(destination) {
         // Calculate the vector pointing from the current position to the destination
@@ -94,7 +100,6 @@ class Electron {
         // Draw the electron
         fill(color.neg)
         dim ? fill(color.negDim) : null;
-        // fill(0, 150, 200);
         noStroke();
         ellipse(this.position.x, this.position.y, this.radius * 1.7);
     }
@@ -107,10 +112,6 @@ class Charge {
         this.y = y;
         this.animated = false;
         this.dim = false;
-    }
-
-    updateDim(value) {
-        this.dim = value;
     }
 
     updateAnimated(bool) {

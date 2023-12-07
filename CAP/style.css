@@ -48,14 +48,16 @@
 .row7,
 .row8, 
 .row9,
-.row10 {
+.row10,
+.row11,
+.row12 {
     margin-top: 200px;
     opacity: 0;
     transform: translateY(50px);
     transition: all 0.3s ease-out;
 }
 
-.row10 {
+.row11 {
     margin-bottom: 300px;
 }
 
@@ -68,7 +70,9 @@
 .row7 h1,
 .row8 h1,
 .row9 h1,
-.row10 h1
+.row10 h1,
+.row11 h1,
+.row12 h1
  {
     font-family: Agency FB;
     font-style: normal;
@@ -103,7 +107,9 @@
 .row7 p,
 .row8 p,
 .row9 p,
-.row10 p {
+.row10 p,
+.row11 p,
+.row12 p {
     margin-top: 30px;
     font-family: Bai Jamjuree;
     font-style: normal;
@@ -216,6 +222,7 @@
      background-color: #ccc;
      -webkit-transition: .4s;
      transition: .4s;
+    display: block;
  }
 
  .slider:before {
@@ -270,6 +277,7 @@ input:checked+.slider:before {
 }
 
 .labels {
+display: block;
     color: white;
 }
 
