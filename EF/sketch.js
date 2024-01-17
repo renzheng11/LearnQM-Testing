@@ -14,6 +14,9 @@ let toggleNegBox6;
 
 let screenAmount;
 
+let slider;
+let sliderValue;
+
 let animate;
 let animated;
 
@@ -251,6 +254,12 @@ function setup() {
     for (let i = 0; i < allBoxes.length; i++) {
         populateChargeGrid(allBoxes[i])
     }
+
+    // slider = createSlider(0, 80, 0);
+    // slider.position(10, 5400);
+    // slider.style('width', '200px');
+
+    // sliderValue = slider.value();
 }
 
 function draw() {
@@ -329,7 +338,16 @@ function scene3() {
         drawCharges(box3);
     }
 
+    
+
+
+
     drawBox(box3,  "r");
+
+    // sliderValue = slider.value();
+    // box3.updateCharge(sliderValue);
+    // resetCharges();
+
 }
 
 function scene4() {
@@ -484,6 +502,9 @@ function scene7() { // 7scene
         drawBox(negbox7c,   "s");
         drawCharges(negbox7c);
     }
+
+
+
 }
 
 
@@ -511,6 +532,11 @@ function scene8() { //8scene
     drawBox(box8, "r");
     drawCharges(negbox8);
     drawBox(negbox8, "p");
+
+    // sliderValue = slider.value();
+    // negbox8.updateW(int(sliderValue));
+    // volumeWidth = (negbox8.w) / 75;
+    // resetCharges();
 }
 
 function toggleBox() {
@@ -563,11 +589,6 @@ function flowCharges(value) {
         chargeMapC[i] = start;
         start += 1;
     }
-
-    console.log("A");
-    console.log(chargeMapA);
-    console.log("C");
-    console.log(chargeMapC);
 
     negbox7a.updateCharge(chargeMapA[value]);
     negbox7c.updateCharge(chargeMapC[value]);
