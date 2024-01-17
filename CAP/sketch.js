@@ -54,7 +54,7 @@ let boxes = {
 }
 
 const graphY = 560
-const graphW = 440
+const graphW = 616
 const graphC = 260
 const leftPadding = 140
 const graphX = graphC - graphW / 2 + leftPadding
@@ -285,8 +285,8 @@ function animateElectrons() {
   // reset scanner
   controlHelper(
     4,
-    "scanButton4",
-    "Scan",
+    "voltageButton4",
+    "Apply Voltage",
     () => {
       if (sceneAnimated == false) {
         setTimeout(() => {
@@ -604,6 +604,73 @@ function drawBox(box) {
   vertex(box.x + box.w + boxD, box.y + boxA) // top right
   vertex(box.x + boxD, box.y + boxA) // top left
   endShape(CLOSE)
+
+  styleText()
+
+  if (box.type == "m") {
+    let totalNM = 10
+    text(`Total nm: 10`, box.x + 20, box.y + 300)
+
+    // code numtransfer = 12
+    // # / 20 in 1m = #/20nm
+    if (electronsTransferred > 1) {
+      if (box.x > 300) {
+        totalNM -= numTransfer / 20
+      } else {
+        totalNM += numTransfer / 20
+      }
+    }
+
+    let numElectrons = (totalNM * 10 ** 15).toExponential()
+
+    // let nr1 = numElectrons.substr(0, 4)
+    // let nr2 = numElectrons.substr(4, numElectrons.length)
+
+    // let finalNr = Number(nr1 + 0 + nr2).toExponential(2)
+
+    text(`Total electrons: ${numElectrons}`, box.x + 20, box.y + 320)
+  } else if (box.type == "s") {
+    let totalNM = 10
+    // let expoRange = 10 ** 2 / box.dopantAmount
+    let expo = 10 ** 15
+
+    // let expo = 10 ** 15
+
+    text(`Total nm: 10`, box.x + 20, box.y + 300)
+    let numElectrons = (totalNM * expo).toExponential()
+
+    let nr1 = numElectrons.substr(0, 4)
+    let nr2 = numElectrons.substr(4, numElectrons.length)
+    let finalNr = Number(nr1 + 0 + nr2).toExponential(2)
+
+    // console.log(numElectrons)
+    text(`Total electrons: ${finalNr}`, box.x + 20, box.y + 320)
+  }
+  // text(`total negative charges:${box.numElectrons}`, box.x + 20, box.y + 320)
+  // text(
+  //   `total positive charges:${box.chargeMap.length}`,
+  //   box.x + 20,
+  //   box.y + 340
+  // )
+
+  // text(
+  //   `net charge: ${box.chargeMap.length - box.numElectrons}`,
+  //   box.x + 20,
+  //   box.y + 360
+  // )
+
+  // // left box
+  // text(`total nm: 10`, xLeft + 20, box.y + 300)
+  // text(
+  //   `total negative charges:${currLeftBox.numElectrons}`,
+  //   xLeft + 20,
+  //   box.y + 320
+  // )
+  // text(
+  //   `total positive charges:${currLeftBox.chargeMap.length}`,
+  //   xLeft + 20,
+  //   box.y + 340
+  // )
 }
 
 function drawAnimatedCharges(charges) {
@@ -715,8 +782,8 @@ function drawCharges(box, type) {
     drawCharge(chargeX, chargeY, chargeType, box.chargeMap[i].lit)
   }
 
-  styleText()
-  text(`#negative charges: ${box.numElectrons}`, box.x + 30, box.y + 300)
+  // styleText()
+  // text(`#negative charges: ${box.numElectrons}`, box.x + 30, box.y + 300)
 }
 
 function updateDopantAmount(value) {
@@ -914,7 +981,7 @@ function drawCharge(chargeX, chargeY, chargeType, lit) {
   if (chargeType == "pos") {
     lit ? fill(218, 107, 107) : fill(218, 107, 107, fade)
     circle(chargeX, chargeY, posSize)
-    stroke(color.sign)
+    lit ? stroke(122, 59, 59) : stroke(122, 59, 59, fade)
   }
   if (chargeType == "neutral") {
     fill(color.neutral)
@@ -983,7 +1050,7 @@ function drawScanner(box) {
   // let electronIndex = Math.floor(box.numElectrons * scanProgress)
 
   // draw scanner
-  fill(255, 250, 202, 120)
+  fill(255, 250, 202, 80)
   noStroke()
 
   let xPos = 0
@@ -1005,19 +1072,47 @@ function drawScanner(box) {
     scannerNM = 1
   }
 
-  rect(box.scannerX, box.scannerY, lastPos + scannerWidth, box.h)
+  // only draw if electrons have been animated
+  if (electronsTransferred > 1) {
+    rect(box.scannerX, box.scannerY, lastPos + scannerWidth, box.h)
 
-  beginShape()
-  vertex(box.x, box.y) // bottom left
-  vertex(box.x + scannerWidth + lastPos, box.y) // bottom right
-  vertex(box.x + scannerWidth + 24 + lastPos, box.y + boxA) // top right
-  vertex(box.x + boxD, box.y + boxA) // top left
-  endShape(CLOSE)
+    beginShape()
+    vertex(box.x, box.y) // bottom left
+    vertex(box.x + scannerWidth + lastPos, box.y) // bottom right
+    vertex(box.x + scannerWidth + 24 + lastPos, box.y + boxA) // top right
+    vertex(box.x + boxD, box.y + boxA) // top left
+    endShape(CLOSE)
 
-  // text of numbers
+    // text of numbers
 
-  styleText()
-  text(`nm: ${scannerNM.toFixed(2)}`, box.x + 30, box.y - 30)
+    styleText()
+    // text(`scanner nm: ${scannerNM.toFixed(2)}`, box.x + 30, box.y - 60)
+    // text(
+    //   `scanner negative charges: ${floor(scannerNM * 20)}`,
+    //   box.x + 30,
+    //   box.y - 40
+    // )
+
+    // text(
+    //   `scanner positive charges: ${floor(scannerNM * 20)}`,
+    //   box.x + 30,
+    //   box.y - 20
+    // )
+
+    // text(`Scanner net charge: 0`, box.x + 30, box.y - 0)
+
+    // + floor(Math.random() * 4 - 2)
+
+    text(`Scanner nm: ${scannerNM.toFixed(2)}`, box.x + 30, box.y - 60)
+
+    let numElectrons = (scannerNM * 10 ** 15).toExponential()
+
+    let nr1 = numElectrons.substr(0, 4)
+    let nr2 = numElectrons.substr(4, numElectrons.length)
+    let finalNr = Number(nr1 + 0 + nr2).toExponential(2)
+
+    text(`Electrons within scanner: ${finalNr}`, box.x + 30, box.y - 40)
+  }
 }
 
 function styleText() {
@@ -1037,7 +1132,7 @@ function drawGraph() {
 
   line(graphC, graphY - 76, graphC, graphY + 60) // vert
 
-  sceneCount == 8 ? (xAxisExtend = 20) : null
+  // sceneCount == 8 ? (xAxisExtend = 20) : null
   line(graphX, graphY, graphEnd, graphY) // hor
 
   fill(color.grey)
@@ -1047,6 +1142,7 @@ function drawGraph() {
   let size = 4.4
   stroke(color.grey)
 
+  // graph lines + arrows
   // y axis arrow - up
   line(graphC, graphY - 76, graphC - size, graphY - 76 + size)
   line(graphC, graphY - 76, graphC + size, graphY - 76 + size)
@@ -1071,15 +1167,25 @@ function drawGraph() {
     eFieldHeight = numTransfer * 6
   }
 
-  let noHeights = [0, 0, 0]
-  let noHeightXPoints = [graphX, graphC, graphC + 80]
+  let noHeights = [0, 0]
+  let noHeightXPoints = [graphX, graphEnd]
 
   if (!showEF) {
     drawLines(noHeightXPoints, noHeights, color.purple)
   }
 
-  let purpleHeights = [0, -eFieldHeight, 0]
-  let purpleXPoints = [graphX, graphC, graphC + 80]
+  purpleHeights = [0, 0, -eFieldHeight, -eFieldHeight, 0, 0]
+  purpleXPoints = [graphX, graphC, graphC, graphC + 80, graphC + 80, graphEnd]
+
+  if (
+    sceneCount == 6 ||
+    sceneCount == 7 ||
+    sceneCount == 8 ||
+    sceneCount == 9
+  ) {
+    purpleHeights = [0, 0, -eFieldHeight, -eFieldHeight, 0]
+    purpleXPoints = [graphX, graphC, graphC, graphC + 80, graphEnd]
+  }
 
   graphNorm = 1.4
   // standardize the heights
@@ -1103,14 +1209,8 @@ function drawLines(points, rawHeights, color) {
     heights[i] = unit * rawHeights[i] + graphY
   }
 
-  for (i = 0; i < points.length; i++) {
-    if (i == points.length - 1) {
-      // last graph line
-      line(points[i], heights[i], graphEnd, heights[i]) // line
-    } else {
-      line(points[i], heights[i], points[i + 1], heights[i]) // line
-      line(points[i + 1], heights[i], points[i + 1], heights[i + 1]) // connecting
-    }
+  for (i = 0; i < points.length - 1; i++) {
+    line(points[i], heights[i], points[i + 1], heights[i + 1]) // line
   }
 }
 
@@ -1130,6 +1230,7 @@ function drawArrows() {
       y = 112
     }
 
+    // draw 7 arrows
     for (let i = 0; i < 7; i++) {
       strokeCap(SQUARE)
       stroke(color.purple)
@@ -1137,8 +1238,24 @@ function drawArrows() {
       strokeWeight(weight)
 
       let triangleSize = 12
-      line(x1, y, x2 - triangleSize, y)
       fill(color.purple)
+      // draw line
+      line(x1, y, x2 - triangleSize, y)
+      if (
+        sceneCount == 6 ||
+        sceneCount == 7 ||
+        sceneCount == 8 ||
+        sceneCount == 9
+      ) {
+        noStroke()
+        // rect(xRight, y, 100, weight)
+        beginShape()
+        vertex(xRight - 4, y - 2) // left top
+        vertex(xRight - 4, y - 2 + weight) // left bottom
+        vertex(xRight + boxWidth, y - 2 + weight / 2) // right bottom
+        vertex(xRight + boxWidth, y - 2 + weight / 2) // right top
+        endShape(CLOSE)
+      }
       noStroke()
 
       if (weight > 0) {
@@ -1170,7 +1287,7 @@ function drawArrows() {
 // fade all neutral charges
 function fadeFunc() {
   fadeAmount = -2
-  if (fade > 70) {
+  if (fade > 56) {
     fade += fadeAmount
   }
 }
@@ -1271,7 +1388,7 @@ function scene3() {
 }
 
 function scene4() {
-  currButton = document.getElementById("scanButton4")
+  currButton = document.getElementById("voltageButton4")
   currVoltageSlider = document.getElementById("voltageSlider4")
   background(18)
   currLeftBox = boxes.L4
@@ -1313,9 +1430,8 @@ function scene5() {
 }
 
 function scene6() {
-  currButton = document.getElementById("scanButton6")
-  currVoltageSlider = document.getElementById("voltageSlider6")
-  currDopantSlider = document.getElementById("dopantSlider6")
+  currButton = document.getElementById("voltageButton6")
+
   background(18)
   currLeftBox = boxes.L6
   currRightBox = boxes.R6
