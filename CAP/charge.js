@@ -101,10 +101,11 @@ class Electron {
 
   display(dim) {
     // Draw the electron
+    let colorFade = color.neg.concat(fade)
+
     this.animate || this.passedDest.includes(4)
-      ? fill(5, 177, 255)
-      : fill(5, 177, 255, fade) // negative
-    // dim ? fill(color.negDim) : null
+      ? fill(color.neg)
+      : fill(colorFade) // negative
     noStroke()
     ellipse(this.position.x, this.position.y, this.radius * 1.7)
   }

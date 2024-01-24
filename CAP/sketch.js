@@ -4,18 +4,16 @@ let afterDelay = false
 
 // vars
 let color = {
-  grey: "#989898",
-  pos: "#DA6B6B",
-  posDim: "#412E2E",
-  neg: "#5FB1FF",
-  negDim: "#124268",
-  sign: "#7A3B3B",
-  signDim: "#321F1F",
-  grey: "#AFAFAF",
-  battery: "#E6E2BC",
-  none: "#575757",
-  purple: "#9157CC",
-  neutral: "#4F4F4F",
+  grey: [175, 175, 175],
+  pos: [218, 107, 107],
+  posDim: [65, 46, 46],
+  neg: [95, 177, 255],
+  negDim: [18, 66, 104],
+  sign: [122, 59, 59],
+  signDim: [50, 31, 31],
+  battery: [230, 226, 188],
+  purple: [145, 87, 204],
+  neutral: [79, 79, 79],
 }
 
 let boxes = {
@@ -53,7 +51,7 @@ let boxes = {
   R11: null,
 }
 
-const graphY = 560
+const graphY = 580
 const graphW = 616
 const graphC = 260
 const leftPadding = 140
@@ -63,12 +61,6 @@ const graphEnd = graphC + graphW / 2 - 60
 const rows = 20
 const cols = 10
 
-const myShape = {
-  x: 200,
-  y: 100,
-  w: 50,
-  h: 50,
-}
 // battery measurements
 const batteryPosition = {
   center: 300,
@@ -124,9 +116,10 @@ let currVoltageSlider
 let currDopantSlider
 
 // box dimensions
-let xLeft = 100
+let xLeft = 0
 let xRight = 340
-let boxWidth = 160
+let boxY = 110
+let boxWidth = 280
 let boxHeight = 280
 
 // scanner / sizes
@@ -141,7 +134,7 @@ function setup() {
   batteryNeg = loadImage("batteryNeg.png")
 
   // tempBox
-  tempBox = new Box(100, 100, boxWidth, boxHeight, 0)
+  tempBox = new Box(xLeft, boxY, boxWidth, boxHeight, 0)
 
   let side = "left"
 
@@ -150,7 +143,7 @@ function setup() {
 
     let x
     side == "left" ? (x = xLeft) : (x = xRight)
-    boxes[box] = new Box(x, 100, 160, 280, totalElectrons, "m")
+    boxes[box] = new Box(x, boxY, 160, 280, totalElectrons, "m")
     side == "left" ? (side = "right") : (side = "left")
   }
 
@@ -579,8 +572,10 @@ function drawBox(box) {
   strokeWeight(1.2)
   noFill()
 
-  boxA = -20
-  boxD = 24
+  // boxA = -20
+  boxA = -60
+  // boxD = 24
+  boxD = 80
 
   beginShape()
   vertex(box.x, box.y)
