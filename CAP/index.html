@@ -1,231 +1,336 @@
 <!DOCTYPE html>
 <html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Capacitors</title>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Capacitors</title>
+		<!-- <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script> -->
+		<!-- <script src="https://two-ticks.github.io/p5.teach.js/dist/p5.teach.js"></script> -->
+		<!-- <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script> -->
+		<!-- <script src="p5.pattern.js"></script> -->
+		<!-- <script src="teach.js"></script> -->
+		<!-- <script type="text/javascript" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script> -->
 
-    
-    
-    
-
-    <!-- <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script> -->
-    <!-- <script src="https://two-ticks.github.io/p5.teach.js/dist/p5.teach.js"></script> -->
-    <!-- <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script> -->
-    <!-- <script src="p5.pattern.js"></script> -->
-    <!-- <script src="teach.js"></script> -->
-    <!-- <script type="text/javascript" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script> -->
-
-
-    <!-- <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script> -->
-    <!-- <script type="text/x-mathjax-config">
+		<!-- <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script> -->
+		<!-- <script type="text/x-mathjax-config">
       MathJax.Hub.Config({ tex2jax: { inlineMath: [['\\(', '\\)']] } });
     </script> -->
 
+		<link href="./style.css" rel="stylesheet" />
+		<link
+			href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+			rel="stylesheet"
+		/>
+		<link
+			href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@400;700&display=swap"
+			rel="stylesheet"
+		/>
 
-    <link href="./style.css" rel="stylesheet" />
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@400;700&display=swap" rel="stylesheet">
+		<script
+			defer
+			src="https://cdn.jsdelivr.net/npm/p5@1.0.0/lib/p5.js"
+		></script>
+		<script
+			defer
+			src="//cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.7/ScrollMagic.min.js"
+		></script>
+		<script
+			defer
+			src="//cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.7/plugins/debug.addIndicators.min.js"
+		></script>
+		<script
+			defer
+			src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.15.1/d3.min.js"
+		></script>
+		<script
+			defer
+			src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+		></script>
 
-    <script defer src="https://cdn.jsdelivr.net/npm/p5@1.0.0/lib/p5.js"></script>
-    <script defer src="//cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.7/ScrollMagic.min.js"></script>
-    <script defer src="//cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.7/plugins/debug.addIndicators.min.js"></script>
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.15.1/d3.min.js"></script>
-    <script defer src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"></script>
+		<script defer src="./tools.js"></script>
+		<script defer src="./scroll.js"></script>
+		<script defer src="./box.js"></script>
+		<script defer src="./charge.js"></script>
+		<script defer src="./sketch.js"></script>
+		<script defer src="./p5.tween.js"></script>
+	</head>
 
-    <script defer src="./scroll.js"></script>
-    <script defer src="./box.js"></script>
-    <script defer src="./charge.js"></script>
-    <script defer src="./sketch.js"></script>
-    <script defer src="./p5.tween.js"></script>
-</head>
+	<body id="body_parent" onload="StartScroll()">
+		<!-- <a href="../index.html"><img id="back-icon" src="../images/arrow-left.svg" /></a> -->
+		<div class="container">
+			<div class="row title">
+				<h1 class="col-lg-12">CAPACITORS</h1>
+				<div class="col-lg-1"></div>
+				<p class="col-lg-10">Introduction paragraph</p>
+				<div class="col-lg-1"></div>
+			</div>
+			<div class="row row1" id="scene1">
+				<div class="col-lg-4">
+					<h1>[1] Metal - Apply Voltage</h1>
 
-<body id="body_parent" onload="StartScroll()">
-    <!-- <a href="../index.html"><img id="back-icon" src="../images/arrow-left.svg" /></a> -->
-    <div class="container">
-        <div class="row title">
-            <h1 class="col-lg-12">CAPACITORS</h1>
-            <div class="col-lg-1"></div>
-            <p class="col-lg-10">
-                Introduction paragraph
-            </p>
-            <div class="col-lg-1"></div>
-        </div>
-        <div class="row row1" id="scene1">
-            <div class="col-lg-4">
-                <h1>[1] Metal - Apply Voltage</h1>
-                
-                <p>
-                    Paragraph
+					<p>
+						Paragraph
 
-                <br><br>
-                <span class="highlight">Directions</span>
-            </p>
-            <button class="button voltageButton" type="button" onclick="animateElectrons()">Apply Voltage</button>
-            </div>
-            
-        </div>
+						<br /><br />
+						<span class="highlight">Directions</span>
+					</p>
+					<button
+						class="button voltageButton"
+						type="button"
+						onclick="animateElectrons()"
+					>
+						Apply Voltage
+					</button>
+				</div>
+			</div>
 
-        <div class="row row2" id="scene2">
-            <div class="col-lg-4">
-                <h1>[2] Metal - Change Voltage</h1>
-                <p>
-                    Title
-                    <br><br>
-                    <span class="highlight">Slider Directions</span></p>
-                    <input class="voltageSlider" style="width: 300" type="range" min="0" max="16" value="12" onchange="updateNumTransfer(this.value)">
-                    <label for="voltageSlider" class="labels">Voltage</label>
-                    <br><br>
-                    <button class="button voltageButton" type="button" onclick="animateElectrons()">Apply Voltage</button>
-            </div>
-            
-        </div>
+			<div class="row row2" id="scene2">
+				<div class="col-lg-4">
+					<h1>[2] Metal - Change Voltage</h1>
+					<p>
+						Title
+						<br /><br />
+						<span class="highlight">Slider Directions</span>
+					</p>
+					<input
+						class="voltageSlider"
+						style="width: 300"
+						type="range"
+						min="0"
+						max="16"
+						value="12"
+						onchange="updateNumTransfer(this.value)"
+					/>
+					<label for="voltageSlider" class="labels">Voltage</label>
+					<br /><br />
+					<button
+						class="button voltageButton"
+						type="button"
+						onclick="animateElectrons()"
+					>
+						Apply Voltage
+					</button>
+				</div>
+			</div>
 
-        <div class="row row3" id="scene3">
-            <div class="col-lg-4">
-                <h1>[3] Electric Field</h1>
-                <p>
-                Paragraph</p>
+			<div class="row row3" id="scene3">
+				<div class="col-lg-4">
+					<h1>[3] Electric Field</h1>
+					<p>Paragraph</p>
 
+					<input
+						class="voltageSlider"
+						style="width: 300"
+						type="range"
+						min="0"
+						max="16"
+						value="12"
+						onchange="updateNumTransfer(this.value)"
+					/>
+					<!-- <br><br> -->
+					<label for="voltageSlider" class="labels">Voltage</label>
+
+					<br /><br />
+					<button
+						class="button voltageButton"
+						type="button"
+						onclick="animateElectrons()"
+					>
+						Apply Voltage
+					</button>
+				</div>
+			</div>
+			<div class="row row4" id="scene4">
+				<div class="col-lg-4">
+					<h1>[4] Metal - Scanner</h1>
+
+					<p>
+						Paragraph
+
+						<br /><br />
+
+						<input
+							class="voltageSlider"
+							style="width: 300"
+							type="range"
+							min="0"
+							max="16"
+							value="12"
+							onchange="updateNumTransfer(this.value)"
+						/>
+						<label for="voltageSlider" class="labels">Voltage</label>
+						<br /><br />
+
+						<button
+							class="button voltageButton"
+							type="button"
+							onclick="animateElectrons()"
+						>
+							Apply Voltage
+						</button>
+					</p>
+				</div>
+			</div>
+			<div class="row row5" id="scene5">
+				<div class="col-lg-4">
+					<h1>[5] Semi - Apply Voltage</h1>
+					<p></p>
+
+					<button
+						class="button voltageButton"
+						type="button"
+						onclick="animateElectrons()"
+					>
+						Apply Voltage
+					</button>
+				</div>
+			</div>
+
+			<div class="row row6" id="scene6">
+				<div class="col-lg-4">
+					<h1>[6] Electric field over a distance</h1>
+					<p>...</p>
+					<input
+						class="voltageSlider"
+						style="width: 300"
+						type="range"
+						min="0"
+						max="16"
+						value="12"
+						onchange="updateNumTransfer(this.value)"
+					/>
+					<label for="voltageSlider" class="labels">Voltage</label>
+					<br /><br />
+					<button
+						class="button voltageButton"
+						type="button"
+						onclick="animateElectrons()"
+					>
+						Apply Voltage
+					</button>
+				</div>
+			</div>
+			<div class="row row7" id="scene7">
+				<div class="col-lg-4">
+					<h1>[7] Semi - Change voltage</h1>
+
+					<input
+						class="voltageSlider"
+						style="width: 300"
+						type="range"
+						min="0"
+						max="17"
+						value="12"
+						onchange="updateNumTransfer(this.value)"
+					/>
+					<label for="voltageSlider" class="labels">Voltage</label>
+					<br /><br />
+					<button
+						class="button voltageButton"
+						type="button"
+						onclick="animateElectrons()"
+					>
+						Apply Voltage
+					</button>
+				</div>
+			</div>
+			<div class="row row8" id="scene8">
+				<div class="col-lg-4">
+					<h1>[8] Semi - Scanner</h1>
+					<p>Paragraph</p>
+					<!-- <button class="button" type="button" id ="negbox6" onclick="toggleBox()">Add Surface</button> -->
+					<br /><br />
+
+					<input
+						class="voltageSlider"
+						style="width: 300"
+						type="range"
+						min="0"
+						max="16"
+						value="12"
+						onchange="updateNumTransfer(this.value)"
+					/>
+					<label for="voltageSlider" class="labels">Voltage</label>
+
+					<button
+						class="button scanButton"
+						type="button"
+						onclick="animateElectrons()"
+					>
+						Scan
+					</button>
+				</div>
+			</div>
+			<div class="row row9" id="scene9">
+				<div class="col-lg-4">
+					<h1>[9] Semi - Change Dopants</h1>
+					<p>Paragraph</p>
+
+					<input
+						class="voltageSlider"
+						style="width: 300"
+						type="range"
+						min="0"
+						max="16"
+						value="12"
+						onchange="updateNumTransfer(this.value)"
+					/>
+					<label for="voltageSlider" class="labels">Voltage</label>
+
+					<input
+						class="dopantSlider"
+						style="width: 300"
+						type="range"
+						min="10"
+						max="80"
+						value="30"
+						onchange="updateDopantAmount(this.value)"
+					/>
+					<label for="dopantSlider" class="labels">Dopant Amount</label>
+					<br /><br />
+					<button
+						class="button scanButton"
+						type="button"
+						onclick="animateElectrons()"
+					>
+						Scan
+					</button>
+				</div>
+			</div>
+
+			<div class="row row10" id="scene10">
+				<div class="col-lg-4">
+					<h1>[10] MOS</h1>
+					<p>Content</p>
+					<br /><br />
+					<br /><br />
+					<br /><br />
+					<br /><br />
+					<br /><br />
+					<br /><br />
+					<br /><br />
+					<br /><br />
+
+					<!-- <h1>[10] Reverse polarity</h1>
+                    <p>
+                        Content
+                    </p>
                     <input class="voltageSlider" style="width: 300" type="range" min="0" max="16" value="12"
                         onchange="updateNumTransfer(this.value)">
-                <!-- <br><br> -->
-                <label for="voltageSlider" class="labels">Voltage</label>
+                    <label for="voltageSlider" class="labels">Voltage</label>
+                    
+                    <button class="button scanButton" type="button" onclick="animateElectrons()">Scan</button> -->
+				</div>
+			</div>
 
-                <br><br>
-                <button class="button voltageButton" type="button" onclick="animateElectrons()">Apply Voltage</button>
-            </div>
-        </div>
-        <div class="row row4" id="scene4">
-            <div class="col-lg-4">
-                <h1>[4] Metal - Scanner</h1>
-            
-                <p>
-                Paragraph
+			<div class="row row10" id="scene11">
+				<div class="col-lg-4">
+					<h1>Spacing</h1>
+				</div>
+			</div>
 
-                <br><br>
-
-                <input class="voltageSlider" style="width: 300" type="range" min="0" max="16" value="12"
-                    onchange="updateNumTransfer(this.value)">
-                <label for="voltageSlider" class="labels">Voltage</label>
-                <br><br>
-
-                <button class="button voltageButton" type="button" onclick="animateElectrons()">Apply Voltage</button>
-                
-            </div>
-        </div>
-        <div class="row row5" id="scene5">
-            <div class="col-lg-4">
-                
-                <h1>[5] Semi - Apply Voltage</h1>
-                <p> 
-
-                </p>
-
-                <button class="button voltageButton" type="button" onclick="animateElectrons()">Apply Voltage</button>
-
-
-            </div>
-        </div>
-
-                <div class="row row6" id="scene6">
-            <div class="col-lg-4">
-                <h1>[6] Electric field over a distance</h1>
-                <p>
-                    ...
-                </p>
-                <input class="voltageSlider" style="width: 300" type="range" min="0" max="16" value="12"
-                    onchange="updateNumTransfer(this.value)">
-                <label for="voltageSlider" class="labels">Voltage</label>
-                <br><br>
-                <button class="button voltageButton" type="button" onclick="animateElectrons()">Apply Voltage</button>
-            </div>
-        </div>
-        <div class="row row7" id="scene7">
-            <div class="col-lg-4">
-                
-                <h1>[7] Semi - Change voltage</h1>
-
-                <input class="voltageSlider" style="width: 300" type="range" min="0" max="17" value="12"
-                    onchange="updateNumTransfer(this.value)">
-                <label for="voltageSlider" class="labels">Voltage</label>
-                <br><br>
-                <button class="button voltageButton" type="button" onclick="animateElectrons()">Apply Voltage</button>
-
-            </div>
-        </div>
-        <div class="row row8" id="scene8">
-            <div class="col-lg-4">
-                
-                <h1>[8] Semi - Scanner</h1>
-                <p>
-                    Paragraph
-                </p>
-                <!-- <button class="button" type="button" id ="negbox6" onclick="toggleBox()">Add Surface</button> -->
-                <br><br>
-
-                <input class="voltageSlider" style="width: 300" type="range" min="0" max="16" value="12"
-                    onchange="updateNumTransfer(this.value)">
-                <label for="voltageSlider" class="labels">Voltage</label>
-                
-                <button class="button scanButton" type="button" onclick="animateElectrons()">Scan</button>
-                
-                </svg>
-
-                </svg>
-            </div>
-        </div>
-        <div class="row row9" id="scene9">
-            <div class="col-lg-4">
-                <h1>[9] Semi - Change Dopants </h1>
-                <p>
-                    Paragraph
-                </p>
-
-                <input class="voltageSlider" style="width: 300" type="range" min="0" max="16" value="12"
-                    onchange="updateNumTransfer(this.value)">
-                <label for="voltageSlider" class="labels">Voltage</label>
-
-                <input class="dopantSlider" style="width: 300" type="range" min="10" max="80" value="30"
-                    onchange="updateDopantAmount(this.value)">
-                <label for="dopantSlider" class="labels">Dopant Amount</label>
-                <br><br>
-                <button class="button scanButton" type="button" onclick="animateElectrons()">Scan</button>
-
-
-
-            </div>
-        </div>
-
-        <div class="row row10" id="scene10">
-            <div class="col-lg-4">
-                <h1>[10] Reverse polarity</h1>
-                <p>
-                    Content
-                </p>
-                <input class="voltageSlider" style="width: 300" type="range" min="0" max="16" value="12"
-                    onchange="updateNumTransfer(this.value)">
-                <label for="voltageSlider" class="labels">Voltage</label>
-                
-                <button class="button scanButton" type="button" onclick="animateElectrons()">Scan</button>
-            </div>
-        </div>
-        <div class="row row11" id="scene11">
-            <div class="col-lg-4">
-                <h1>[11] MOS </h1>
-                <p>
-                    Content
-                </p>
-                <br><br>
-                <br><br>
-                <br><br>
-            </div>
-        </div>
-        <div id="visualization">
-
-        </div>
-    </div>
-</body>
-
+			<div id="visualization"></div>
+		</div>
+	</body>
 </html>
