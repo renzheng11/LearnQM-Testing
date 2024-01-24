@@ -28,20 +28,17 @@
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@400;700&display=swap" rel="stylesheet">
 
-    <script src="https://cdn.jsdelivr.net/npm/p5@1.0.0/lib/p5.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.7/ScrollMagic.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.7/plugins/debug.addIndicators.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.15.1/d3.min.js"></script>
-    <script src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/p5@1.0.0/lib/p5.js"></script>
+    <script defer src="//cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.7/ScrollMagic.min.js"></script>
+    <script defer src="//cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.7/plugins/debug.addIndicators.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.15.1/d3.min.js"></script>
+    <script defer src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"></script>
 
-    <script src="./scroll.js"></script>
-    <script src="./box.js"></script>
-    <script src="./charge.js"></script>
-    <script src="./sketch.js"></script>
-    <script src="./p5.tween.js"></script>
-
-    
-    
+    <script defer src="./scroll.js"></script>
+    <script defer src="./box.js"></script>
+    <script defer src="./charge.js"></script>
+    <script defer src="./sketch.js"></script>
+    <script defer src="./p5.tween.js"></script>
 </head>
 
 <body id="body_parent" onload="StartScroll()">
@@ -65,7 +62,7 @@
                 <br><br>
                 <span class="highlight">Directions</span>
             </p>
-            <button class="button" type="button" id="voltageButton1" onclick="animateElectrons()">Apply Voltage</button>
+            <button class="button voltageButton" type="button" onclick="animateElectrons()">Apply Voltage</button>
             </div>
             
         </div>
@@ -77,10 +74,10 @@
                     Title
                     <br><br>
                     <span class="highlight">Slider Directions</span></p>
-                    <input id="voltageSlider2" style="width: 300" type="range" min="0" max="16" value="12" onchange="updateNumTransfer(this.value)">
-                    <label for="voltageSlider2" class="labels">Voltage</label>
+                    <input class="voltageSlider" style="width: 300" type="range" min="0" max="16" value="12" onchange="updateNumTransfer(this.value)">
+                    <label for="voltageSlider" class="labels">Voltage</label>
                     <br><br>
-                    <button class="button" type="button" id="voltageButton2" onclick="animateElectrons()">Apply Voltage</button>
+                    <button class="button voltageButton" type="button" onclick="animateElectrons()">Apply Voltage</button>
             </div>
             
         </div>
@@ -91,13 +88,13 @@
                 <p>
                 Paragraph</p>
 
-                    <input id="voltageSlider3" style="width: 300" type="range" min="0" max="16" value="12"
+                    <input class="voltageSlider" style="width: 300" type="range" min="0" max="16" value="12"
                         onchange="updateNumTransfer(this.value)">
                 <!-- <br><br> -->
-                <label for="voltageSlider3" class="labels">Voltage</label>
+                <label for="voltageSlider" class="labels">Voltage</label>
 
                 <br><br>
-                <button class="button" type="button" id="voltageButton3" onclick="animateElectrons()">Apply Voltage</button>
+                <button class="button voltageButton" type="button" onclick="animateElectrons()">Apply Voltage</button>
             </div>
         </div>
         <div class="row row4" id="scene4">
@@ -109,12 +106,12 @@
 
                 <br><br>
 
-                <input id="voltageSlider4" style="width: 300" type="range" min="0" max="16" value="12"
+                <input class="voltageSlider" style="width: 300" type="range" min="0" max="16" value="12"
                     onchange="updateNumTransfer(this.value)">
-                <label for="voltageSlider4" class="labels">Voltage</label>
+                <label for="voltageSlider" class="labels">Voltage</label>
                 <br><br>
 
-                <button class="button" type="button" id="voltageButton4"  onclick="animateElectrons()">Apply Voltage</button>
+                <button class="button voltageButton" type="button" onclick="animateElectrons()">Apply Voltage</button>
                 
             </div>
         </div>
@@ -126,7 +123,7 @@
 
                 </p>
 
-                <button class="button" type="button" id="voltageButton5" onclick="animateElectrons()">Apply Voltage</button>
+                <button class="button voltageButton" type="button" onclick="animateElectrons()">Apply Voltage</button>
 
 
             </div>
@@ -138,15 +135,11 @@
                 <p>
                     ...
                 </p>
-                <input id="voltageSlider6" style="width: 300" type="range" min="0" max="16" value="12"
+                <input class="voltageSlider" style="width: 300" type="range" min="0" max="16" value="12"
                     onchange="updateNumTransfer(this.value)">
-                <label for="voltageSlider6" class="labels">Voltage</label>
-                
-                <!-- <input id="dopantSlider6" style="width: 300" type="range" min="0" max="180" value="30"
-                    onchange="updateDopantAmount(this.value)">
-                <label for="dopantSlider6" class="labels">Dopant Amount</label> -->
+                <label for="voltageSlider" class="labels">Voltage</label>
                 <br><br>
-                <button id="voltageButton6" class="button" type="button" onclick="animateElectrons()">Apply Voltage</button>
+                <button class="button voltageButton" type="button" onclick="animateElectrons()">Apply Voltage</button>
             </div>
         </div>
         <div class="row row7" id="scene7">
@@ -154,11 +147,11 @@
                 
                 <h1>[7] Semi - Change voltage</h1>
 
-                <input id="voltageSlider7" style="width: 300" type="range" min="0" max="17" value="12"
+                <input class="voltageSlider" style="width: 300" type="range" min="0" max="17" value="12"
                     onchange="updateNumTransfer(this.value)">
-                <label for="voltageSlider7" class="labels">Voltage</label>
+                <label for="voltageSlider" class="labels">Voltage</label>
                 <br><br>
-                <button class="button" type="button" id="voltageButton7" onclick="animateElectrons()">Apply Voltage</button>
+                <button class="button voltageButton" type="button" onclick="animateElectrons()">Apply Voltage</button>
 
             </div>
         </div>
@@ -172,11 +165,11 @@
                 <!-- <button class="button" type="button" id ="negbox6" onclick="toggleBox()">Add Surface</button> -->
                 <br><br>
 
-                <input id="voltageSlider8" style="width: 300" type="range" min="0" max="16" value="12"
+                <input class="voltageSlider" style="width: 300" type="range" min="0" max="16" value="12"
                     onchange="updateNumTransfer(this.value)">
-                <label for="voltageSlider8" class="labels">Voltage</label>
+                <label for="voltageSlider" class="labels">Voltage</label>
                 
-                <button id="scanButton8" class="button" type="button" onclick="animateElectrons()">Scan</button>
+                <button class="button scanButton" type="button" onclick="animateElectrons()">Scan</button>
                 
                 </svg>
 
@@ -190,15 +183,15 @@
                     Paragraph
                 </p>
 
-                <input id="voltageSlider9" style="width: 300" type="range" min="0" max="16" value="12"
+                <input class="voltageSlider" style="width: 300" type="range" min="0" max="16" value="12"
                     onchange="updateNumTransfer(this.value)">
-                <label for="voltageSlider9" class="labels">Voltage</label>
+                <label for="voltageSlider" class="labels">Voltage</label>
 
-                <input id="dopantSlider9" style="width: 300" type="range" min="10" max="80" value="30"
+                <input class="dopantSlider" style="width: 300" type="range" min="10" max="80" value="30"
                     onchange="updateDopantAmount(this.value)">
-                <label for="dopantSlider9" class="labels">Dopant Amount</label>
+                <label for="dopantSlider" class="labels">Dopant Amount</label>
                 <br><br>
-                <button id="scanButton9" class="button" type="button" onclick="animateElectrons()">Scan</button>
+                <button class="button scanButton" type="button" onclick="animateElectrons()">Scan</button>
 
 
 
@@ -211,11 +204,11 @@
                 <p>
                     Content
                 </p>
-                <input id="voltageSlider10" style="width: 300" type="range" min="0" max="16" value="12"
+                <input class="voltageSlider" style="width: 300" type="range" min="0" max="16" value="12"
                     onchange="updateNumTransfer(this.value)">
-                <label for="voltageSlider10" class="labels">Voltage</label>
+                <label for="voltageSlider" class="labels">Voltage</label>
                 
-                <button id="scanButton10" class="button" type="button" onclick="animateElectrons()">Scan</button>
+                <button class="button scanButton" type="button" onclick="animateElectrons()">Scan</button>
             </div>
         </div>
         <div class="row row11" id="scene11">

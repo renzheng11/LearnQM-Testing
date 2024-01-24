@@ -51,31 +51,49 @@ let boxes = {
   R11: null,
 }
 
-const graphY = 580
-const graphW = 616
-const graphC = 260
-const leftPadding = 140
-const graphX = graphC - graphW / 2 + leftPadding
-const graphEnd = graphC + graphW / 2 - 60
-
 const rows = 20
-const cols = 10
+const cols = 15
 
-// battery measurements
-const batteryPosition = {
-  center: 300,
-  leftX: 180,
-  rightX: 420,
-  y1: 381,
-  y2: 420,
+// box dimensions
+const boxD = {
+  xLeft: 0,
+  xRight: 260,
+  y: 110,
+  width: 234,
+  height: 280,
+  depth: 80,
+  angle: -60,
+}
+
+// battery dimensions
+const batteryD = {
+  imageX: boxD.xRight - 44,
+  imageY: boxD.y + boxD.height + 44,
+  leftX: boxD.xLeft + boxD.width / 2,
+  rightX: boxD.xRight + boxD.width / 2,
+  y1: boxD.y + boxD.height,
+  y2: boxD.y + boxD.height + 60,
   batterySize: 40,
 }
+
+// graph dimensions
+const graphD = {
+  y: batteryD.imageY + 140,
+  width: 616,
+  center: boxD.xLeft + boxD.width,
+  leftPadding: 140,
+  x: 0,
+  end: 0,
+}
+
+graphD.x = graphD.center - graphD.width / 2 + graphD.leftPadding
+graphD.end = graphD.center + graphD.width / 2 - 60
 
 const colorChangeInterval = 500
 
 // images
-let batteryPos
-let batteryNeg
+let batteryPosImg
+let batteryNegImg
 
 let reverse = false
 
@@ -86,6 +104,7 @@ let dest3
 let dest4
 let attractSide
 let destSide
+
 let currLeftBox
 let currRightBox
 
@@ -115,13 +134,6 @@ let currButton
 let currVoltageSlider
 let currDopantSlider
 
-// box dimensions
-let xLeft = 0
-let xRight = 340
-let boxY = 110
-let boxWidth = 280
-let boxHeight = 280
-
 // scanner / sizes
 let lastPos = 0
 const surfaceWidth = 10 // 10nm
@@ -130,11 +142,11 @@ function setup() {
   fade = 255
   canvas = createCanvas((2 * windowWidth) / 4 + 40, windowHeight)
   canvas.parent("visualization")
-  batteryPos = loadImage("batteryPos.png")
-  batteryNeg = loadImage("batteryNeg.png")
+  batteryPosImg = loadImage("batteryPos.png")
+  batteryNegImg = loadImage("batteryNeg.png")
 
   // tempBox
-  tempBox = new Box(xLeft, boxY, boxWidth, boxHeight, 0)
+  tempBox = new Box(boxD.xLeft, boxD.y, boxD.width, boxD.height, 0)
 
   let side = "left"
 
@@ -142,8 +154,15 @@ function setup() {
     // instantiate each box with x position depending on left or right box
 
     let x
-    side == "left" ? (x = xLeft) : (x = xRight)
-    boxes[box] = new Box(x, boxY, 160, 280, totalElectrons, "m")
+    side == "left" ? (x = boxD.xLeft) : (x = boxD.xRight)
+    boxes[box] = new Box(
+      x,
+      boxD.y,
+      boxD.width,
+      boxD.height,
+      totalElectrons,
+      "m"
+    )
     side == "left" ? (side = "right") : (side = "left")
   }
 
@@ -161,17 +180,18 @@ function updateNumTransfer(value) {
   numTransfer = value
 }
 
-function controlHelper(scene, id, text, controlFunc, resetFunc) {
-  if (sceneCount == scene) {
-    if (document.getElementById(`${id}`).textContent == "Reset") {
-      resetFunc()
-      electronsTransferred = 0
-      document.getElementById(`${id}`).textContent = `${text}`
-    } else if (document.getElementById(`${id}`).textContent == `${text}`) {
-      controlFunc()
-      document.getElementById(`${id}`).textContent = "Reset"
-    }
+function controlHelper(id, text, controlFunc, resetFunc) {
+  // before: param 1 = scene
+  // if (sceneCount == scene) {
+  if (document.getElementById(`${id}`).textContent == "Reset") {
+    resetFunc()
+    electronsTransferred = 0
+    document.getElementById(`${id}`).textContent = `${text}`
+  } else if (document.getElementById(`${id}`).textContent == `${text}`) {
+    controlFunc()
+    document.getElementById(`${id}`).textContent = "Reset"
   }
+  // }
 }
 
 function animateElectrons() {
@@ -208,264 +228,32 @@ function animateElectrons() {
   }
 
   // reset voltage controls
-  controlHelper(
-    1,
-    "voltageButton1",
-    "Apply Voltage",
-    () => {
-      if (
-        sceneAnimated == false &&
-        document.getElementById("voltageButton1").textContent == "Reset"
-      ) {
+  const voltageButtons = document.querySelectorAll(".voltageButton")
+  voltageButtons.forEach((btn) => {
+    if (btn.textContent == "Reset") {
+      // resetFunc()
+      // re-initialize current boxes
+      currLeftBox = new Box(100, 100, 160, 280, totalElectrons, "m")
+      currRightBox = new Box(340, 100, 160, 280, totalElectrons, "m")
+      // need special cases for semiconductors / other special boxes that aren't metals
+      tempBox.electrons = []
+      sceneAnimated = false
+      showEF = false
+      electronsTransferred = 0
+      btn.textContent = "Apply Voltage"
+    } else if (btn.textContent == "Apply Voltage") {
+      if (sceneAnimated == false && btn.textContent == "Reset") {
         // hasn't animated yet and not reset
-        sceneAnimated = true
-      }
-    },
-    () => {
-      boxes.L1 = new Box(100, 100, 160, 280, totalElectrons, "m")
-      boxes.R1 = new Box(340, 100, 160, 280, totalElectrons, "m")
-
-      tempBox.electrons = []
-      sceneAnimated = false
-    }
-  )
-
-  controlHelper(
-    2,
-    "voltageButton2",
-    "Apply Voltage",
-    () => {
-      if (
-        sceneAnimated == false &&
-        document.getElementById("voltageButton2").textContent == "Reset"
-      ) {
-        // hasn't animated yet
-        sceneAnimated = true
-      }
-    },
-    () => {
-      boxes.L2 = new Box(100, 100, 160, 280, totalElectrons, "m")
-      boxes.R2 = new Box(340, 100, 160, 280, totalElectrons, "m")
-      tempBox.electrons = []
-
-      sceneAnimated = false
-    }
-  )
-
-  controlHelper(
-    3,
-    "voltageButton3",
-    "Apply Voltage",
-    () => {
-      if (sceneAnimated == false) {
-        // hasn't animated yet
         setTimeout(() => {
-          showEF = true
-        }, "4000")
-        sceneAnimated = true
-      }
-    },
-    () => {
-      boxes.L3 = new Box(100, 100, 160, 280, totalElectrons, "m")
-      boxes.R3 = new Box(340, 100, 160, 280, totalElectrons, "m")
-      tempBox.electrons = []
-
-      sceneAnimated = false
-      showEF = false
-    }
-  )
-
-  // reset scanner
-  controlHelper(
-    4,
-    "voltageButton4",
-    "Apply Voltage",
-    () => {
-      if (sceneAnimated == false) {
-        setTimeout(() => {
-          if (boxes.R4.numElectrons < totalElectrons) {
-            sceneAnimated = true
+          if (currRightBox.numElectrons < totalElectrons) {
             showEF = true
+            sceneAnimated = true
           }
         }, "4000")
       }
-    },
-    () => {
-      boxes.L4 = new Box(100, 100, 160, 280, totalElectrons, "m")
-      boxes.R4 = new Box(340, 100, 160, 280, totalElectrons, "m")
-
-      tempBox.electrons = []
-
-      sceneAnimated = false
-      showEF = false
-      scannerSpeed = 0
-      boxes.R4.scannerX = boxes.R4.x
+      btn.textContent = "Reset"
     }
-  )
-
-  controlHelper(
-    5,
-    "voltageButton5",
-    "Apply Voltage",
-    () => {
-      if (sceneAnimated == false) {
-        // hasn't animated yet
-        setTimeout(() => {
-          if (currButton.textContent == "Reset" && sceneAnimated == false)
-            sceneAnimated = true
-          showEF = true
-        }, "4000")
-      }
-    },
-    () => {
-      boxes.L5 = new Box(100, 100, 160, 280, totalElectrons, "m")
-      boxes.R5 = new Box(340, 100, 160, 280, totalElectrons, "s")
-      tempBox.electrons = []
-
-      boxes.R5.updateDopants(defaultDopants)
-
-      sceneAnimated = false
-      showEF = false
-    }
-  )
-
-  controlHelper(
-    6,
-    "voltageButton6",
-    "Apply Voltage",
-    () => {
-      if (sceneAnimated == false) {
-        // hasn't animated yet
-        setTimeout(() => {
-          sceneAnimated = true
-          showEF = true
-        }, "4000")
-      }
-    },
-    () => {
-      boxes.L6 = new Box(100, 100, 160, 280, totalElectrons, "m")
-      boxes.R6 = new Box(340, 100, 160, 280, totalElectrons, "s")
-      tempBox.electrons = []
-
-      boxes.R6.updateDopants(defaultDopants)
-
-      sceneAnimated = false
-      showEF = false
-    }
-  )
-
-  controlHelper(
-    7,
-    "scanButton7",
-    "Scan",
-    () => {
-      if (sceneAnimated == false) {
-        setTimeout(() => {
-          if (boxes.R7.numElectrons < totalElectrons) {
-            sceneAnimated = true
-            showEF = true
-          }
-        }, "4000")
-      }
-    },
-    () => {
-      boxes.L7 = new Box(100, 100, 160, 280, totalElectrons, "m")
-      boxes.R7 = new Box(340, 100, 160, 280, totalElectrons, "s")
-
-      tempBox.electrons = []
-      boxes.R7.updateDopants(defaultDopants)
-
-      sceneAnimated = false
-      showEF = false
-      scannerSpeed = 0
-      boxes.R7.scannerX = boxes.R7.x
-    }
-  )
-
-  controlHelper(
-    8,
-    "scanButton8",
-    "Scan",
-    () => {
-      if (sceneAnimated == false) {
-        setTimeout(() => {
-          if (boxes.R8.numElectrons < totalElectrons) {
-            sceneAnimated = true
-            showEF = true
-          }
-        }, "4000")
-      }
-    },
-    () => {
-      boxes.L8 = new Box(100, 100, 160, 280, totalElectrons, "m")
-      boxes.R8 = new Box(340, 100, 160, 280, totalElectrons, "s")
-
-      tempBox.electrons = []
-      boxes.R8.updateDopants(defaultDopants)
-
-      sceneAnimated = false
-      showEF = false
-      scannerSpeed = 0
-      boxes.R8.scannerX = boxes.R8.x
-      boxes.R8.updateDopants(document.getElementById("dopantSlider8").value)
-    }
-  )
-
-  controlHelper(
-    9,
-    "scanButton9",
-    "Scan",
-    () => {
-      if (sceneAnimated == false) {
-        setTimeout(() => {
-          // if (boxes.L9.numElectrons < totalElectrons) {
-          showEF = true
-          sceneAnimated = true
-
-          // }
-        }, "4000")
-      }
-    },
-    () => {
-      boxes.L9 = new Box(100, 100, 160, 280, totalElectrons, "m")
-      boxes.R9 = new Box(340, 100, 160, 280, totalElectrons, "s")
-
-      tempBox.electrons = []
-      boxes.R9.updateDopants(defaultDopants)
-
-      sceneAnimated = false
-      showEF = false
-      scannerSpeed = 0
-      boxes.R9.scannerX = boxes.R9.x
-      boxes.R9.updateDopants(document.getElementById("dopantSlider9").value)
-    }
-  )
-
-  // control 10
-  controlHelper(
-    10,
-    "scanButton10",
-    "Scan",
-    () => {
-      if (sceneAnimated == false) {
-        // hasn't animated yet
-        setTimeout(() => {
-          sceneAnimated = true
-          showEF = true
-        }, "4000")
-      }
-    },
-    () => {
-      boxes.L10 = new Box(100, 100, 160, 280, totalElectrons, "m")
-      boxes.R10 = new Box(340, 100, 160, 280, totalElectrons, "s")
-      tempBox.electrons = []
-
-      boxes.R10.updateDopants(defaultDopants)
-
-      sceneAnimated = false
-      showEF = false
-    }
-  )
+  })
 }
 
 // function animateScanner() {
@@ -495,13 +283,15 @@ function resetScene() {
 
   scannerSpeed = 0
 
-  resetControl("voltageSlider2", 12)
-  resetControl("voltageSlider3", 12)
-  resetControl("voltageSlider6", 12)
-  resetControl("voltageSlider7", 12)
-  resetControl("voltageSlider8", 12)
-  resetControl("voltageSlider10", 12)
-  // resetControl("dopantSlider6", defaultDopants)
+  const voltageButtons = document.querySelectorAll(".voltageButton")
+  voltageButtons.forEach((btn) => {
+    btn.value = 12
+  })
+
+  const dopantSliders = document.querySelectorAll(".dopantSlider")
+  dopantSliders.forEach((slider) => {
+    slider.value = defaultDopants
+  })
 
   // dim neutrals after 2 seconds
   setTimeout(() => {
@@ -522,17 +312,12 @@ function resetScene() {
   }, 1000)
 }
 
-function resetControl(id, v) {
-  document.getElementById(`${id}`).value = v
-}
-
 function drawBattery() {
-  let center = batteryPosition.center
-  let leftX = batteryPosition.leftX
-  let rightX = batteryPosition.rightX
-  let y1 = batteryPosition.y1
-  let y2 = batteryPosition.y2
-  let batterySize = batteryPosition.batterySize
+  let leftX = batteryD.leftX
+  let rightX = batteryD.rightX
+  let y1 = batteryD.y1
+  let y2 = batteryD.y2
+  let batterySize = batteryD.batterySize
 
   noStroke()
   fill(color.battery)
@@ -544,13 +329,25 @@ function drawBattery() {
   line(rightX, y1, rightX, y2)
 
   if (reverse) {
-    image(batteryPos, 266, 404, batteryPos.width / 1.5, batteryPos.height / 1.5)
+    image(
+      batteryPosImg,
+      batteryD.imageX,
+      batteryD.imageY,
+      batteryPosImg.width / 1.5,
+      batteryPosImg.height / 1.5
+    )
   } else {
-    image(batteryNeg, 266, 404, batteryNeg.width / 1.5, batteryNeg.height / 1.5)
+    image(
+      batteryNegImg,
+      batteryD.imageX,
+      batteryD.imageY,
+      batteryNegImg.width / 1.5,
+      batteryNegImg.height / 1.5
+    )
   }
 }
 
-function drawMOS(box, label, leftPadding) {
+function drawMOS(box, label) {
   fill(18)
   stroke("#fff")
   let boxD = 100
@@ -564,18 +361,13 @@ function drawMOS(box, label, leftPadding) {
 
   noStroke()
   fill("white")
-  text(label, box.x + box.w + leftPadding, box.y + box.h / 2 - 40)
+  text(label, box.x + box.w + graphD.leftPadding, box.y + box.h / 2 - 40)
 }
 
 function drawBox(box) {
   stroke("#FFF")
   strokeWeight(1.2)
-  noFill()
-
-  // boxA = -20
-  boxA = -60
-  // boxD = 24
-  boxD = 80
+  fill(18)
 
   beginShape()
   vertex(box.x, box.y)
@@ -588,16 +380,16 @@ function drawBox(box) {
   beginShape()
   vertex(box.x + box.w, box.y + box.h) // left top
   vertex(box.x + box.w, box.y) // left bottom
-  vertex(box.x + box.w + boxD, box.y + boxA) // top right
-  vertex(box.x + box.w + boxD, box.y + box.h + boxA)
+  vertex(box.x + box.w + boxD.depth, box.y + boxD.angle) // top right
+  vertex(box.x + box.w + boxD.depth, box.y + box.h + boxD.angle)
   endShape(CLOSE)
 
   // // box top
   beginShape()
   vertex(box.x, box.y) // bottom left
   vertex(box.x + box.w, box.y) // bottom right
-  vertex(box.x + box.w + boxD, box.y + boxA) // top right
-  vertex(box.x + boxD, box.y + boxA) // top left
+  vertex(box.x + box.w + boxD.depth, box.y + boxD.angle) // top right
+  vertex(box.x + boxD.depth, box.y + boxD.angle) // top left
   endShape(CLOSE)
 
   styleText()
@@ -655,15 +447,15 @@ function drawBox(box) {
   // )
 
   // // left box
-  // text(`total nm: 10`, xLeft + 20, box.y + 300)
+  // text(`total nm: 10`, boxD.xLeft + 20, box.y + 300)
   // text(
   //   `total negative charges:${currLeftBox.numElectrons}`,
-  //   xLeft + 20,
+  //   boxD.xLeft + 20,
   //   box.y + 320
   // )
   // text(
   //   `total positive charges:${currLeftBox.chargeMap.length}`,
-  //   xLeft + 20,
+  //   boxD.xLeft + 20,
   //   box.y + 340
   // )
 }
@@ -811,22 +603,16 @@ function drawElectrons(box) {
 
     // set destinations for travel
     if (!reverse) {
-      dest1 = createVector(batteryPosition.rightX, batteryPosition.y1)
-      dest2 = createVector(batteryPosition.rightX, batteryPosition.y2)
-      dest3 = createVector(batteryPosition.leftX, batteryPosition.y2)
-      dest4 = createVector(
-        batteryPosition.leftX,
-        batteryPosition.y1 - (i % 15) * 17 - 20
-      )
+      dest1 = createVector(batteryD.rightX, batteryD.y1)
+      dest2 = createVector(batteryD.rightX, batteryD.y2)
+      dest3 = createVector(batteryD.leftX, batteryD.y2)
+      dest4 = createVector(batteryD.leftX, batteryD.y1 - (i % 15) * 17 - 20)
       attractSide = currLeftBox.x + currLeftBox.w - 10
     } else {
-      dest1 = createVector(batteryPosition.leftX, batteryPosition.y1)
-      dest2 = createVector(batteryPosition.leftX, batteryPosition.y2)
-      dest3 = createVector(batteryPosition.rightX, batteryPosition.y2)
-      dest4 = createVector(
-        batteryPosition.rightX,
-        batteryPosition.y1 - (i % 15) * 17 - 20
-      )
+      dest1 = createVector(batteryD.leftX, batteryD.y1)
+      dest2 = createVector(batteryD.leftX, batteryD.y2)
+      dest3 = createVector(batteryD.rightX, batteryD.y2)
+      dest4 = createVector(batteryD.rightX, batteryD.y1 - (i % 15) * 17 - 20)
       attractSide = currRightBox.x + 10
     }
 
@@ -1053,15 +839,15 @@ function drawScanner(box) {
   let scannerNM = 1
   let scannerWidth = scannerNM * scale // 1nm
 
-  if (mouseX > xRight + scannerWidth && mouseX < xRight + box.w) {
-    xPos = mouseX - xRight - scannerWidth
+  if (mouseX > boxD.xRight + scannerWidth && mouseX < boxD.xRight + box.w) {
+    xPos = mouseX - boxD.xRight - scannerWidth
     lastPos = xPos
-    scannerNM += (mouseX - xRight) / (boxWidth / scale) - 1 // 1 = default scannerNM
-  } else if (mouseX > xRight + box.w) {
+    scannerNM += (mouseX - boxD.xRight) / (boxD.width / scale) - 1 // 1 = default scannerNM
+  } else if (mouseX > boxD.xRight + box.w) {
     // if over right side of box, set nm = 10 (prevent fast mouse exit)
-    lastPos = boxWidth - scannerWidth
+    lastPos = boxD.width - scannerWidth
     scannerNM = scannerWidth
-  } else if (mouseX < xRight + scannerWidth) {
+  } else if (mouseX < boxD.xRight + scannerWidth) {
     // if over left side of box, set nm = 1 (prevent fast mouse exit)
     lastPos = scannerWidth
     scannerNM = 1
@@ -1125,10 +911,10 @@ function drawGraph() {
 
   canvas.drawingContext.setLineDash([7, 3])
 
-  line(graphC, graphY - 76, graphC, graphY + 60) // vert
+  line(graphD.center, graphD.y - 76, graphD.center, graphD.y + 60) // vert
 
   // sceneCount == 8 ? (xAxisExtend = 20) : null
-  line(graphX, graphY, graphEnd, graphY) // hor
+  line(graphD.x, graphD.y, graphD.end, graphD.y) // hor
 
   fill(color.grey)
 
@@ -1139,20 +925,20 @@ function drawGraph() {
 
   // graph lines + arrows
   // y axis arrow - up
-  line(graphC, graphY - 76, graphC - size, graphY - 76 + size)
-  line(graphC, graphY - 76, graphC + size, graphY - 76 + size)
+  line(graphD.center, graphD.y - 76, graphD.center - size, graphD.y - 76 + size)
+  line(graphD.center, graphD.y - 76, graphD.center + size, graphD.y - 76 + size)
 
   // y axis arrow - down
-  line(graphC, graphY + 61, graphC + size, graphY + 61 - size)
-  line(graphC, graphY + 61, graphC - size, graphY + 61 - size)
+  line(graphD.center, graphD.y + 61, graphD.center + size, graphD.y + 61 - size)
+  line(graphD.center, graphD.y + 61, graphD.center - size, graphD.y + 61 - size)
 
   // x axis arrow - right
-  line(graphEnd, graphY, graphEnd - size, graphY - size)
-  line(graphEnd, graphY, graphEnd - size, graphY + size)
+  line(graphD.end, graphD.y, graphD.end - size, graphD.y - size)
+  line(graphD.end, graphD.y, graphD.end - size, graphD.y + size)
 
   // x axis arrow - left
-  line(graphX, graphY, graphX + size, graphY + size)
-  line(graphX, graphY, graphX + size, graphY - size)
+  line(graphD.x, graphD.y, graphD.x + size, graphD.y + size)
+  line(graphD.x, graphD.y, graphD.x + size, graphD.y - size)
 
   strokeWeight(2)
   stroke(color.purple)
@@ -1163,14 +949,21 @@ function drawGraph() {
   }
 
   let noHeights = [0, 0]
-  let noHeightXPoints = [graphX, graphEnd]
+  let noHeightXPoints = [graphD.x, graphD.end]
 
   if (!showEF) {
     drawLines(noHeightXPoints, noHeights, color.purple)
   }
 
   purpleHeights = [0, 0, -eFieldHeight, -eFieldHeight, 0, 0]
-  purpleXPoints = [graphX, graphC, graphC, graphC + 80, graphC + 80, graphEnd]
+  purpleXPoints = [
+    graphD.x,
+    graphD.center,
+    graphD.center,
+    graphD.center + 80,
+    graphD.center + 80,
+    graphD.end,
+  ]
 
   if (
     sceneCount == 6 ||
@@ -1179,7 +972,13 @@ function drawGraph() {
     sceneCount == 9
   ) {
     purpleHeights = [0, 0, -eFieldHeight, -eFieldHeight, 0]
-    purpleXPoints = [graphX, graphC, graphC, graphC + 80, graphEnd]
+    purpleXPoints = [
+      graphD.x,
+      graphD.center,
+      graphD.center,
+      graphD.center + 80,
+      graphD.end,
+    ]
   }
 
   graphNorm = 1.4
@@ -1201,7 +1000,7 @@ function drawLines(points, rawHeights, color) {
   let heights = []
 
   for (let i = 0; i < rawHeights.length; i++) {
-    heights[i] = unit * rawHeights[i] + graphY
+    heights[i] = unit * rawHeights[i] + graphD.y
   }
 
   for (i = 0; i < points.length - 1; i++) {
@@ -1243,12 +1042,12 @@ function drawArrows() {
         sceneCount == 9
       ) {
         noStroke()
-        // rect(xRight, y, 100, weight)
+        // rect(boxD.xRight, y, 100, weight)
         beginShape()
-        vertex(xRight - 4, y - 2) // left top
-        vertex(xRight - 4, y - 2 + weight) // left bottom
-        vertex(xRight + boxWidth, y - 2 + weight / 2) // right bottom
-        vertex(xRight + boxWidth, y - 2 + weight / 2) // right top
+        vertex(boxD.xRight - 4, y - 2) // left top
+        vertex(boxD.xRight - 4, y - 2 + weight) // left bottom
+        vertex(boxD.xRight + boxD.width, y - 2 + weight / 2) // right bottom
+        vertex(boxD.xRight + boxD.width, y - 2 + weight / 2) // right top
         endShape(CLOSE)
       }
       noStroke()
