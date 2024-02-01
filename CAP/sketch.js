@@ -4,51 +4,18 @@ let afterDelay = false;
 
 // vars
 let color = {
+	bg: [18, 18, 18],
+	white: [255, 255, 255],
 	grey: [175, 175, 175],
 	pos: [218, 107, 107],
 	posDim: [65, 46, 46],
-	neg: [95, 177, 255],
+	neg: [255, 247, 174],
 	negDim: [18, 66, 104],
 	sign: [122, 59, 59],
 	signDim: [50, 31, 31],
 	battery: [230, 226, 188],
 	purple: [145, 87, 204],
 	neutral: [79, 79, 79],
-};
-
-let boxes = {
-	L1: null,
-	R1: null,
-
-	L2: null,
-	R2: null,
-
-	L3: null,
-	R3: null,
-
-	L4: null,
-	R4: null,
-
-	L5: null,
-	R5: null,
-
-	L6: null,
-	R6: null,
-
-	L7: null,
-	R7: null,
-
-	L8: null,
-	R8: null,
-
-	L9: null,
-	R9: null,
-
-	L10: null,
-	R10: null,
-
-	L11: null,
-	R11: null,
 };
 
 const rows = 20;
@@ -148,50 +115,47 @@ function setup() {
 	// tempBox
 	tempBox = new Box(boxD.xLeft, boxD.y, boxD.width, boxD.height, 0);
 
-	let side = "left";
+	// let side = "left";
 
-	for (let [box, value] of Object.entries(boxes)) {
-		// instantiate each box with x position depending on left or right box
+	// for (let [box, value] of Object.entries(boxes)) {
+	// 	// instantiate each box with x position depending on left or right box
 
-		let x;
-		side == "left" ? (x = boxD.xLeft) : (x = boxD.xRight);
-		boxes[box] = new Box(
-			x,
-			boxD.y,
-			boxD.width,
-			boxD.height,
-			totalElectrons,
-			"m"
-		);
-		side == "left" ? (side = "right") : (side = "left");
-	}
+	// 	let x;
+	// 	side == "left" ? (x = boxD.xLeft) : (x = boxD.xRight);
+	// 	boxes[box] = new Box(
+	// 		x,
+	// 		boxD.y,
+	// 		boxD.width,
+	// 		boxD.height,
+	// 		totalElectrons,
+	// 		"m"
+	// 	);
+	// 	side == "left" ? (side = "right") : (side = "left");
+	// }
 
-	// change electrons, dopants, type for semiconductor boxes
-	let semis = [boxes.R5, boxes.R6, boxes.R7, boxes.R8, boxes.R9, boxes.R10];
-	semis.forEach((box) => {
-		box.updateNumElectrons(defaultDopants);
-		box.updateDopants(defaultDopants);
-		box.updateType("s");
-	});
+	// instantiate left and right box
+
+	currLeftBox = new Box(
+		boxD.xLeft,
+		boxD.y,
+		boxD.width,
+		boxD.height,
+		totalElectrons,
+		"m"
+	);
+	currRightBox = new Box(
+		boxD.xRight,
+		boxD.y,
+		boxD.width,
+		boxD.height,
+		totalElectrons,
+		"m"
+	);
 }
 
 // update number of electrons transferred to other box
 function updateNumTransfer(value) {
 	numTransfer = value;
-}
-
-function controlHelper(id, text, controlFunc, resetFunc) {
-	// before: param 1 = scene
-	// if (sceneCount == scene) {
-	if (document.getElementById(`${id}`).textContent == "Reset") {
-		resetFunc();
-		electronsTransferred = 0;
-		document.getElementById(`${id}`).textContent = `${text}`;
-	} else if (document.getElementById(`${id}`).textContent == `${text}`) {
-		controlFunc();
-		document.getElementById(`${id}`).textContent = "Reset";
-	}
-	// }
 }
 
 function animateElectrons() {
@@ -283,6 +247,17 @@ function resetScene() {
 
 	scannerSpeed = 0;
 
+	// change electrons, dopants, type for semiconductor boxes
+	let semis = [5, 6, 7, 8, 9];
+	semis.forEach((s) => {
+		if (scene(s)) {
+			currRightBox.updateNumElectrons(defaultDopants);
+			currRightBox.updateDopants(defaultDopants);
+			currRightBox.updateType("s");
+		}
+	});
+	// if semis.includes(sceneCount)
+
 	const voltageButtons = document.querySelectorAll(".voltageButton");
 	voltageButtons.forEach((btn) => {
 		btn.value = 12;
@@ -320,10 +295,10 @@ function drawBattery() {
 	let batterySize = batteryD.batterySize;
 
 	noStroke();
-	fill(color.battery);
+	fill(...color.battery);
 
 	strokeWeight(1.2);
-	stroke("#FFF");
+	stroke(...color.white);
 	line(leftX, y1, leftX, y2); // x y x y
 	line(leftX, y2, rightX, y2);
 	line(rightX, y1, rightX, y2);
@@ -348,8 +323,8 @@ function drawBattery() {
 }
 
 function drawMOS(box, label) {
-	fill(18);
-	stroke("#fff");
+	fill(...color.bg);
+	stroke(...color.white);
 	let boxD = 100;
 	let boxA = -100;
 	beginShape();
@@ -360,14 +335,14 @@ function drawMOS(box, label) {
 	endShape(CLOSE);
 
 	noStroke();
-	fill("white");
+	fill(...color.white);
 	text(label, box.x + box.w + graphD.leftPadding, box.y + box.h / 2 - 40);
 }
 
 function drawBox(box) {
-	stroke("#FFF");
+	stroke(...color.white);
 	strokeWeight(1.2);
-	fill(18);
+	fill(...color.bg);
 
 	beginShape();
 	vertex(box.x, box.y);
@@ -433,31 +408,6 @@ function drawBox(box) {
 		// console.log(numElectrons)
 		text(`Total electrons: ${finalNr}`, box.x + 20, box.y + 320);
 	}
-	// text(`total negative charges:${box.numElectrons}`, box.x + 20, box.y + 320)
-	// text(
-	//   `total positive charges:${box.chargeMap.length}`,
-	//   box.x + 20,
-	//   box.y + 340
-	// )
-
-	// text(
-	//   `net charge: ${box.chargeMap.length - box.numElectrons}`,
-	//   box.x + 20,
-	//   box.y + 360
-	// )
-
-	// // left box
-	// text(`total nm: 10`, boxD.xLeft + 20, box.y + 300)
-	// text(
-	//   `total negative charges:${currLeftBox.numElectrons}`,
-	//   boxD.xLeft + 20,
-	//   box.y + 320
-	// )
-	// text(
-	//   `total positive charges:${currLeftBox.chargeMap.length}`,
-	//   boxD.xLeft + 20,
-	//   box.y + 340
-	// )
 }
 
 function drawAnimatedCharges(charges) {
@@ -760,12 +710,12 @@ function drawCharge(chargeX, chargeY, chargeType, lit) {
 	// charge circles
 	// positive charge
 	if (chargeType == "pos") {
-		lit ? fill(218, 107, 107) : fill(218, 107, 107, fade);
+		lit ? fill(...color.pos) : fill(...color.pos, fade);
 		circle(chargeX, chargeY, posSize);
-		lit ? stroke(122, 59, 59) : stroke(122, 59, 59, fade);
+		lit ? stroke(...color.sign) : stroke(...color.sign, fade);
 	}
 	if (chargeType == "neutral") {
-		fill(color.neutral);
+		fill(...color.neutral);
 		circle(chargeX, chargeY, posSize);
 	}
 
@@ -898,7 +848,7 @@ function drawScanner(box) {
 
 function styleText() {
 	noStroke();
-	fill("white");
+	fill(...color.white);
 	textSize(12);
 
 	textStyle(NORMAL);
@@ -906,7 +856,7 @@ function styleText() {
 }
 
 function drawGraph() {
-	stroke(color.grey); // axis color
+	stroke(...color.grey); // axis color
 	strokeWeight(1);
 
 	canvas.drawingContext.setLineDash([7, 3]);
@@ -916,12 +866,12 @@ function drawGraph() {
 	// sceneCount == 8 ? (xAxisExtend = 20) : null
 	line(graphD.x, graphD.y, graphD.end, graphD.y); // hor
 
-	fill(color.grey);
+	fill(...color.grey);
 
 	canvas.drawingContext.setLineDash([]);
 
 	let size = 4.4;
-	stroke(color.grey);
+	stroke(...color.grey);
 
 	// graph lines + arrows
 	// y axis arrow - up
@@ -961,7 +911,7 @@ function drawGraph() {
 	line(graphD.x, graphD.y, graphD.x + size, graphD.y - size);
 
 	strokeWeight(2);
-	stroke(color.purple);
+	stroke(...color.purple);
 
 	let eFieldHeight = 0;
 	if (sceneAnimated) {
@@ -972,7 +922,7 @@ function drawGraph() {
 	let noHeightXPoints = [graphD.x, graphD.end];
 
 	if (!showEF) {
-		drawLines(noHeightXPoints, noHeights, color.purple);
+		drawLines(noHeightXPoints, noHeights);
 	}
 
 	purpleHeights = [0, 0, -eFieldHeight, -eFieldHeight, 0, 0];
@@ -1008,12 +958,12 @@ function drawGraph() {
 	}
 
 	if (currButton && currButton.textContent == "Reset" && showEF) {
-		drawLines(purpleXPoints, purpleHeights, color.purple);
+		drawLines(purpleXPoints, purpleHeights);
 		drawArrows();
 	}
 }
 
-function drawLines(points, rawHeights, color) {
+function drawLines(points, rawHeights) {
 	let graphDivisor = 2;
 	let unit = 1 / graphDivisor;
 
@@ -1047,12 +997,12 @@ function drawArrows() {
 		// draw 7 arrows
 		for (let i = 0; i < 7; i++) {
 			strokeCap(SQUARE);
-			stroke(color.purple);
+			stroke(...color.purple);
 			let weight = numTransfer / 3;
 			strokeWeight(weight);
 
 			let triangleSize = 12;
-			fill(color.purple);
+			fill(...color.purple);
 			// draw line
 			line(x1, y, x2 - triangleSize, y);
 			if (
@@ -1144,12 +1094,11 @@ function draw() {
 }
 
 function drawItems() {
-	background(18);
+	background(...color.bg);
 	noStroke();
 
 	drawBox(currLeftBox);
 	drawBox(currRightBox);
-
 	drawCharges(currLeftBox);
 	drawCharges(currRightBox);
 	drawElectrons(currLeftBox);
@@ -1164,57 +1113,57 @@ function drawItems() {
 }
 
 function scene1() {
-	currLeftBox = boxes.L1;
-	currRightBox = boxes.R1;
+	// currLeftBox = boxes.L1;
+	// currRightBox = boxes.R1;
 
 	drawItems();
 }
 
 function scene2() {
-	currLeftBox = boxes.L2;
-	currRightBox = boxes.R2;
+	// currLeftBox = boxes.L2;
+	// currRightBox = boxes.R2;
 	drawItems();
 }
 
 function scene3() {
-	currLeftBox = boxes.L3;
-	currRightBox = boxes.R3;
+	// currLeftBox = boxes.L3;
+	// currRightBox = boxes.R3;
 	drawItems();
 }
 
 function scene4() {
-	currLeftBox = boxes.L4;
-	currRightBox = boxes.R4;
+	// currLeftBox = boxes.L4;
+	// currRightBox = boxes.R4;
 	drawItems();
 }
 
 function scene5() {
-	currLeftBox = boxes.L5;
-	currRightBox = boxes.R5;
+	// currLeftBox = boxes.L5;
+	// currRightBox = boxes.R5;
 	drawItems();
 }
 
 function scene6() {
-	currLeftBox = boxes.L6;
-	currRightBox = boxes.R6;
+	// currLeftBox = boxes.L6;
+	// currRightBox = boxes.R6;
 	drawItems();
 }
 
 function scene7() {
-	currLeftBox = boxes.L7;
-	currRightBox = boxes.R7;
+	// currLeftBox = boxes.L7;
+	// currRightBox = boxes.R7;
 	drawItems();
 }
 
 function scene8() {
-	currLeftBox = boxes.L8;
-	currRightBox = boxes.R8;
+	// currLeftBox = boxes.L8;
+	// currRightBox = boxes.R8;
 	drawItems();
 }
 
 function scene9() {
-	currLeftBox = boxes.L9;
-	currRightBox = boxes.R9;
+	// currLeftBox = boxes.L9;
+	// currRightBox = boxes.R9;
 	drawItems();
 }
 
@@ -1226,7 +1175,7 @@ function scene10() {
 
 	// drawScanner(boxes.L10);
 
-	background(18);
+	background(...color.bg);
 
 	let surface1 = new Box(30, 200, 120, 300);
 	let surface2 = new Box(120, 200, 120, 300);
