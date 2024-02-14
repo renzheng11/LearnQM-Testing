@@ -2,6 +2,8 @@ let fade;
 let fadeAmount = 1;
 let afterDelay = false;
 
+const timeout = 4000;
+
 // vars
 let color = {
 	bg: [18, 18, 18],
@@ -14,12 +16,13 @@ let color = {
 	sign: [122, 59, 59],
 	signDim: [50, 31, 31],
 	battery: [230, 226, 188],
-	purple: [145, 87, 204],
+	net: [117, 190, 255],
 	neutral: [79, 79, 79],
 };
 
 const rows = 20;
 const cols = 15;
+let totalElectrons = rows * cols;
 
 // box dimensions
 const boxD = {
@@ -45,15 +48,14 @@ const batteryD = {
 
 // graph dimensions
 const graphD = {
-	y: batteryD.imageY + 140,
-	width: 616,
-	center: boxD.xLeft + boxD.width,
-	leftPadding: 140,
 	x: 0,
+	y: batteryD.imageY + 140,
+	width: 640,
+	center: boxD.xLeft + boxD.width,
 	end: 0,
 };
 
-graphD.x = graphD.center - graphD.width / 2 + graphD.leftPadding;
+graphD.x = graphD.center - graphD.width / 2;
 graphD.end = graphD.center + graphD.width / 2 - 60;
 
 const colorChangeInterval = 500;
@@ -61,6 +63,7 @@ const colorChangeInterval = 500;
 // images
 let batteryPosImg;
 let batteryNegImg;
+let mosImg;
 
 let reverse = false;
 
@@ -81,29 +84,30 @@ let lastColorChange = 0;
 let tempBox;
 let atDestSide = false;
 
+let currentlyAnimating = false;
 let sceneAnimated = false;
 let showEF = false;
 let numTransfer = 12;
+let numTransferRange = 16;
+let Q = numTransfer / numTransferRange;
 
 let brightChargesMetal = [];
 let brightChargesSemi = [];
 let animCharges = [];
 
-let balls = [];
-let totalElectrons = 200;
-
-let scannerSpeed = 0;
-
 let electronsTransferred = 0;
 let defaultDopants = 30;
 
 let currButton;
-let currVoltageSlider;
-let currDopantSlider;
+let currChargeSlider;
+
+let moveBound = 0;
 
 // scanner / sizes
 let lastPos = 0;
 const surfaceWidth = 10; // 10nm
+
+let buttonState = "A";
 
 function setup() {
 	fade = 255;
@@ -111,30 +115,118 @@ function setup() {
 	canvas.parent("visualization");
 	batteryPosImg = loadImage("batteryPos.png");
 	batteryNegImg = loadImage("batteryNeg.png");
+	mosImg = loadImage("mos.png");
 
 	// tempBox
 	tempBox = new Box(boxD.xLeft, boxD.y, boxD.width, boxD.height, 0);
 
-	// let side = "left";
-
-	// for (let [box, value] of Object.entries(boxes)) {
-	// 	// instantiate each box with x position depending on left or right box
-
-	// 	let x;
-	// 	side == "left" ? (x = boxD.xLeft) : (x = boxD.xRight);
-	// 	boxes[box] = new Box(
-	// 		x,
-	// 		boxD.y,
-	// 		boxD.width,
-	// 		boxD.height,
-	// 		totalElectrons,
-	// 		"m"
-	// 	);
-	// 	side == "left" ? (side = "right") : (side = "left");
-	// }
-
 	// instantiate left and right box
 
+	newMetalBoxes();
+}
+
+// update number of electrons transferred to other box
+function updateNumTransfer(value) {
+	numTransfer = value;
+}
+
+function animateElectrons() {
+	// reset voltage controls
+	const btn = document.querySelector(`.chargeButton${sceneCount}`);
+	if (buttonState == "R") {
+		// reset
+		const chargeSliders = document.querySelectorAll(".chargeSlider");
+		chargeSliders.forEach((slider) => {
+			slider.disabled = false;
+		});
+
+		const dopantSlider = document.querySelector(".dopantSlider");
+		dopantSlider.disabled = false;
+
+		// re-initialize current boxes
+		currLeftBox = new Box(
+			boxD.xLeft,
+			boxD.y,
+			boxD.width,
+			boxD.height,
+			totalElectrons,
+			"m"
+		);
+		currRightBox = new Box(
+			boxD.xRight,
+			boxD.y,
+			boxD.width,
+			boxD.height,
+			totalElectrons,
+			"m"
+		);
+		tempBox.electrons = [];
+		sceneAnimated = false;
+		showEF = false;
+		electronsTransferred = 0;
+		buttonState = "A";
+		moveBound = 0;
+		btn.innerText = "Apply Charge";
+	} else if (buttonState == "A") {
+		// default
+		const chargeSliders = document.querySelectorAll(".chargeSlider");
+		chargeSliders.forEach((slider) => {
+			slider.disabled = true;
+		});
+
+		const dopantSlider = document.querySelector(".dopantSlider");
+		dopantSlider.disabled = true;
+
+		btn.innerText = "Reset";
+		// button is ready to apply
+
+		if (!reverse) {
+			if (sceneAnimated == false) {
+				let i = 0;
+				for (let i = 0; i < numTransfer; i++) {
+					let e = currRightBox.electrons[currRightBox.electrons.length - 1];
+
+					if (e.avail) {
+						tempBox.electrons.push(e);
+						currRightBox.electrons.pop();
+						e.updateAnimate(true);
+						e.updateLit(true);
+					}
+				}
+			}
+		} else {
+			// ready to reset
+			numTransfer *= -1;
+			if (sceneAnimated == false) {
+				let i = 0;
+				for (let i = 0; i < numTransfer; i++) {
+					let e = currLeftBox.electrons[currLeftBox.electrons.length - 1];
+
+					if (e.avail) {
+						tempBox.electrons.push(e);
+						currLeftBox.electrons.pop();
+						e.updateAnimate(true);
+						e.updateLit(true);
+					}
+				}
+			}
+			numTransfer *= -1;
+		}
+
+		setTimeout(() => {
+			if (currRightBox.numElectrons < totalElectrons) {
+				// amount has transfered
+				showEF = true;
+				sceneAnimated = true;
+				reverse ? (moveBound = -30) : (moveBound = 30);
+			}
+		}, timeout);
+
+		buttonState = "R";
+	}
+}
+
+function newMetalBoxes() {
 	currLeftBox = new Box(
 		boxD.xLeft,
 		boxD.y,
@@ -153,77 +245,6 @@ function setup() {
 	);
 }
 
-// update number of electrons transferred to other box
-function updateNumTransfer(value) {
-	numTransfer = value;
-}
-
-function animateElectrons() {
-	scannerSpeed = 1;
-
-	if (!reverse) {
-		if (sceneAnimated == false) {
-			let i = 0;
-			for (let i = 0; i < numTransfer; i++) {
-				let e = currRightBox.electrons[currRightBox.electrons.length - 1];
-
-				if (e.avail) {
-					tempBox.electrons.push(e);
-					currRightBox.electrons.pop();
-					e.updateAnimate(true);
-					e.updateLit(true);
-				}
-			}
-		}
-	} else {
-		if (sceneAnimated == false) {
-			let i = 0;
-			for (let i = 0; i < numTransfer; i++) {
-				let e = currLeftBox.electrons[currLeftBox.electrons.length - 1];
-
-				if (e.avail) {
-					tempBox.electrons.push(e);
-					currLeftBox.electrons.pop();
-					e.updateAnimate(true);
-					e.updateLit(true);
-				}
-			}
-		}
-	}
-
-	// reset voltage controls
-	const voltageButtons = document.querySelectorAll(".voltageButton");
-	voltageButtons.forEach((btn) => {
-		if (btn.textContent == "Reset") {
-			// resetFunc()
-			// re-initialize current boxes
-			currLeftBox = new Box(100, 100, 160, 280, totalElectrons, "m");
-			currRightBox = new Box(340, 100, 160, 280, totalElectrons, "m");
-			// need special cases for semiconductors / other special boxes that aren't metals
-			tempBox.electrons = [];
-			sceneAnimated = false;
-			showEF = false;
-			electronsTransferred = 0;
-			btn.textContent = "Apply Voltage";
-		} else if (btn.textContent == "Apply Voltage") {
-			if (sceneAnimated == false && btn.textContent == "Reset") {
-				// hasn't animated yet and not reset
-				setTimeout(() => {
-					if (currRightBox.numElectrons < totalElectrons) {
-						showEF = true;
-						sceneAnimated = true;
-					}
-				}, "4000");
-			}
-			btn.textContent = "Reset";
-		}
-	});
-}
-
-// function animateScanner() {
-//     animateElectrons();
-// }
-
 function resetScene() {
 	fade = 255;
 	reverse = false;
@@ -234,7 +255,13 @@ function resetScene() {
 	animCharges = [];
 	displayCharges = [];
 	sceneAnimated = false;
+	timesAnimated = 0;
 	electronsTransferred = 0;
+	moveBound = 0;
+	// slider.disabled = false;
+
+	boxD.depth = 80;
+	boxD.angle = -60;
 
 	lastColorChange = 0;
 
@@ -242,10 +269,9 @@ function resetScene() {
 
 	showEF = false;
 
-	balls = [];
-	totalElectrons = 200;
+	totalElectrons = rows * cols;
 
-	scannerSpeed = 0;
+	newMetalBoxes();
 
 	// change electrons, dopants, type for semiconductor boxes
 	let semis = [5, 6, 7, 8, 9];
@@ -256,35 +282,27 @@ function resetScene() {
 			currRightBox.updateType("s");
 		}
 	});
-	// if semis.includes(sceneCount)
-
-	const voltageButtons = document.querySelectorAll(".voltageButton");
-	voltageButtons.forEach((btn) => {
-		btn.value = 12;
-	});
 
 	const dopantSliders = document.querySelectorAll(".dopantSlider");
 	dopantSliders.forEach((slider) => {
 		slider.value = defaultDopants;
 	});
 
-	// dim neutrals after 2 seconds
-	setTimeout(() => {
-		// background(255, 0, 0, fade)
-		// afterDelay = true
-		// for (let i = 0; i <= currRightBox.chargeMap.length - 1; i++) {
-		//   currRightBox.chargeMap[i].updateType("dim")
-		// }
-		// for (let i = 0; i <= currRightBox.electrons.length - 1; i++) {
-		//   currRightBox.electrons[i].updateDim(true)
-		// }
-		// for (let i = 0; i <= currLeftBox.chargeMap.length - 1; i++) {
-		//   currLeftBox.chargeMap[i].updateType("dim")
-		// }
-		// for (let i = 0; i <= currLeftBox.electrons.length - 1; i++) {
-		//   currLeftBox.electrons[i].updateDim(true)
-		// }
-	}, 1000);
+	const chargeSliders = document.querySelectorAll(".chargeSlider");
+	chargeSliders.forEach((slider) => {
+		slider.value = 12;
+		slider.min = -numTransferRange;
+		slider.max = numTransferRange;
+		slider.disabled = false;
+	});
+
+	const dopantSlider = document.querySelector(".dopantSlider");
+	dopantSlider.disabled = false;
+
+	const btn = document.querySelector(`.chargeButton${sceneCount}`);
+	btn.innerText = "Apply Charge";
+
+	buttonState = "A";
 }
 
 function drawBattery() {
@@ -322,24 +340,29 @@ function drawBattery() {
 	}
 }
 
-function drawMOS(box, label) {
-	fill(...color.bg);
-	stroke(...color.white);
-	let boxD = 100;
-	let boxA = -100;
-	beginShape();
-	vertex(box.x + box.w, box.y + box.h); // left top
-	vertex(box.x + box.w, box.y); // left bottom
-	vertex(box.x + box.w + boxD, box.y + boxA); // top right
-	vertex(box.x + box.w + boxD, box.y + box.h + boxA);
-	endShape(CLOSE);
+// function drawMOS(box, label, leftPadding) {
+// 	fill(...color.bg);
+// 	stroke(...color.white);
+// 	let boxD = 100;
+// 	let boxA = -100;
+// 	beginShape();
+// 	vertex(box.x + box.w, box.y + box.h); // left top
+// 	vertex(box.x + box.w, box.y); // left bottom
+// 	vertex(box.x + box.w + boxD, box.y + boxA); // top right
+// 	vertex(box.x + box.w + boxD, box.y + box.h + boxA);
+// 	endShape(CLOSE);
 
-	noStroke();
-	fill(...color.white);
-	text(label, box.x + box.w + graphD.leftPadding, box.y + box.h / 2 - 40);
-}
+// 	noStroke();
+// 	fill(...color.white);
+// 	text(label, box.x + box.w + leftPadding, box.y + box.h / 2 - 40);
+// }
 
 function drawBox(box) {
+	if (scene(10)) {
+		boxD.depth = 80;
+		boxD.angle = -60;
+	}
+
 	stroke(...color.white);
 	strokeWeight(1.2);
 	fill(...color.bg);
@@ -366,48 +389,6 @@ function drawBox(box) {
 	vertex(box.x + box.w + boxD.depth, box.y + boxD.angle); // top right
 	vertex(box.x + boxD.depth, box.y + boxD.angle); // top left
 	endShape(CLOSE);
-
-	styleText();
-
-	if (box.type == "m") {
-		let totalNM = 10;
-		text(`Total nm: 10`, box.x + 20, box.y + 300);
-
-		// code numtransfer = 12
-		// # / 20 in 1m = #/20nm
-		if (electronsTransferred > 1) {
-			if (box.x > 300) {
-				totalNM -= numTransfer / 20;
-			} else {
-				totalNM += numTransfer / 20;
-			}
-		}
-
-		let numElectrons = (totalNM * 10 ** 15).toExponential();
-
-		// let nr1 = numElectrons.substr(0, 4)
-		// let nr2 = numElectrons.substr(4, numElectrons.length)
-
-		// let finalNr = Number(nr1 + 0 + nr2).toExponential(2)
-
-		text(`Total electrons: ${numElectrons}`, box.x + 20, box.y + 320);
-	} else if (box.type == "s") {
-		let totalNM = 10;
-		// let expoRange = 10 ** 2 / box.dopantAmount
-		let expo = 10 ** 15;
-
-		// let expo = 10 ** 15
-
-		text(`Total nm: 10`, box.x + 20, box.y + 300);
-		let numElectrons = (totalNM * expo).toExponential();
-
-		let nr1 = numElectrons.substr(0, 4);
-		let nr2 = numElectrons.substr(4, numElectrons.length);
-		let finalNr = Number(nr1 + 0 + nr2).toExponential(2);
-
-		// console.log(numElectrons)
-		text(`Total electrons: ${finalNr}`, box.x + 20, box.y + 320);
-	}
 }
 
 function drawAnimatedCharges(charges) {
@@ -440,11 +421,11 @@ function genBrightCharges(dopantIndices) {
 			brightChargesMetal.push(randomIndex);
 		}
 	}
+
+	let index = 0;
 	while (brightChargesSemi.length < electronsTransferred) {
-		let randomIndex = floor(random(defaultDopants));
-		if (!brightChargesSemi.includes(randomIndex)) {
-			brightChargesSemi.push(randomIndex);
-		}
+		brightChargesSemi.push(index);
+		index += 1;
 	}
 }
 
@@ -469,13 +450,24 @@ function drawCharges(box, type) {
 			boxSideCondition = box.x < boxD.xRight;
 		}
 
+		let numLit = 0;
 		if (box.type == "s") {
 			for (let i = 0; i <= box.chargeMap.length - 1; i++) {
 				let isDopant = box.dopantIndices.includes(i);
+
 				if (isDopant) {
 					box.chargeMap[i].updateType("pos");
+
+					if (boxSideCondition) {
+						// only light up dopants closest to side
+						if (numLit < electronsTransferred) {
+							box.chargeMap[i].updateLit(true);
+							numLit += 1;
+						}
+					}
 				}
 			}
+			numLit = 0;
 		}
 
 		if (boxSideCondition) {
@@ -483,10 +475,6 @@ function drawCharges(box, type) {
 				let isBrightMetal = brightChargesMetal.includes(i);
 
 				if (box.type == "m") {
-					// dim all right positive charges
-					// if (electronsTransferred >= 1) {
-					//   box.chargeMap[i].updateType("dim")
-					// }
 					// light up attracted positive charges
 					if (isBrightMetal) {
 						// box.chargeMap[i].updateType("pos")
@@ -495,41 +483,15 @@ function drawCharges(box, type) {
 						box.chargeMap[i].updateLit(false);
 					}
 				}
-
-				// // make all neutrals
-				// if (box.type == "s") {
-				//   if (electronsTransferred >= 1) {
-				//     box.chargeMap[i].updateType("dim")
-				//   }
-				// }
-			}
-			if (box.type == "s") {
-				// light up attracted dopants
-				for (let j = 0; j < brightChargesSemi.length; j++) {
-					let dopant = box.chargeMap[box.dopantIndices[brightChargesSemi[j]]];
-					if (brightChargesSemi.includes(j)) {
-						dopant.updateLit(true);
-					} else {
-						dopant.updateLit(false);
-					}
-				}
 			}
 		}
 
 		drawCharge(chargeX, chargeY, chargeType, box.chargeMap[i].lit);
 	}
-
-	// styleText()
-	// text(`#negative charges: ${box.numElectrons}`, box.x + 30, box.y + 300)
 }
 
 function updateDopantAmount(value) {
-	sceneCount == 5 ? boxes.R5.updateDopants(value) : null;
-	sceneCount == 6 ? boxes.R6.updateDopants(value) : null;
-	sceneCount == 7 ? boxes.R7.updateDopants(value) : null;
-	sceneCount == 8 ? boxes.R8.updateDopants(value) : null;
-	sceneCount == 9 ? boxes.R9.updateDopants(value) : null;
-	sceneCount == 10 ? boxes.R10.updateDopants(value) : null;
+	currRightBox.updateDopants(value);
 }
 
 function checkDest(electron, dest, side) {
@@ -644,21 +606,7 @@ function drawElectrons(box) {
 							if (electron.pushed == false) {
 								electron.updatePushed(true);
 								sceneAnimated = true;
-
-								// dim all electrons
-								// for (let i = 0; i < currLeftBox.electrons.length; i++) {
-								//   currLeftBox.electrons[i].updateDim(true)
-								// }
-								// for (let i = 0; i < currRightBox.electrons.length; i++) {
-								//   currRightBox.electrons[i].updateDim(true)
-								// }
-
 								electronsTransferred += 1;
-
-								// for (let i = 0; i < currLeftBox.chargeMap.length; i++) {
-								//   // for each column
-								//   currLeftBox.chargeMap[i].updateType("dim")
-								// }
 							}
 						}
 					} else if (reverse) {
@@ -672,21 +620,8 @@ function drawElectrons(box) {
 							if (electron.pushed == false) {
 								electron.updatePushed(true);
 								sceneAnimated = true;
-
-								// dim all electrons
-								// for (let i = 0; i < currLeftBox.electrons.length; i++) {
-								//   currLeftBox.electrons[i].updateDim(true)
-								// }
-								// for (let i = 0; i < currRightBox.electrons.length; i++) {
-								//   currRightBox.electrons[i].updateDim(true)
-								// }
-
+								timesAnimated += 1;
 								electronsTransferred += 1;
-
-								// for (let i = 0; i < currLeftBox.chargeMap.length; i++) {
-								//   // for each column
-								//   currLeftBox.chargeMap[i].updateType("dim")
-								// }
 							}
 						}
 					}
@@ -712,7 +647,7 @@ function drawCharge(chargeX, chargeY, chargeType, lit) {
 	if (chargeType == "pos") {
 		lit ? fill(...color.pos) : fill(...color.pos, fade);
 		circle(chargeX, chargeY, posSize);
-		lit ? stroke(...color.sign) : stroke(...color.sign, fade);
+		lit ? stroke(...color.sign) : stroke(...color.sign, fade * 8);
 	}
 	if (chargeType == "neutral") {
 		fill(...color.neutral);
@@ -728,122 +663,151 @@ function drawCharge(chargeX, chargeY, chargeType, lit) {
 	line(chargeX, chargeY - signSize / 2, chargeX, chargeY + signSize / 2);
 }
 
+function distanceLog(position) {
+	// position will be between 0 and 100
+	var minp = 0;
+	var maxp = boxD.width;
+
+	// The result should be between 100 an 10000000
+	var minv = Math.log(0.1);
+	var maxv = Math.log(10000000);
+
+	// calculate adjustment factor
+	var scale = (maxv - minv) / (maxp - minp);
+
+	return Math.exp(minv + scale * (position - minp));
+}
+
 function drawScanner(box) {
-	// setTimeout(() => {
-	//   if (sceneCount == 4) {
-	//     let measure = int(box.x) + int(currVoltageSlider.value)
-	//     if (box.scannerX >= measure) {
-	//       scannerSpeed = 0
-	//     }
-	//   }
-	//   if (sceneCount == 8) {
-	//     let measure = int(box.x) + int(currVoltageSlider.value) * 6
-	//     if (box.scannerX >= measure) {
-	//       scannerSpeed = 0
-	//     }
-	//   }
-	//   if (sceneCount == 9) {
-	//     // let measure = int(box.x) + int(currVoltageSlider.value) * 6;
-	//     let measure = int(box.x) + Math.log(int(currVoltageSlider.value)) * 42
-	//     measure = measure - int(currDopantSlider.value) / 2
-	//     if (box.scannerX >= measure) {
-	//       if (int(currDopantSlider.value) > 0) {
-	//         scannerSpeed = 0
-	//       }
-	//     }
-	//   }
-	//   if (sceneCount == 10) {
-	//     let measure = int(box.x) + int(currVoltageSlider.value)
-	//     if (box.scannerX >= measure) {
-	//       scannerSpeed = 0
-	//     }
-	//   }
-	// }, "200")
-
-	// // if scanner hits end of box or electron goal has been transferred
-	// if (
-	//   box.scannerX > box.x + box.w - 10 ||
-	//   electronsTransferred >= numTransfer
-	// ) {
-	//   scannerSpeed = 0
-	// }
-
-	// // move the scanner using scannerSpeed
-	// box.updateScannerX(box.scannerX + scannerSpeed)
-
-	// // how much of box has been scanned
-	// let scannerOverBox = box.scannerX - box.x // total = 150
-
-	// // gets percentage of scan
-	// let scanProgress = scannerOverBox / 150
-
-	// // which electron to move based on scan percentage
-	// let electronIndex = Math.floor(box.numElectrons * scanProgress)
-
 	// draw scanner
 	fill(255, 250, 202, 80);
 	noStroke();
 
 	let xPos = 0;
-	let scale = 10;
+	let scale = 1;
 	let scannerNM = 1;
 	let scannerWidth = scannerNM * scale; // 1nm
 
-	if (mouseX > boxD.xRight + scannerWidth && mouseX < boxD.xRight + box.w) {
-		xPos = mouseX - boxD.xRight - scannerWidth;
-		lastPos = xPos;
-		scannerNM += (mouseX - boxD.xRight) / (boxD.width / scale) - 1; // 1 = default scannerNM
-	} else if (mouseX > boxD.xRight + box.w) {
-		// if over right side of box, set nm = 10 (prevent fast mouse exit)
-		lastPos = boxD.width - scannerWidth;
-		scannerNM = scannerWidth;
-	} else if (mouseX < boxD.xRight + scannerWidth) {
-		// if over left side of box, set nm = 1 (prevent fast mouse exit)
-		lastPos = scannerWidth;
-		scannerNM = 1;
+	// if mouse is in box
+	if (mouseX < box.x + boxD.width + 2 && mouseX > box.x - 2) {
+		xPos = mouseX - box.x - scannerWidth;
 	}
 
 	// only draw if electrons have been animated
-	if (electronsTransferred > 1) {
-		rect(box.scannerX, box.scannerY, lastPos + scannerWidth, box.h);
+	rect(box.scannerX, box.scannerY, xPos + scannerWidth, box.h);
 
-		beginShape();
-		vertex(box.x, box.y); // bottom left
-		vertex(box.x + scannerWidth + lastPos, box.y); // bottom right
-		vertex(box.x + scannerWidth + 24 + lastPos, box.y + boxA); // top right
-		vertex(box.x + boxD, box.y + boxA); // top left
-		endShape(CLOSE);
+	beginShape();
+	vertex(box.x, box.y); // bottom left
+	vertex(box.x + scannerWidth + lastPos, box.y); // bottom right
+	vertex(box.x + scannerWidth + lastPos + boxD.depth, box.y + boxD.angle); // top right
+	vertex(box.x + boxD.depth, box.y + boxD.angle); // top left
+	endShape(CLOSE);
 
-		// text of numbers
+	styleText();
 
-		styleText();
-		// text(`scanner nm: ${scannerNM.toFixed(2)}`, box.x + 30, box.y - 60)
-		// text(
-		//   `scanner negative charges: ${floor(scannerNM * 20)}`,
-		//   box.x + 30,
-		//   box.y - 40
-		// )
+	let xDistance = distanceLog(xPos);
+	// scale to units
 
-		// text(
-		//   `scanner positive charges: ${floor(scannerNM * 20)}`,
-		//   box.x + 30,
-		//   box.y - 20
-		// )
-
-		// text(`Scanner net charge: 0`, box.x + 30, box.y - 0)
-
-		// + floor(Math.random() * 4 - 2)
-
-		text(`Scanner nm: ${scannerNM.toFixed(2)}`, box.x + 30, box.y - 60);
-
-		let numElectrons = (scannerNM * 10 ** 15).toExponential();
-
-		let nr1 = numElectrons.substr(0, 4);
-		let nr2 = numElectrons.substr(4, numElectrons.length);
-		let finalNr = Number(nr1 + 0 + nr2).toExponential(2);
-
-		text(`Electrons within scanner: ${finalNr}`, box.x + 30, box.y - 40);
+	// // 100 nm
+	if (xDistance < 1) {
+		scaledDistance = "< 1nm";
 	}
+
+	// < 100nm
+	if (xDistance >= 1) {
+		scaledDistance = xDistance.toFixed(2) + "nm";
+	}
+
+	// µm
+	if (xDistance >= 10000) {
+		scaledDistance = xDistance / 10000;
+		scaledDistance = scaledDistance.toFixed(2) + "µm";
+	}
+
+	// mm
+	if (xDistance >= 1000000) {
+		scaledDistance = xDistance / 1000000;
+		scaledDistance = scaledDistance.toFixed(2) + "mm";
+	}
+
+	// cm
+	if (xDistance >= 10000000) {
+		scaledDistance = xDistance / 10000000;
+		scaledDistance = scaledDistance.toFixed(2) + "cm";
+	}
+
+	Q = numTransfer / numTransferRange;
+
+	let saturationX;
+	if (box.type == "m") {
+		saturationX = Q / (1.6 * (10 ^ 3)); // in cm
+	} else if (box.type == "s") {
+		saturationX = Q / (1.6 * (10 ^ -4)); // in cm
+	}
+
+	text(`x distance: ${scaledDistance}`, box.x + 90, box.y - 86);
+
+	text(`Q: ${Q}`, box.x + 90, box.y - 72); // right box (from)
+	text(`Q: ${-Q}`, boxD.xLeft + 90, box.y - 72); // left box (to)
+
+	text(`S : ${saturationX}`, box.x + 150, box.y - 72); // left box (to)
+
+	// let numElectrons = (scannerNM * 10 ** 15).toExponential();
+
+	// let nr1 = numElectrons.substr(0, 4);
+	// let nr2 = numElectrons.substr(4, numElectrons.length);
+	// let finalNr = Number(nr1 + 0 + nr2).toExponential(2);
+
+	// 3 text
+
+	// if (box.type == "m") {
+	// let totalNM = 10;
+
+	// // code numtransfer = 12
+	// // # / 20 in 1m = #/20nm
+	// if (electronsTransferred > 1) {
+	// 	if (box.x > 0) {
+	// 		totalNM -= numTransfer / 20;
+	// 	} else {
+	// 		totalNM += numTransfer / 20;
+	// 	}
+	// }
+
+	// let numElectrons = (totalNM * 10 ** 15).toExponential();
+
+	styleText();
+	text("1cm x 1cm 1cm", box.x + 4, box.y + boxD.height - 4);
+	text("|", box.x + 29, box.y + boxD.height + 10);
+	text("1nm", box.x + 19, box.y + boxD.height + 24);
+	text("|", box.x + 88, box.y + boxD.height + 10);
+	text("100nm", box.x + 78, box.y + boxD.height + 24);
+	text("|", box.x + 147, box.y + boxD.height + 10);
+	text("10µm", box.x + 137, box.y + boxD.height + 24);
+	text("|", box.x + 205, box.y + boxD.height + 10);
+	text("1mm", box.x + 195, box.y + boxD.height + 24);
+	text("|", box.x + boxD.width - 2, box.y + boxD.height + 8);
+	text("1cm", box.x + boxD.width - 10, box.y + boxD.height + 24);
+
+	// fill(...color.neg);
+	// text(`Total electrons: ${numElectrons}`, box.x + 90, box.y - 40);
+	// fill(...color.pos);
+	// text(`Total positive charge: ${numElectrons}`, box.x + 90, box.y - 24);
+	// fill(...color.net);
+	// text(`Total net charge: ${numElectrons}`, box.x + 90, box.y - 8);
+	// }
+	// else if (box.type == "s") {
+	// 	let totalNM = 10;
+	// 	let expo = 10 ** 15;
+
+	// 	text(`Total nm: 10`, box.x + 20, box.y + 300);
+	// 	let numElectrons = (totalNM * expo).toExponential();
+
+	// 	let nr1 = numElectrons.substr(0, 4);
+	// 	let nr2 = numElectrons.substr(4, numElectrons.length);
+	// 	let finalNr = Number(nr1 + 0 + nr2).toExponential(2);
+
+	// 	text(`Total electrons: ${finalNr}`, box.x + 20, box.y + 320);
+	// }
 }
 
 function styleText() {
@@ -863,7 +827,6 @@ function drawGraph() {
 
 	line(graphD.center, graphD.y - 76, graphD.center, graphD.y + 60); // vert
 
-	// sceneCount == 8 ? (xAxisExtend = 20) : null
 	line(graphD.x, graphD.y, graphD.end, graphD.y); // hor
 
 	fill(...color.grey);
@@ -906,12 +869,16 @@ function drawGraph() {
 	line(graphD.end, graphD.y, graphD.end - size, graphD.y - size);
 	line(graphD.end, graphD.y, graphD.end - size, graphD.y + size);
 
-	// x axis arrow - left
-	line(graphD.x, graphD.y, graphD.x + size, graphD.y + size);
-	line(graphD.x, graphD.y, graphD.x + size, graphD.y - size);
+	// x axis arrow - right
+	line(0, graphD.y, 0 + size, graphD.y - size);
+	line(0, graphD.y, 0 + size, graphD.y + size);
+
+	// // x axis arrow - left
+	// line(graphD.x, graphD.y, graphD.x + size, graphD.y + size);
+	// line(graphD.x, graphD.y, graphD.x + size, graphD.y - size);
 
 	strokeWeight(2);
-	stroke(...color.purple);
+	stroke(...color.net);
 
 	let eFieldHeight = 0;
 	if (sceneAnimated) {
@@ -925,40 +892,61 @@ function drawGraph() {
 		drawLines(noHeightXPoints, noHeights);
 	}
 
-	purpleHeights = [0, 0, -eFieldHeight, -eFieldHeight, 0, 0];
-	purpleXPoints = [
-		graphD.x,
-		graphD.center,
-		graphD.center,
-		graphD.center + 80,
-		graphD.center + 80,
-		graphD.end,
-	];
-
-	if (
-		sceneCount == 6 ||
-		sceneCount == 7 ||
-		sceneCount == 8 ||
-		sceneCount == 9
-	) {
-		purpleHeights = [0, 0, -eFieldHeight, -eFieldHeight, 0];
-		purpleXPoints = [
+	if (!reverse) {
+		netHeights = [0, 0, -eFieldHeight, -eFieldHeight, 0, 0];
+		netXPoints = [
 			graphD.x,
 			graphD.center,
 			graphD.center,
-			graphD.center + 80,
+			graphD.center + 26,
+			graphD.center + 26,
 			graphD.end,
 		];
+
+		// over distance
+		if (sceneCount > 6) {
+			netHeights = [0, 0, -eFieldHeight, -eFieldHeight, 0];
+			netXPoints = [
+				graphD.x,
+				graphD.center,
+				graphD.center,
+				graphD.center + 26,
+				graphD.end,
+			];
+		}
+	} else {
+		netHeights = [0, 0, -eFieldHeight, -eFieldHeight, 0, 0];
+		netXPoints = [
+			graphD.x,
+			graphD.center,
+			graphD.center,
+			graphD.center + 26,
+			graphD.center + 26,
+			graphD.end,
+		];
+
+		// over distance
+		if (sceneCount > 6) {
+			netHeights = [0, 0, -eFieldHeight, -eFieldHeight, 0];
+			netXPoints = [
+				graphD.x,
+				graphD.center,
+				graphD.center,
+				graphD.center + 26,
+				graphD.end,
+			];
+		}
 	}
 
 	graphNorm = 1.4;
 	// standardize the heights
-	for (let i = 0; i < purpleHeights.length; i++) {
-		purpleHeights[i] = purpleHeights[i] / graphNorm;
+	for (let i = 0; i < netHeights.length; i++) {
+		netHeights[i] = -netHeights[i] / graphNorm;
 	}
 
-	if (currButton && currButton.textContent == "Reset" && showEF) {
-		drawLines(purpleXPoints, purpleHeights);
+	// const btn = document.querySelector(`.voltageButton${sceneCount}`);
+	if (buttonState == "R") {
+		drawLines(netXPoints, netHeights);
 		drawArrows();
 	}
 }
@@ -980,69 +968,67 @@ function drawLines(points, rawHeights) {
 
 function drawArrows() {
 	if (showEF) {
-		let x1;
-		let x2;
-		let y;
-
-		if (!reverse) {
-			x1 = 268;
-			x2 = 350;
-			y = 112;
-		} else if (reverse) {
-			x1 = 262;
-			x2 = 338;
-			y = 112;
-		}
+		let y = 120;
 
 		// draw 7 arrows
 		for (let i = 0; i < 7; i++) {
 			strokeCap(SQUARE);
-			stroke(...color.purple);
-			let weight = numTransfer / 3;
-			strokeWeight(weight);
+			stroke(...color.net);
+			let weight = Math.abs(numTransfer) / 3;
 
 			let triangleSize = 12;
-			fill(...color.purple);
-			// draw line
-			line(x1, y, x2 - triangleSize, y);
-			if (
-				sceneCount == 6 ||
-				sceneCount == 7 ||
-				sceneCount == 8 ||
-				sceneCount == 9
-			) {
-				noStroke();
-				// rect(boxD.xRight, y, 100, weight)
-				beginShape();
-				vertex(boxD.xRight - 4, y - 2); // left top
-				vertex(boxD.xRight - 4, y - 2 + weight); // left bottom
-				vertex(boxD.xRight + boxD.width, y - 2 + weight / 2); // right bottom
-				vertex(boxD.xRight + boxD.width, y - 2 + weight / 2); // right top
-				endShape(CLOSE);
-			}
-			noStroke();
+			fill(...color.net);
 
-			if (weight > 0) {
+			if (weight != 0) {
 				if (!reverse) {
+					noStroke();
 					triangle(
-						x1 - 8,
+						boxD.xLeft + boxD.width,
 						y,
-						x1 + triangleSize - 8,
+						boxD.xLeft + boxD.width + 12,
 						y + triangleSize / 1.7,
-						x1 + triangleSize - 8,
+						boxD.xLeft + boxD.width + 12,
 						y - triangleSize / 1.7
 					);
+					if (sceneCount > 5) {
+						noStroke();
+						beginShape();
+						vertex(boxD.xRight - 16, y - 2); // left top
+						vertex(boxD.xRight - 16, y - 2 + weight); // left bottom
+						vertex(boxD.xRight + boxD.width, y + weight / 2); // right bottom
+						vertex(boxD.xRight + boxD.width, y + weight / 2); // right top
+						endShape(CLOSE);
+					} else {
+						strokeWeight(weight);
+						stroke(...color.net);
+						line(boxD.xLeft + boxD.width + 4, y, boxD.xRight, y);
+					}
 				} else if (reverse) {
+					noStroke();
 					triangle(
-						x2,
-						y,
-						x2 - triangleSize,
-						y - triangleSize / 1.7,
-						x2 - triangleSize,
-						y + triangleSize / 1.7
+						boxD.xRight,
+						y + 4,
+						boxD.xRight - 12,
+						y + triangleSize / 1.7 + 4,
+						boxD.xRight - 12,
+						y - triangleSize / 1.7 + 4
 					);
+					if (sceneCount > 5) {
+						noStroke();
+						beginShape();
+						vertex(boxD.xLeft, y + weight / 2); // left top
+						vertex(boxD.xLeft, y + weight / 2); // left bottom
+						vertex(boxD.xLeft + boxD.width + 16, y); // right bottom
+						vertex(boxD.xLeft + boxD.width + 16, y + weight); // right top
+						endShape(CLOSE);
+					} else {
+						strokeWeight(weight);
+						stroke(...color.net);
+						line(boxD.xLeft + boxD.width, y, boxD.xRight - 4, y);
+					}
 				}
 			}
+
 			y += 40;
 		}
 	}
@@ -1096,6 +1082,7 @@ function draw() {
 function drawItems() {
 	background(...color.bg);
 	noStroke();
+	reverse = numTransfer < 0;
 
 	drawBox(currLeftBox);
 	drawBox(currRightBox);
@@ -1105,85 +1092,78 @@ function drawItems() {
 	drawElectrons(currRightBox);
 	drawElectrons(tempBox);
 
+	if (sceneAnimated) {
+		if (scene(4) || scene(8) || scene(9)) {
+			reverse ? drawScanner(currLeftBox) : drawScanner(currRightBox);
+		}
+	}
+
+	styleText();
+	text("n: " + numTransfer, 20, 20);
+
+	// text("Q: " + Q, 20, 34);
+
 	drawBattery();
 
-	if (sceneCount > 3) {
+	if (sceneCount > 2) {
 		drawGraph();
 	}
 }
 
 function scene1() {
-	// currLeftBox = boxes.L1;
-	// currRightBox = boxes.R1;
-
 	drawItems();
 }
 
 function scene2() {
-	// currLeftBox = boxes.L2;
-	// currRightBox = boxes.R2;
 	drawItems();
 }
 
 function scene3() {
-	// currLeftBox = boxes.L3;
-	// currRightBox = boxes.R3;
 	drawItems();
 }
 
 function scene4() {
-	// currLeftBox = boxes.L4;
-	// currRightBox = boxes.R4;
 	drawItems();
 }
 
 function scene5() {
-	// currLeftBox = boxes.L5;
-	// currRightBox = boxes.R5;
 	drawItems();
 }
 
 function scene6() {
-	// currLeftBox = boxes.L6;
-	// currRightBox = boxes.R6;
 	drawItems();
 }
 
 function scene7() {
-	// currLeftBox = boxes.L7;
-	// currRightBox = boxes.R7;
 	drawItems();
 }
 
 function scene8() {
-	// currLeftBox = boxes.L8;
-	// currRightBox = boxes.R8;
 	drawItems();
 }
 
 function scene9() {
-	// currLeftBox = boxes.L9;
-	// currRightBox = boxes.R9;
 	drawItems();
 }
 
 function scene10() {
-	// reversePol = true;
-	// background(18);
-	// currLeftBox = boxes.L10;
-	// currRightBox = boxes.R10;
-
-	// drawScanner(boxes.L10);
-
 	background(...color.bg);
+	image(mosImg, 60, 60, 251, 495);
 
-	let surface1 = new Box(30, 200, 120, 300);
-	let surface2 = new Box(120, 200, 120, 300);
-	let surface3 = new Box(210, 200, 120, 300);
+	// let surface1 = new Box(120, 200, 20, 300);
+	// let surface2 = new Box(150, 200, 20, 300);
+	// let surface3 = new Box(180, 200, 20, 300);
 
-	drawMOS(surface1, "Metal", 30);
-	drawMOS(surface2, "Oxide", 30);
-	drawMOS(surface3, "Semiconductor", 10);
+	// drawBox(surface1);
+	// drawBox(surface2);
+	// drawBox(surface3);
+
+	// styleText();
+	// // rotate(angle1);
+
+	// text("Metal", surface1.x, boxD.y / 2 - 40);
+	// text("Oxide", surface2.x, boxD.y / 2 - 40);
+	// text("Semiconductor", surface3.x, boxD.y / 2 - 40);
 }
 
 function scene11() {}

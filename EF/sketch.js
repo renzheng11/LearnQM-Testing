@@ -783,7 +783,6 @@ function scene4() {
 	// animating scene 4
 	if (animate.scene4 && negbox4.arrowOffsetY >= 0) {
 		negbox4.updateArrowOffsetY(-0.2);
-		console.log(negbox4.arrowOffsetY);
 	}
 }
 
