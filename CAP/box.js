@@ -79,6 +79,8 @@ class Box {
 		let index = 0;
 		for (let col = 0; col < cols; col++) {
 			for (let row = 0; row < rows; row++) {
+				// console.log(col);
+				// console.log(xUnit * col + this.x - 7);
 				this.chargeMap.push(
 					new Charge(
 						type,
