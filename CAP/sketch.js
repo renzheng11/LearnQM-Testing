@@ -719,12 +719,6 @@ function drawScanner(box) {
 		scaledDistance = scaledDistance.toFixed(2) + "µm";
 	}
 
-	// // µm
-	// if (xDistance >= 10000) {
-	// 	scaledDistance = xDistance / 1000;
-	// 	scaledDistance = scaledDistance.toFixed(2) + "µm";
-	// }
-
 	// mm
 	if (xDistance >= 1000000) {
 		scaledDistance = xDistance / 1000000;
@@ -746,9 +740,6 @@ function drawScanner(box) {
 		let xMax3 = xMax2 * 10 ** -6; // nm
 		xMax = xMax3;
 		actualQ = xDistance * (1.6 * 10 ** 3);
-
-		// saturationX = Q / (1.6 * (10 ^ 3)); // in cm
-		// xMax = Q / (1.6 * (10 ^ 3)); // in nm
 	} else if (box.type == "s") {
 		// Q = µC
 		let xMax1 = Q / (1.6 * 10 ** -4); // cm
@@ -756,18 +747,9 @@ function drawScanner(box) {
 		let xMax3 = xMax2 * 10 ** -6; // nm
 		xMax = xMax3.toFixed(2);
 		actualQ = xDistance * (1.6 * 10 ** -4);
-
-		// revert xDistance to box size from xMax
-
-		// saturationX = Q / (1.6 * (10 ^ -11)); // in nm
-
-		// find actual Q
 	}
 
-	// let actualQ = xDistance / 10 ** -6;
-	// actualQ = actualQ / 10 ** 7;
-	// actualQ = actualQ * (1.6 * 10 ** -4);
-
+	// find actual Q
 	if (actualQ > Q) {
 		actualQ = Q;
 	}
@@ -779,11 +761,7 @@ function drawScanner(box) {
 
 	// update lit dopants
 	for (let i = 0; i <= box.dopantIndices.length - 1; i++) {
-		// let isDopant = box.dopantIndices.includes(i);
 		let charge = box.chargeMap[box.dopantIndices[i]];
-		// let pos = box.chargeMap[i].x;
-
-		// change all to less than
 
 		xMax > 0 && charge.x == 253 ? charge.updateLit(true) : null; // 0
 		xMax > 0 ? (maxBox = 253 + 19) : null; // 0
@@ -829,63 +807,49 @@ function drawScanner(box) {
 
 		xMax > 2000000 && charge.x == 463 ? charge.updateLit(true) : null; // 14
 		xMax > 2000000 ? (maxBox = 463 + 19) : null; // 14
-
-		// xMax > && charge.x > 478 ? charge.updateLit(true) : null; // 15
-
-		// in nms
-		// 1 - .4 / 268
-		// 2 - 1.45 // 283
-		// 3 - 4 // 298
-		// 4 - 15 // 313
-		// 5 - 42 // 328
-		// 6 - 120 // 343
-		// 7 - 450 // 358
-		// 8 - 1370 // 373
-		// 9 - 4462 // 388
-		// 10 - 15000 // 403
-		// 11 - 50000 // 418
-		// 12 - 150000 // 433
-		// 13 - 550000 // 448
-		// 14 - 1800000 // 463
-		// 15 - 2000000 // 478
 	}
 
-	// draw scanner
-	fill(255, 250, 202, 80);
-	noStroke();
+	if (sceneCount >= 7 || sceneCount == 4) {
+		// draw scanner
+		fill(255, 250, 202, 80);
+		noStroke();
 
-	// only draw if electrons have been animated
-	rect(box.scannerX, box.scannerY, xPos + scannerWidth, box.h);
+		// only draw if electrons have been animated
+		rect(box.scannerX, box.scannerY, xPos + scannerWidth, box.h);
 
-	beginShape();
-	vertex(box.x, box.y); // bottom left
-	vertex(box.x + scannerWidth + lastPos, box.y); // bottom right
-	vertex(box.x + scannerWidth + lastPos + boxD.depth, box.y + boxD.angle); // top right
-	vertex(box.x + boxD.depth, box.y + boxD.angle); // top left
-	endShape(CLOSE);
+		beginShape();
+		vertex(box.x, box.y); // bottom left
+		vertex(box.x + scannerWidth + lastPos, box.y); // bottom right
+		vertex(box.x + scannerWidth + lastPos + boxD.depth, box.y + boxD.angle); // top right
+		vertex(box.x + boxD.depth, box.y + boxD.angle); // top left
+		endShape(CLOSE);
 
-	styleText();
+		styleText();
 
-	text(`nm distance: ${xDistance.toFixed(2)}`, box.x + 90, box.y - 98);
-	text(`x distance: ${scaledDistance}`, box.x + 90, box.y - 86);
+		fill(...color.grey);
+		text(`nm distance: ${xDistance.toFixed(2)}`, box.x + 90, box.y - 98);
+		fill(...color.grey);
+		text(`x distance: ${scaledDistance}`, box.x + 90, box.y - 86);
 
-	text(`Q: ${actualQ.toFixed(4)}`, box.x + 90, box.y - 72); // right box (from)
-	text(`Q: ${-Q}`, boxD.xLeft + 90, box.y - 72); // left box (to)
+		styleText();
+		text(`Q: ${actualQ.toFixed(4)}`, box.x + 90, box.y - 72); // right box (from)
+		text(`Q: ${-Q}`, boxD.xLeft + 90, box.y - 72); // left box (to)
 
-	text(`xMax : ${xMax} nm`, box.x + 150, box.y - 72); // left box (to)
+		text(`xMax : ${xMax} nm`, box.x + 150, box.y - 72); // left box (to)
 
-	styleText();
-	text("1cm x 1cm 1cm", box.x + 4, box.y + boxD.height - 4);
-	text("|", box.x + 29, box.y + boxD.height + 10);
-	text("1nm", box.x + 19, box.y + boxD.height + 24);
-	text("|", box.x + 88, box.y + boxD.height + 10);
-	text("100nm", box.x + 78, box.y + boxD.height + 24);
-	text("|", box.x + 147, box.y + boxD.height + 10);
-	text("10µm", box.x + 137, box.y + boxD.height + 24);
-	text("|", box.x + 205, box.y + boxD.height + 10);
-	text("1mm", box.x + 195, box.y + boxD.height + 24);
-	text("|", box.x + boxD.width - 2, box.y + boxD.height + 8);
-	text("1cm", box.x + boxD.width - 10, box.y + boxD.height + 24);
+		styleText();
+		text("1cm x 1cm 1cm", box.x + 4, box.y + boxD.height - 4);
+		text("|", box.x + 29, box.y + boxD.height + 10);
+		text("1nm", box.x + 19, box.y + boxD.height + 24);
+		text("|", box.x + 88, box.y + boxD.height + 10);
+		text("100nm", box.x + 78, box.y + boxD.height + 24);
+		text("|", box.x + 147, box.y + boxD.height + 10);
+		text("10µm", box.x + 137, box.y + boxD.height + 24);
+		text("|", box.x + 205, box.y + boxD.height + 10);
+		text("1mm", box.x + 195, box.y + boxD.height + 24);
+		text("|", box.x + boxD.width - 2, box.y + boxD.height + 8);
+		text("1cm", box.x + boxD.width - 10, box.y + boxD.height + 24);
+	}
 }
 
 function styleText() {
@@ -1177,6 +1141,7 @@ function drawItems() {
 	}
 
 	styleText();
+	fill(...color.grey);
 	text("n: " + numTransfer, 20, 20);
 
 	// text("Q: " + Q, 20, 34);
