@@ -69,36 +69,33 @@ class Electron {
 		let buffer = 6;
 
 		let left = this.boxX + buffer;
-
 		let right = this.boxX + this.boxW - buffer;
 		let top = this.boxY + buffer;
 		let bottom = this.boxY + this.boxH - buffer;
-
-		// console.log(this.boxX);
-		// console.log(this.boxX == 0);
-		// console.log(this.boxX == 260);
-		// console.log(boxD.xRight);
-		// if (this.boxX == 0) {
-		// 	moveBound = 0;
-		// }
 
 		if (!reverse) {
 		} else {
 		}
 
-		// right box
-		if (this.boxX > 0 && !reverse) {
+		// handle repulsion space
+
+		// right box && default polarity
+		if (this.boxX > 200 && !reverse) {
+			// going left -> hit repulsion edge -> bounce right
 			if (this.position.x < left + moveBound && this.velocity.x < 0) {
 				this.velocity.x *= -1;
 			}
 		} else {
+			// either box: going left -> hit edge -> bounce right
+			// going left -> hit edge -> bounce right
 			if (this.position.x < left && this.velocity.x < 0) {
 				this.velocity.x *= -1;
 			}
 		}
 
-		// left box
-		if (this.boxX == 0 && reverse) {
+		// left box && reverse polarity
+		if (this.boxX < 200 && reverse) {
+			// going right -> hit repulsion edge -> bounce left
 			if (
 				this.position.x > right - this.radius + moveBound &&
 				this.velocity.x > 0
@@ -106,6 +103,7 @@ class Electron {
 				this.velocity.x *= -1;
 			}
 		} else {
+			// either box: going right -> hit edge -> bounce left
 			if (this.position.x > right - this.radius && this.velocity.x > 0) {
 				this.velocity.x *= -1;
 			}
