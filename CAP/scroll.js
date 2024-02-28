@@ -15,7 +15,8 @@ StartScroll = () => {
 				resetScene();
 			} else {
 				sceneCount = 0;
-				resetScene();
+				// resetScene();
+				resetDraw();
 			}
 		})
 		.addTo(controller);

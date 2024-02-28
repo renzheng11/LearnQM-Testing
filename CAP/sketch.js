@@ -2,6 +2,8 @@ let fade;
 let fadeAmount = 1;
 let afterDelay = false;
 
+let timeoutID = 0;
+
 const timeout = 4000;
 
 // vars
@@ -135,10 +137,13 @@ function setup() {
 // update number of electrons transferred to other box
 function updateNumTransfer(value) {
 	numTransfer = Math.round(value / 625);
+	if (numTransfer == 0) {
+		numTransfer = 1;
+	}
 	Q = value;
 }
 
-function animateElectrons() {
+function animateElectrons(currAnim) {
 	// reset voltage controls
 	const btn = document.querySelector(`.chargeButton${sceneCount}`);
 	if (buttonState == "R") {
@@ -187,7 +192,7 @@ function animateElectrons() {
 			}
 		}
 
-		setTimeout(() => {
+		timeoutID = setTimeout(() => {
 			let condition = !reverse
 				? currRightBox.numElectrons < totalElectrons
 				: currLeftBox.numElectrons < totalElectrons;
@@ -201,6 +206,7 @@ function animateElectrons() {
 		}, timeout);
 
 		buttonState = "R";
+		// numAnim += 1;
 	}
 }
 
@@ -224,6 +230,8 @@ function newMetalBoxes() {
 }
 
 function resetScene() {
+	clearTimeout(timeoutID);
+
 	fade = 255;
 	reverse = false;
 	tempBox.electrons = [];
@@ -236,19 +244,13 @@ function resetScene() {
 	timesAnimated = 0;
 	electronsTransferred = 0;
 	moveBound = 0;
-	// slider.disabled = false;
 
 	// re-initialize current boxes
-	moveBound = 0;
 	boxD.depth = 80;
 	boxD.angle = -60;
-
 	lastColorChange = 0;
-
 	atDestSide = false;
-
 	showEF = false;
-
 	totalElectrons = rows * cols;
 
 	newMetalBoxes();
@@ -280,9 +282,15 @@ function resetScene() {
 	dopantSlider.disabled = false;
 
 	const btn = document.querySelector(`.chargeButton${sceneCount}`);
-	btn.innerText = "Apply Charge";
+	if (btn) {
+		btn.innerText = "Apply Charge";
+	}
 
 	buttonState = "A";
+}
+
+function resetDraw() {
+	background(...color.bg);
 }
 
 function mouseHover() {
@@ -696,16 +704,13 @@ function scaleUnits(item, unit) {
 		item = item / 1000;
 		item = item.toFixed(2) + `µ${unit}`;
 	} else if (item < 1 && unit == "m") {
-		item = ">1nm";
+		item = "<1nm";
 	}
 	// < 100nm
 	else if (item < 1000) {
 		item = item.toFixed(2) + `n${unit}`;
 	}
 
-	if (item < 1 && unit == "m") {
-		item = "<1nm";
-	}
 	return item;
 }
 
@@ -863,7 +868,7 @@ function drawGraph() {
 
 	canvas.drawingContext.setLineDash([7, 3]);
 
-	line(graphD.center, graphD.y - 76, graphD.center, graphD.y + 60); // vert
+	line(graphD.center, graphD.y - 76, graphD.center, graphD.y + 76); // vert
 
 	line(graphD.x, graphD.y, graphD.end, graphD.y); // hor
 
@@ -892,15 +897,15 @@ function drawGraph() {
 	// y axis arrow - down
 	line(
 		graphD.center,
-		graphD.y + 61,
+		graphD.y + 76,
 		graphD.center + size,
-		graphD.y + 61 - size
+		graphD.y + 76 - size
 	);
 	line(
 		graphD.center,
-		graphD.y + 61,
+		graphD.y + 76,
 		graphD.center - size,
-		graphD.y + 61 - size
+		graphD.y + 76 - size
 	);
 
 	// x axis arrow - right
@@ -910,6 +915,12 @@ function drawGraph() {
 	// x axis arrow - right
 	line(0, graphD.y, 0 + size, graphD.y - size);
 	line(0, graphD.y, 0 + size, graphD.y + size);
+
+	// y axis labels
+	noStroke();
+	fill(...color.grey);
+	text("1 MV/cm —", graphD.center - 60, graphD.y - 54);
+	text("-1 MV/cm —", graphD.center - 64, graphD.y + 54);
 
 	textFont("Cambria");
 	textStyle(ITALIC);
@@ -1122,8 +1133,8 @@ function drawItems() {
 
 	styleText();
 	fill(...color.grey);
-	text("n: " + numTransfer, 20, 20);
-	text("Q: " + Q, 20, 40);
+	// text("n: " + numTransfer, 20, 20);
+	// text("Q: " + Q, 20, 40);
 
 	drawBattery();
 	styleText();
