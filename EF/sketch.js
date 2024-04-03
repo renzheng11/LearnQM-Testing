@@ -83,9 +83,9 @@ let volumeWidth;
 function setup() {
 	canvas = createCanvas((2 * windowWidth) / 4 + 40, windowHeight);
 	canvas.parent("visualization");
-	img = loadImage("vecE.png");
-	img2 = loadImage("vecELabel.png");
-	imgX = loadImage("xLabel.png");
+	img = loadImage("./images/vecE.png");
+	img2 = loadImage("./images/vecELabel.png");
+	imgX = loadImage("./images/xLabel.png");
 
 	chargeDivisor = 3.2;
 	flowDirection = "right";
@@ -1062,7 +1062,7 @@ function drawAxis() {
 
 	let xAxisExtend = 0;
 	sceneCount == 8 ? (xAxisExtend = 20) : null;
-	line(graphX, graphY, graphW - 6 + xAxisExtend, graphY); // hor
+	line(graphX, graphY, graphW + xAxisExtend + 10, graphY); // hor
 
 	noStroke();
 	fill(...color.grey);
@@ -1075,7 +1075,7 @@ function drawAxis() {
 	if (sceneCount == 8) {
 		text("x (µm)", graphC + graphW / 2 - 34 + xAxisExtend, graphY + 3);
 	} else {
-		text("x", graphC + graphW / 2 - 34 + xAxisExtend, graphY + 3);
+		text("x", graphC + graphW / 2 - 24 + xAxisExtend, graphY + 3);
 	}
 
 	textStyle(NORMAL);
@@ -1104,8 +1104,8 @@ function drawAxis() {
 
 	if (sceneCount != 8) {
 		// x axis arrow - right
-		line(graphW, graphY, graphW - size, graphY - size);
-		line(graphW, graphY, graphW - size, graphY + size);
+		line(graphW + 10, graphY, graphW - size + 10, graphY - size);
+		line(graphW + 10, graphY, graphW - size + 10, graphY + size);
 
 		// x axis arrow - left
 		line(graphX, graphY, graphX + size, graphY + size);

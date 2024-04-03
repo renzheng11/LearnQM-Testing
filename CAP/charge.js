@@ -109,7 +109,10 @@ class Electron {
 			}
 		}
 
-		if (this.position.y < top || this.position.y > bottom - this.radius) {
+		if (
+			this.position.y < top + this.radius ||
+			this.position.y > bottom - this.radius
+		) {
 			this.velocity.y *= -1;
 		}
 	}
