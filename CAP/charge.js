@@ -142,7 +142,7 @@ class Electron {
 			? fill(color.neg)
 			: fill(colorFade); // negative
 		noStroke();
-		ellipse(this.position.x, this.position.y, this.radius * 1.7);
+		ellipse(this.position.x * sx, this.position.y * sy, this.radius * 1.7 * sx);
 	}
 }
 

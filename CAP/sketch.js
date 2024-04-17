@@ -1,5 +1,7 @@
-let scale_x = 1440;
-let scale_y = 789;
+// let scale_x = 1440;
+// let scale_y = 789;
+let scale_x = 1296;
+let scale_y = 710;
 
 let sx;
 let sy;
@@ -378,25 +380,25 @@ function drawBattery() {
 
 	strokeWeight(1.2);
 	stroke(...color.white);
-	line(leftX, y1, leftX, y2); // x y x y
-	line(leftX, y2, rightX, y2);
-	line(rightX, y1, rightX, y2);
+	line(leftX * sx, y1 * sy, leftX * sx, y2 * sy); // x y x y
+	line(leftX * sx, y2 * sy, rightX * sx, y2 * sy);
+	line(rightX * sx, y1 * sy, rightX * sx, y2 * sy);
 
 	if (reverse) {
 		image(
 			batteryPosImg,
-			batteryD.imageX,
-			batteryD.imageY,
-			batteryPosImg.width / 1.5,
-			batteryPosImg.height / 1.5
+			batteryD.imageX * sx,
+			batteryD.imageY * sy,
+			(batteryPosImg.width / 1.5) * sx,
+			(batteryPosImg.height / 1.5) * sy
 		);
 	} else {
 		image(
 			batteryNegImg,
-			batteryD.imageX,
-			batteryD.imageY,
-			batteryNegImg.width / 1.5,
-			batteryNegImg.height / 1.5
+			batteryD.imageX * sx,
+			batteryD.imageY * sy,
+			(batteryNegImg.width / 1.5) * sx,
+			(batteryNegImg.height / 1.5) * sy
 		);
 	}
 }
@@ -413,26 +415,26 @@ function drawBox(box) {
 	// box cross section
 	// box front
 	beginShape();
-	vertex(box.x, box.y);
-	vertex(box.x, box.y + box.h);
-	vertex(box.x + box.w, box.y + box.h);
-	vertex(box.x + box.w, box.y);
+	vertex(box.x * sx, box.y * sy);
+	vertex(box.x * sx, (box.y + box.h) * sy);
+	vertex((box.x + box.w) * sx, (box.y + box.h) * sy);
+	vertex((box.x + box.w) * sx, box.y * sy);
 	endShape(CLOSE);
 
 	// box side
 	beginShape();
-	vertex(box.x + box.w, box.y + box.h); // left top
-	vertex(box.x + box.w, box.y); // left bottom
-	vertex(box.x + box.w + boxD.depth, box.y + boxD.angle); // top right
-	vertex(box.x + box.w + boxD.depth, box.y + box.h + boxD.angle);
+	vertex((box.x + box.w) * sx, (box.y + box.h) * sy); // left top
+	vertex((box.x + box.w) * sx, box.y * sy); // left bottom
+	vertex((box.x + box.w + boxD.depth) * sx, (box.y + boxD.angle) * sy); // top right
+	vertex((box.x + box.w + boxD.depth) * sx, (box.y + box.h + boxD.angle) * sy);
 	endShape(CLOSE);
 
 	// // box top
 	beginShape();
-	vertex(box.x, box.y); // bottom left
-	vertex(box.x + box.w, box.y); // bottom right
-	vertex(box.x + box.w + boxD.depth, box.y + boxD.angle); // top right
-	vertex(box.x + boxD.depth, box.y + boxD.angle); // top left
+	vertex(box.x * sx, box.y * sy); // bottom left
+	vertex((box.x + box.w) * sx, box.y * sy); // bottom right
+	vertex((box.x + box.w + boxD.depth) * sx, (box.y + boxD.angle) * sy); // top right
+	vertex((box.x + boxD.depth) * sx, (box.y + boxD.angle) * sy); // top left
 	endShape(CLOSE);
 }
 
@@ -677,29 +679,39 @@ function drawElectrons(box) {
 }
 
 function drawCharge(chargeX, chargeY, chargeType, lit) {
-	let posSize = 9;
-	let signSize = 7;
+	let posSize = 9 * sx;
+	let signSize = 7 * sx;
 	noStroke();
 
 	// charge circles
 	// positive charge
 	if (chargeType == "pos") {
 		lit ? fill(...color.pos) : fill(...color.pos, fade);
-		circle(chargeX, chargeY, posSize);
+		circle(chargeX * sx, chargeY * sy, posSize);
 		lit ? stroke(...color.sign) : stroke(...color.sign, fade * 8);
 	}
 	if (chargeType == "neutral") {
 		fill(...color.neutral);
-		circle(chargeX, chargeY, posSize);
+		circle(chargeX * sx, chargeY * sy, posSize);
 	}
 
 	strokeWeight(1);
 	canvas.drawingContext.setLineDash([]);
 
 	// cross line
-	line(chargeX - signSize / 2, chargeY, chargeX + signSize / 2, chargeY);
+	line(
+		(chargeX - signSize / 2) * sx,
+		chargeY * sy,
+		(chargeX + signSize / 2) * sx,
+		chargeY * sy
+	);
 	// up line
-	line(chargeX, chargeY - signSize / 2, chargeX, chargeY + signSize / 2);
+	line(
+		chargeX * sx,
+		(chargeY - signSize / 2) * sy,
+		chargeX * sx,
+		(chargeY + signSize / 2) * sy
+	);
 }
 
 function distanceLog(position, box) {
@@ -833,10 +845,13 @@ function drawScanner(box) {
 		);
 
 		beginShape();
-		vertex(box.x, box.y); // bottom left
-		vertex(box.x + scannerWidth + lastPos, box.y); // bottom right
-		vertex(box.x + scannerWidth + lastPos + boxD.depth, box.y + boxD.angle); // top right
-		vertex(box.x + boxD.depth, box.y + boxD.angle); // top left
+		vertex(box.x * sx, box.y * sy); // bottom left
+		vertex((box.x + scannerWidth + lastPos) * sx, box.y * sy); // bottom right
+		vertex(
+			(box.x + scannerWidth + lastPos + boxD.depth) * sx,
+			(box.y + boxD.angle) * sy
+		); // top right
+		vertex((box.x + boxD.depth) * sx, (box.y + boxD.angle) * sy); // top left
 		endShape(CLOSE);
 		styleText();
 		fill(...color.grey);
@@ -852,44 +867,64 @@ function drawScanner(box) {
 		if (!reverse) {
 			fill(...color.scanner);
 			// right box Q + electrons
-			text(`Q: ${currQ.toFixed(2)}µC`, box.x + 80, box.y - 32);
+			text(`Q: ${currQ.toFixed(2)}µC`, (box.x + 80) * sx, (box.y - 32) * sy);
 			styleText();
-			text(`#Electrons: ${electrons}`, box.x + 160, box.y - 32);
+			text(`#Electrons: ${electrons}`, (box.x + 160) * sx, (box.y - 32) * sy);
 			// left box Q + electrons
-			text(`Q: -${actualQ.toFixed(2)}µC`, boxD.xLeft + 80, box.y - 32);
-			text(`#Electrons: ${electrons}`, boxD.xLeft + 160, box.y - 32);
+			text(
+				`Q: -${actualQ.toFixed(2)}µC`,
+				(boxD.xLeft + 80) * sx,
+				(box.y - 32) * sy
+			);
+			text(
+				`#Electrons: ${electrons}`,
+				(boxD.xLeft + 160) * sx,
+				(box.y - 32) * sy
+			);
 			// right box xMax
-			text(`xMax: ${xMax}µm`, box.x + 80, box.y - 16);
+			text(`xMax: ${xMax}µm`, (box.x + 80) * sx, (box.y - 16) * sy);
 			// drag over box prompt
 			if (currX == 0) {
 				text(
 					`Drag over box to see how \n Q changes over a distance`,
-					box.x + 80,
+					(box.x + 80) * sx,
 					box.y + boxD.height / 2
 				);
 			}
 		} else if (reverse) {
 			// right box Q
-			text(`Q: -${currQ.toFixed(2)}µC`, box.x + 120, box.y - 32);
+			text(`Q: -${currQ.toFixed(2)}µC`, (box.x + 120) * sx, (box.y - 32) * sy);
 			// left box Q
-			text(`Q: ${actualQ.toFixed(2)}µC`, boxD.xLeft + 120, box.y - 32);
+			text(
+				`Q: ${actualQ.toFixed(2)}µC`,
+				(boxD.xLeft + 120) * sx,
+				(box.y - 32) * sy
+			);
 		}
 		styleText();
 		for (let i = 0; i < 5; i++) {
 			let distance = boxD.width / 5;
-			text(`${i * 200}µm`, box.x + i * distance - 12, box.y + boxD.height + 24);
-			text("|", box.x + i * distance - 1.4, box.y + boxD.height + 9);
+			text(
+				`${i * 200}µm`,
+				(box.x + i * distance - 12) * sx,
+				(box.y + boxD.height + 24) * sy
+			);
+			text(
+				"|",
+				(box.x + i * distance - 1.4) * sx,
+				(box.y + boxD.height + 9) * sy
+			);
 		}
-		text("1cm x 1cm 1cm", box.x + 4, box.y + boxD.height - 4);
-		text("|", box.x + boxD.width - 1.4, box.y + boxD.height + 10);
-		text("1mm", box.x + boxD.width, box.y + boxD.height + 24);
+		text("1cm x 1cm 1cm", (box.x + 4) * sx, (box.y + boxD.height - 4) * sy);
+		text("|", (box.x + boxD.width - 1.4) * sx, (box.y + boxD.height + 10) * sy);
+		text("1mm", (box.x + boxD.width) * sx, (box.y + boxD.height + 24) * sy);
 	}
 }
 
 function styleText() {
 	noStroke();
 	fill(...color.white);
-	textSize(12);
+	textSize(12 * sx);
 
 	textStyle(NORMAL);
 	textFont("Sans-serif");
@@ -901,9 +936,14 @@ function drawGraph() {
 
 	canvas.drawingContext.setLineDash([7, 3]);
 
-	line(graphD.center, graphD.y - 76, graphD.center, graphD.y + 76); // vert
+	line(
+		graphD.center * sx,
+		(graphD.y - 76) * sy,
+		graphD.center * sx,
+		(graphD.y + 76) * sy
+	); // vert
 
-	line(graphD.x, graphD.y, graphD.end, graphD.y); // hor
+	line(graphD.x * sx, graphD.y * sy, graphD.end * sx, graphD.y * sy); // hor
 
 	fill(...color.grey);
 
@@ -915,51 +955,61 @@ function drawGraph() {
 	// graph lines + arrows
 	// y axis arrow - up
 	line(
-		graphD.center,
-		graphD.y - 76,
-		graphD.center - size,
-		graphD.y - 76 + size
+		graphD.center * sx,
+		(graphD.y - 76) * sy,
+		(graphD.center - size) * sx,
+		(graphD.y - 76 + size) * sy
 	);
 	line(
-		graphD.center,
-		graphD.y - 76,
-		graphD.center + size,
-		graphD.y - 76 + size
+		graphD.center * sx,
+		(graphD.y - 76) * sy,
+		(graphD.center + size) * sx,
+		(graphD.y - 76 + size) * sy
 	);
 
 	// y axis arrow - down
 	line(
-		graphD.center,
-		graphD.y + 76,
-		graphD.center + size,
-		graphD.y + 76 - size
+		graphD.center * sx,
+		(graphD.y + 76) * sy,
+		(graphD.center + size) * sx,
+		(graphD.y + 76 - size) * sy
 	);
 	line(
-		graphD.center,
-		graphD.y + 76,
-		graphD.center - size,
-		graphD.y + 76 - size
+		graphD.center * sx,
+		(graphD.y + 76) * sy,
+		(graphD.center - size) * sx,
+		(graphD.y + 76 - size) * sy
 	);
 
 	// x axis arrow - right
-	line(graphD.end, graphD.y, graphD.end - size, graphD.y - size);
-	line(graphD.end, graphD.y, graphD.end - size, graphD.y + size);
+	line(
+		graphD.end * sx,
+		graphD.y * sy,
+		(graphD.end - size) * sx,
+		(graphD.y - size) * sy
+	);
+	line(
+		graphD.end * sx,
+		graphD.y * sy,
+		(graphD.end - size) * sx,
+		(graphD.y + size) * sy
+	);
 
 	// x axis arrow - right
-	line(0, graphD.y, 0 + size, graphD.y - size);
-	line(0, graphD.y, 0 + size, graphD.y + size);
+	line(0, graphD.y * sy, (0 + size) * sx, (graphD.y - size) * sy);
+	line(0, graphD.y * sy, (0 + size) * sx, (graphD.y + size) * sy);
 
 	// y axis labels
 	noStroke();
 	fill(...color.grey);
-	text("1 MV/cm —", graphD.center - 60, graphD.y - 54);
-	text("-1 MV/cm —", graphD.center - 64, graphD.y + 54);
+	text("1 MV/cm —", (graphD.center - 60) * sx, (graphD.y - 54) * sy);
+	text("-1 MV/cm —", (graphD.center - 64) * sx, (graphD.y + 54) * sy);
 
 	textFont("Cambria");
 	textStyle(ITALIC);
 	textSize(16);
 	stroke(1);
-	text("x", graphD.end + 6, graphD.y + 3);
+	text("x", (graphD.end + 6) * sx, (graphD.y + 3) * sy);
 
 	strokeWeight(2);
 	stroke(...color.net);
@@ -974,10 +1024,10 @@ function drawGraph() {
 
 	image(
 		vecEImg,
-		graphD.center + 8,
-		graphD.y - 80,
-		vecEImg.width / 3.4,
-		vecEImg.height / 3.4
+		(graphD.center + 8) * sx,
+		(graphD.y - 80) * sy,
+		(vecEImg.width / 3.4) * sx,
+		(vecEImg.height / 3.4) * sy
 	);
 
 	if (showEF) {
@@ -1039,7 +1089,12 @@ function drawLines(netXPoints, netHeights) {
 	}
 
 	for (i = 0; i < netXPoints.length; i++) {
-		line(netXPoints[i], heights[i], netXPoints[i + 1], heights[i + 1]); // line
+		line(
+			netXPoints[i] * sx,
+			heights[i] * sy,
+			netXPoints[i + 1] * sx,
+			heights[i + 1] * sy
+		); // line
 	}
 }
 
@@ -1063,39 +1118,49 @@ function drawArrows() {
 				if (!reverse) {
 					noStroke();
 					triangle(
-						boxD.xLeft + boxD.width,
-						y,
-						boxD.xLeft + boxD.width + 12,
-						y + triangleSize / 1.7,
-						boxD.xLeft + boxD.width + 12,
-						y - triangleSize / 1.7
+						(boxD.xLeft + boxD.width) * sx,
+						y * sy,
+						(boxD.xLeft + boxD.width + 12) * sx,
+						(y + triangleSize / 1.7) * sy,
+						(boxD.xLeft + boxD.width + 12) * sx,
+						(y - triangleSize / 1.7) * sy
 					);
 					if (sceneCount > 5) {
 						noStroke();
 						beginShape();
-						vertex(boxD.xRight - 28, y - weight / 2); // left top
-						vertex(boxD.xRight - 28, y + weight / 2); // left bottom
-						vertex(currRightBox.x + boxMax, y + weight / 2); // right bottom
-						vertex(currRightBox.x + boxMax, y + weight / 2); // right top
+						vertex((boxD.xRight - 28) * sx, (y - weight / 2) * sy); // left top
+						vertex((boxD.xRight - 28) * sx, (y + weight / 2) * sy); // left bottom
+						vertex((currRightBox.x + boxMax) * sx, (y + weight / 2) * sy); // right bottom
+						vertex((currRightBox.x + boxMax) * sx, (y + weight / 2) * sy); // right top
 						endShape(CLOSE);
 					} else {
 						strokeWeight(weight);
 						stroke(...color.net);
-						line(boxD.xLeft + boxD.width + 4, y, boxD.xRight, y);
+						line(
+							(boxD.xLeft + boxD.width + 4) * sx,
+							y * sy,
+							boxD.xRight * sx,
+							y * sy
+						);
 					}
 				} else if (reverse) {
 					noStroke();
 					triangle(
-						boxD.xRight,
-						y,
-						boxD.xRight - 12,
-						y + triangleSize / 1.7,
-						boxD.xRight - 12,
-						y - triangleSize / 1.7
+						boxD.xRight * sx,
+						y * sy,
+						(boxD.xRight - 12) * sx,
+						(y + triangleSize / 1.7) * sy,
+						(boxD.xRight - 12) * sx,
+						(y - triangleSize / 1.7) * sy
 					);
 					strokeWeight(weight);
 					stroke(...color.net);
-					line(boxD.xLeft + boxD.width, y, boxD.xRight - 4, y);
+					line(
+						(boxD.xLeft + boxD.width) * sx,
+						y * sy,
+						(boxD.xRight - 4) * sx,
+						y * sy
+					);
 				}
 			}
 			y += 40;
@@ -1177,8 +1242,8 @@ function drawItems() {
 	if (buttonState == "A") {
 		text(
 			"Click battery to reverse polarity",
-			batteryD.leftX + 80,
-			batteryD.y2 + 40
+			(batteryD.leftX + 80) * sx,
+			(batteryD.y2 + 40) * sy
 		);
 	}
 
