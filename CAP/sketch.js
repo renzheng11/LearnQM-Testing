@@ -12,8 +12,8 @@ let afterDelay = false;
 
 let timeoutID = 0;
 
-// const timeout = 4060;
-const timeout = 200;
+const timeout = 4400;
+// const timeout = 0;
 
 // vars
 let color = {
@@ -138,20 +138,9 @@ let scannerNM;
 let scannerWidth;
 
 let currX;
-
 let xMax;
 let currQ;
-
 let xPercent;
-
-// scale to window size
-// function sx(num) {
-// 	return num * s_x;
-// }
-
-// function sy(num) {
-// 	return num * s_y;
-// }
 
 function setup() {
 	sx = windowWidth / scale_x;
@@ -239,13 +228,14 @@ function animateElectrons(currAnim) {
 				: currLeftBox.numElectrons < totalElectrons;
 
 			if (condition) {
+				console.log("reached condition");
 				// amount has transfered
 				showEF = true;
 				sceneAnimated = true;
 				// set bounce when electrons hit positively attracted region
 				reverse ? (moveBound = -30) : (moveBound = 30);
 				// if semiconductor scene
-				if ((currRightBox.type = "s")) {
+				if (currRightBox.type == "s" && !reverse) {
 					// set bounce to boxMax calculated from xMax
 					reverse ? (moveBound = -boxMax) : (moveBound = boxMax);
 				}
@@ -253,7 +243,6 @@ function animateElectrons(currAnim) {
 		}, timeout);
 
 		buttonState = "R";
-		// numAnim += 1;
 	}
 }
 
@@ -284,7 +273,6 @@ function resetScene() {
 	tempBox.electrons = [];
 	numTransfer = 2;
 	brightChargesMetal = [];
-	// brightChargesSemi = [];
 	animCharges = [];
 	displayCharges = [];
 	sceneAnimated = false;
@@ -300,8 +288,6 @@ function resetScene() {
 	showEF = false;
 	totalElectrons = rows * cols;
 
-	updateNumTransfer(1000);
-
 	newMetalBoxes();
 
 	// change electrons, dopants, type for semiconductor boxes
@@ -314,18 +300,21 @@ function resetScene() {
 		}
 	});
 
+	// reset dopant sliders + default values
 	const dopantSliders = document.querySelectorAll(".dopantSlider");
 	dopantSliders.forEach((slider) => {
 		slider.value = defaultDopants;
 	});
 
+	// reset charge sliders + default values
 	const chargeSliders = document.querySelectorAll(".chargeSlider");
 	chargeSliders.forEach((slider) => {
-		slider.value = 1000;
+		slider.value = 8000;
 		slider.min = 1000;
 		slider.max = 10000;
 		slider.disabled = false;
 	});
+	updateNumTransfer(8000);
 
 	const dopantSlider = document.querySelector(".dopantSlider");
 	dopantSlider.disabled = false;
@@ -344,7 +333,12 @@ function resetDraw() {
 
 // check if hovering over battery
 function mouseHover() {
-	if (mouseX > 266 && mouseX < 344 && mouseY > 420 && mouseY < 456) {
+	if (
+		mouseX > 266 * sx &&
+		mouseX < 344 * sx &&
+		mouseY > 420 * sy &&
+		mouseY < 456 * sy
+	) {
 		if (buttonState == "A") {
 			document.body.style.cursor = "pointer";
 		}
@@ -356,13 +350,12 @@ function mouseHover() {
 // flip battery
 function mousePressed() {
 	if (
-		mouseX > 266 &&
-		mouseX < 344 &&
-		mouseY > 420 &&
-		mouseY < 456 &&
+		mouseX > 266 * sx &&
+		mouseX < 344 * sx &&
+		mouseY > 420 * sy &&
+		mouseY < 456 * sy &&
 		buttonState == "A"
 	) {
-		// batteryState *= -1;
 		reverse = !reverse;
 		document.body.style.cursor = "pointer";
 	}
@@ -466,12 +459,6 @@ function genBrightCharges(dopantIndices) {
 			brightChargesMetal.push(randomIndex);
 		}
 	}
-
-	// let index = 0;
-	// while (brightChargesSemi.length < electronsTransferred) {
-	// 	brightChargesSemi.push(index);
-	// 	index += 1;
-	// }
 }
 
 function drawCharges(box, type) {
@@ -487,7 +474,6 @@ function drawCharges(box, type) {
 		}
 
 		// flicker positive charges on surface
-
 		let boxSideCondition; // determines if left or right box gets lit up
 		if (!reverse) {
 			boxSideCondition = box.x >= boxD.xRight;
@@ -656,7 +642,16 @@ function drawElectrons(box) {
 						}
 
 						if (electron.position.x < attractSide + 2) {
-							electron.updateVelocity(createVector(0, -3));
+							// electron.updateVelocity(createVector(0, -3));
+							let possibleSpeeds = [];
+							for (let i = 7; i < 10; i++) {
+								possibleSpeeds.push(i);
+							}
+							for (let i = -7; i > -10; i--) {
+								possibleSpeeds.push(i);
+							}
+							let index = floor(Math.random() * possibleSpeeds.length);
+							electron.updateVelocity(createVector(0, possibleSpeeds[index]));
 							electron.updateAnimate(false);
 							if (electron.pushed == false) {
 								electron.updatePushed(true);
@@ -726,7 +721,6 @@ function distanceLog(position, box) {
 		var minv = Math.log(0.1);
 	}
 	var maxv = Math.log(10000000);
-	// var maxv = Math.log(1000000); // trying less than 1cm max =, current 1mm
 
 	// calculate adjustment factor
 	var scale = (maxv - minv) / (maxp - minp);
@@ -1234,8 +1228,6 @@ function drawItems() {
 
 	styleText();
 	fill(...color.grey);
-	// text("n: " + numTransfer, 80, 40);
-	// text("Q: " + Q + "µC", 80, 54);
 
 	drawBattery();
 	styleText();

@@ -100,14 +100,14 @@ class Box {
 		// Reset the array of dopant indices
 		this.dopantIndices = [];
 		for (let i = 0; i < this.chargeMap.length; i++) {
-			//   this.chargeMap[i].updateType("dim")
 			this.chargeMap[i].updateType("neutral");
 		}
 
-		// Generate random indices for dopants
-		for (let i = 0; i < this.dopantAmount; i++) {
-			//   this.electrons[this.numElectrons - i - 1].updateDim(false)
+		// ensure dopant in first column
+		this.dopantIndices.push(floor(random(cols)));
 
+		// Generate random indices for dopants
+		for (let i = 0; i < this.dopantAmount - 1; i++) {
 			let index = floor(random(allCharges));
 			while (this.dopantIndices.includes(index)) {
 				index = floor(random(allCharges));
