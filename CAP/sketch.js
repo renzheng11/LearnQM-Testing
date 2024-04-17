@@ -1,25 +1,37 @@
+let scale_x = 1440;
+let scale_y = 789;
+
+let sx;
+let sy;
+
 let fade;
 let fadeAmount = 1;
 let afterDelay = false;
 
 let timeoutID = 0;
 
-const timeout = 4000;
+// const timeout = 4060;
+const timeout = 200;
 
 // vars
 let color = {
 	bg: [18, 18, 18],
 	white: [255, 255, 255],
 	grey: [175, 175, 175],
-	pos: [218, 107, 107],
+	// pos: [218, 107, 107],
+	pos: [125, 241, 148],
+	// pos: [218, 107, 107],
+	posDim: [65, 46, 46],
 	posDim: [65, 46, 46],
 	neg: [255, 247, 174],
 	negDim: [18, 66, 104],
-	sign: [122, 59, 59],
+	// sign: [122, 59, 59],
+	sign: [31, 145, 54],
 	signDim: [50, 31, 31],
 	battery: [230, 226, 188],
 	net: [117, 190, 255],
 	neutral: [79, 79, 79],
+	scanner: [218, 107, 107],
 };
 
 const rows = 22;
@@ -130,9 +142,22 @@ let currQ;
 
 let xPercent;
 
+// scale to window size
+// function sx(num) {
+// 	return num * s_x;
+// }
+
+// function sy(num) {
+// 	return num * s_y;
+// }
+
 function setup() {
+	sx = windowWidth / scale_x;
+	sy = windowHeight / scale_y;
 	fade = 255;
+
 	canvas = createCanvas((2 * windowWidth) / 4 + 40, windowHeight);
+
 	canvas.parent("visualization");
 	batteryPosImg = loadImage("batteryPos.png");
 	batteryNegImg = loadImage("batteryNeg.png");
@@ -144,6 +169,7 @@ function setup() {
 
 	// instantiate left and right box
 	newMetalBoxes();
+	resetScene();
 }
 
 // update number of electrons transferred to other box
@@ -214,7 +240,13 @@ function animateElectrons(currAnim) {
 				// amount has transfered
 				showEF = true;
 				sceneAnimated = true;
+				// set bounce when electrons hit positively attracted region
 				reverse ? (moveBound = -30) : (moveBound = 30);
+				// if semiconductor scene
+				if ((currRightBox.type = "s")) {
+					// set bounce to boxMax calculated from xMax
+					reverse ? (moveBound = -boxMax) : (moveBound = boxMax);
+				}
 			}
 		}, timeout);
 
@@ -767,8 +799,7 @@ function drawScanner(box) {
 	boxMax = boxD.width * xPercent;
 
 	// if calculated Q is greater than set Q, has saturated
-
-	if (currQ > actualQ || currX == 0) {
+	if (currQ > actualQ) {
 		currQ = Number(actualQ);
 	}
 
@@ -790,11 +821,16 @@ function drawScanner(box) {
 
 	if (sceneCount > 7 || sceneCount == 4) {
 		// draw scanner
-		fill(255, 250, 202, 80);
+		fill(...color.scanner, 100);
 		noStroke();
 
 		// only draw if electrons have been animated
-		rect(box.scannerX, box.scannerY, xPos + scannerWidth, box.h);
+		rect(
+			box.scannerX * sx,
+			box.scannerY * sy,
+			(xPos + scannerWidth) * sx,
+			box.h * sy
+		);
 
 		beginShape();
 		vertex(box.x, box.y); // bottom left
@@ -811,18 +847,24 @@ function drawScanner(box) {
 			xMax = "<1";
 		}
 
+		let electrons = 1;
+
 		if (!reverse) {
-			// right box Q
-			text(`Q: ${currQ.toFixed(2)}µC`, box.x + 120, box.y - 32);
-			// left box Q
-			text(`Q: -${actualQ.toFixed(2)}µC`, boxD.xLeft + 120, box.y - 32);
+			fill(...color.scanner);
+			// right box Q + electrons
+			text(`Q: ${currQ.toFixed(2)}µC`, box.x + 80, box.y - 32);
+			styleText();
+			text(`#Electrons: ${electrons}`, box.x + 160, box.y - 32);
+			// left box Q + electrons
+			text(`Q: -${actualQ.toFixed(2)}µC`, boxD.xLeft + 80, box.y - 32);
+			text(`#Electrons: ${electrons}`, boxD.xLeft + 160, box.y - 32);
 			// right box xMax
-			text(`xMax: ${xMax}µm`, box.x + 120, box.y - 16);
+			text(`xMax: ${xMax}µm`, box.x + 80, box.y - 16);
 			// drag over box prompt
 			if (currX == 0) {
 				text(
 					`Drag over box to see how \n Q changes over a distance`,
-					box.x + 120,
+					box.x + 80,
 					box.y + boxD.height / 2
 				);
 			}
@@ -1070,6 +1112,8 @@ function fadeFunc() {
 }
 
 function draw() {
+	sx = windowWidth / scale_x;
+	sy = windowHeight / scale_y;
 	mouseHover();
 	if (sceneCount == 1) {
 		scene1();
