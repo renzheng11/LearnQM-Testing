@@ -109,6 +109,7 @@ let showEF = false;
 let numTransfer = 2;
 let numTransferRange = 18;
 let Q = 1;
+let actualQ = 1;
 
 let brightChargesMetal = [];
 let animCharges = [];
@@ -228,7 +229,6 @@ function animateElectrons(currAnim) {
 				: currLeftBox.numElectrons < totalElectrons;
 
 			if (condition) {
-				console.log("reached condition");
 				// amount has transfered
 				showEF = true;
 				sceneAnimated = true;
@@ -858,12 +858,16 @@ function drawScanner(box) {
 
 		let electrons = 1;
 
+		fill(...color.net);
+
 		if (!reverse) {
 			fill(...color.scanner);
 			// right box Q + electrons
 			text(`Q: ${currQ.toFixed(2)}µC`, (box.x + 80) * sx, (box.y - 32) * sy);
 			styleText();
 			text(`#Electrons: ${electrons}`, (box.x + 160) * sx, (box.y - 32) * sy);
+			// fill(...color.net);
+
 			// left box Q + electrons
 			text(
 				`Q: -${actualQ.toFixed(2)}µC`,
@@ -996,8 +1000,17 @@ function drawGraph() {
 	// y axis labels
 	noStroke();
 	fill(...color.grey);
-	text("1 MV/cm —", (graphD.center - 60) * sx, (graphD.y - 54) * sy);
-	text("-1 MV/cm —", (graphD.center - 64) * sx, (graphD.y + 54) * sy);
+	text("120 MV/cm —", (graphD.center - 70) * sx, (graphD.y - 54) * sy);
+	text("-120 MV/cm —", (graphD.center - 70) * sx, (graphD.y + 54) * sy);
+
+	if (sceneAnimated) {
+		fill(...color.net);
+		text(
+			`= ${Q * 11.3} MV/cm`,
+			(graphD.center + 30) * sx,
+			(graphD.y - 64) * sy
+		);
+	}
 
 	textFont("Cambria");
 	textStyle(ITALIC);
@@ -1009,8 +1022,9 @@ function drawGraph() {
 	stroke(...color.net);
 
 	let eFieldHeight = 0;
+
 	if (sceneAnimated) {
-		eFieldHeight = numTransfer * 6;
+		eFieldHeight = Q * 11.3 * 1.1;
 	}
 
 	let netHeights = [0, 0];
