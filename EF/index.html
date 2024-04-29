@@ -74,7 +74,7 @@ Click on the plane to positively charge it.
                     What happens if we change the charge density?
                     <span class="highlight">(Use the slidebar)</span>
                     <br><br>
-                    <input style="width: 300" type="range" min="0" max="80" value="80" onchange="updatebox2(this.value)">
+                    <input style="width: 300" type="range" min="0" max="80" value="80" onchange="updateBoxChargeAmount(this.value)">
                     <br><br>
             </div>
             
@@ -88,7 +88,7 @@ Click on the plane to positively charge it.
                 <button class="button" type="button" onclick="reverseCharge()">Reverse Charge</button>
                 <br><br>
                 <br><br>
-                <input style="width: 300" type="range" min="0" max="80" value="80" onchange="updatebox3(this.value)">
+                <input style="width: 300" type="range" min="0" max="80" value="80" onchange="updateBoxChargeAmount(this.value)">
                 <label for="slider5" class="labels">Negative Charge Density</label>
             </div>
         </div>
@@ -102,16 +102,16 @@ Click on the plane to positively charge it.
                 toggle the arrows.</span>
                 </p>
 
-                <input type="checkbox" id="posToggle4" value="pos" onclick="toggleArrows(this.value)">
+                <input type="checkbox" class="posToggle" id="posToggle4" value="pos" onclick="toggleArrows(this.value)">
                 <label for="posToggle4" class="labels">Show the electric field due to positive charges</label><br>
 
-                <input type="checkbox" id="negToggle4" value="neg" onclick="toggleArrows(this.value)">
+                <input type="checkbox" class="negToggle" id="negToggle4" value="neg" onclick="toggleArrows(this.value)">
                 <label for="negToggle4" class="labels">Show the electric field due to negative charges</label><br>
                 
-                <input type="checkbox" id="netToggle4" value="net" onclick="toggleArrows(this.value)">
-                <label id="label4" for="netToggle4" class="labels">Show net electric field</label><br>
+                <input type="checkbox" class="netToggle" id="netToggle4" value="net" onclick="toggleArrows(this.value)">
+                <label id="label4" for="netToggle4" class="labels netLabel">Show net electric field</label><br>
 
-                <button class="button" type="button" id="showScreen4" onclick="animateScreen()">Show Screening</button>
+                <button class="button showScreen" type="button"  onclick="animateScreen()">Show Screening</button>
             </div>
         </div>
         <div class="row row4" id="scene5">
@@ -121,23 +121,23 @@ Click on the plane to positively charge it.
                 The charge density in the two plane sheets may not always match exactly. Let’s see what happens in that case.
                 </p>
 
-                <input type="checkbox" id="posToggle5" name="posToggle5" value="pos" checked onclick="toggleArrows(this.value)">
+                <input type="checkbox" class="posToggle" id="posToggle5" value="pos" checked onclick="toggleArrows(this.value)">
                 <label for="posToggle5" class="labels">Show the electric field due to positive charges</label><br>
                 
-                <input type="checkbox" id="negToggle5" name="negToggle5" value="neg" checked onclick="toggleArrows(this.value)">
+                <input type="checkbox" class="negToggle" id="negToggle5" value="neg" checked onclick="toggleArrows(this.value)">
                 <label for="negToggle5" class="labels">Show the electric field due to negative charges</label><br>
                 
-                <input type="checkbox" id="netToggle5" name="net" checked value="net" onclick="toggleArrows(this.value)">
-                <label id="label5"for="netToggle5" class="labels">Show net electric field</label>
+                <input type="checkbox" class="netToggle" id="netToggle5" checked value="net" onclick="toggleArrows(this.value)">
+                <label id="label5" for="netToggle5" class="labels netLabel">Show net electric field</label>
                 
                 <br><br>
 
                 <!-- Negative Charge Amount -->
-                <input id="slider5" style="width: 300" type="range" min="0" max="80" value="42" onchange="updateNegbox5(this.value)">
+                <input id="slider5" style="width: 300" type="range" min="0" max="80" value="42" onchange="updateBoxChargeAmount(this.value)">
                 <label for="slider5" class="labels">Negative Charge Density</label>
                 
                 <br><br>
-                <button class="button" type="button" id="showScreen5" onclick="animateScreen()">Show Screening</button>
+                <button class="button showScreen" type="button" onclick="animateScreen()">Show Screening</button>
             </div>
         </div>
         <div class="row row5" id="scene6">
@@ -156,15 +156,15 @@ Click on the plane to positively charge it.
 
                 <br><br>
 
-                <input type="checkbox" id="posToggle6" name="posToggle6" value="pos" checked onclick="toggleArrows(this.value)">
+                <input type="checkbox" class="posToggle" id="posToggle6" value="pos" checked onclick="toggleArrows(this.value)">
                 <label for="posToggle6" class="labels">Show the electric field due to positive charges</label><br>
 
-                <input type="checkbox" id="negToggle6" name="" value="neg" checked onclick="toggleArrows(this.value)">
+                <input type="checkbox" class="negToggle" id="negToggle6" value="neg" checked onclick="toggleArrows(this.value)">
                 <label for="negToggle6" class="labels">Show the electric field due to negative charges</label><br>
                 
-                <input type="checkbox" id="netToggle6" name="netToggle6" checked value="net"  onclick="toggleArrows(this.value)">
+                <input type="checkbox" class="netToggle" id="netToggle6" checked value="net"  onclick="toggleArrows(this.value)">
                 
-                <label for="netToggle6" class="labels">Show the net electric field</label><br>
+                <label for="netToggle6" class="labels netLabel">Show the net electric field</label><br>
                 <svg id="d3-viz"></svg>
             </div>
         </div>
@@ -184,15 +184,15 @@ Click on the plane to positively charge it.
                 <input style="width: 300;" type="range" min="0" max="40" value="40" id="flow" onchange="flowCharges(value)">
                 <br><br>
 
-                <input type="checkbox" id="posToggle7" name="" value="pos" checked onclick="toggleArrows(this.value)">
+                <input type="checkbox" class="posToggle" id="posToggle7" value="pos" checked onclick="toggleArrows(this.value)">
                 <label for="posToggle7" class="labels">Show the electric field due to positive charges</label><br>
 
-                <input type="checkbox" id="negToggle7" name="" value="neg" checked onclick="toggleArrows(this.value)">
+                <input type="checkbox" class="negToggle" id="negToggle7" value="neg" checked onclick="toggleArrows(this.value)">
                 <label for="negToggle7" class="labels">Show the electric field due to negative charges</label><br>
                 
-                <input type="checkbox" id="netToggle7" name="netToggle7" checked value="net"
+                <input type="checkbox" class="netToggle" id="netToggle7" checked value="net"
                     onclick="toggleArrows(this.value)">
-                <label for="netToggle7" class="labels">Show the net electric field</label><br>
+                <label for="netToggle7" class="labels netLabel">Show the net electric field</label><br>
                 <svg id="d3-viz">
 
                 <svg id="d3-viz-final">
@@ -212,15 +212,15 @@ Click on the plane to positively charge it.
                 <input id="widthSlider" style="width: 300" type="range" min="36" max="150" value="75" onchange="updateWidth(this.value)">
 
                 <br><br>
-                <input type="checkbox" id="posToggle8" name="" value="pos" checked onclick="toggleArrows(this.value)">
-                <label for="posToggle8" class="labels">Show the electric field due to positive charges</label><br>
+                <input type="checkbox" class="posToggle" id="posToggle8" value="pos" checked onclick="toggleArrows(this.value)">
+                <label for="posToggle" class="labels">Show the electric field due to positive charges</label><br>
                 
-                <input type="checkbox" id="negToggle8" name="" value="neg" checked onclick="toggleArrows(this.value)">
+                <input type="checkbox" class="negToggle" id="negToggle8" value="neg" checked onclick="toggleArrows(this.value)">
                 <label for="negToggle8" class="labels">Show the electric field due to negative charges</label><br>
                 
-                <input type="checkbox" id="netToggle8" name="netToggle7" checked value="net"
+                <input type="checkbox" class="netToggle" id="netToggle8" checked value="net"
                     onclick="toggleArrows(this.value)">
-                <label for="netToggle8" class="labels">Show the net electric field</label>
+                <label for="netToggle8" class="labels netLabel">Show the net electric field</label>
                 
                 <br><br>
                 <br><br>
