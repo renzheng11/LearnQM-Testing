@@ -1,8 +1,13 @@
+/* ------------------------------- 
+Author: Ren Zheng
+Contact: renzheng112@gmail.com
+------------------------------- */
+
+// color variables for drawing
 let color = {
 	grey: [152, 152, 152],
 	bg: [18, 18, 18],
 	white: [255, 255, 255],
-	// pos: [250, 110, 110],
 	pos: [125, 241, 148],
 	neg: [255, 247, 174],
 	net: [117, 190, 255],
@@ -10,21 +15,12 @@ let color = {
 
 let canvas;
 
-// Toggle drawing
+// Toggle arrows
 let showNegArrows;
 let showPosArrows;
 let showNetArrows;
 
-let togglePairs;
-
-let drawScene1;
-let drawScreen4;
-let toggleNegBox6;
-
-let screenAmount;
-
-let slider;
-let sliderValue;
+let drawScene1; // tracks if scene 1 plane has been clicked
 
 let animate;
 let animated;
@@ -113,7 +109,6 @@ function setup() {
 	showNegArrows = true;
 	showPosArrows = true;
 	showNetArrows = false;
-	toggleNegBox6 = false;
 
 	graphY = 590;
 	graphW = 540;
@@ -124,7 +119,6 @@ function setup() {
 	graphX = graphC - graphW / 2 + leftPadding;
 
 	drawScene1 = false;
-	drawScreen4 = false;
 
 	boxThickness = 1;
 
@@ -671,12 +665,6 @@ function setup() {
 	for (let i = 0; i < allBoxes.length; i++) {
 		populateChargeGrid(allBoxes[i]);
 	}
-
-	// slider = createSlider(0, 80, 0);
-	// slider.position(10, 5400);
-	// slider.style('width', '200px');
-
-	// sliderValue = slider.value();
 }
 
 function draw() {
@@ -713,7 +701,7 @@ function scene1() {
 
 		drawCharges(box1);
 
-		// E vec
+		// Draw E vec symbol
 		fill(...color.grey);
 		noStroke();
 		image(img, 120, 90, img.width / 1.5, img.height / 1.5);
@@ -749,10 +737,6 @@ function scene3() {
 	}
 
 	drawBox(box3, "r");
-
-	// sliderValue = slider.value();
-	// box3.updateCharge(sliderValue);
-	// resetCharges();
 }
 
 function scene4() {
@@ -779,8 +763,6 @@ function scene4() {
 		mouseX > graphC && mouseX < graphW - 10 ? negbox4.updateX(mouseX) : null;
 	}
 
-	drawScreen4 ? drawScreen(negbox4) : null;
-
 	// animating scene 4
 	if (animate.scene4 && negbox4.arrowOffsetY >= 0) {
 		negbox4.updateArrowOffsetY(-0.2);
@@ -788,7 +770,6 @@ function scene4() {
 }
 
 function scene5() {
-	// 5scene
 	currPosBox = box5;
 	currNegBoxes = [negbox5];
 
@@ -811,7 +792,6 @@ function scene5() {
 }
 
 function scene6() {
-	// 6scene
 	currPosBox = box6;
 	currNegBoxes = [negbox6a];
 
@@ -858,8 +838,6 @@ function scene6() {
 }
 
 function scene7() {
-	// 7scene
-
 	currPosBox = box7;
 	currNegBoxes = [negbox7a, negbox7b, negbox7c];
 
@@ -934,11 +912,6 @@ function scene8() {
 	drawBox(box8, "r");
 	drawCharges(negbox8);
 	drawBox(negbox8, "p");
-
-	// sliderValue = slider.value();
-	// negbox8.updateW(int(sliderValue));
-	// volumeWidth = (negbox8.w) / 75;
-	// resetCharges();
 }
 
 function toggleBox() {
@@ -1460,8 +1433,6 @@ function drawBox(box, sides) {
 	noStroke();
 	fill(...color.grey);
 
-	let screenAmount = 0;
-
 	if (sceneCount != 1) {
 		image(img, 120, 90, img.width / 1.5, img.height / 1.5);
 	}
@@ -1576,41 +1547,6 @@ function drawCharges(box) {
 	}
 }
 
-function drawScreen(box) {
-	fill(...color.bg);
-	noStroke();
-	let gap = 20;
-
-	if (sceneCount == 5) {
-		fill(...color.bg, 180);
-	}
-
-	// right
-	beginShape();
-	vertex(box.x + box.w, box.y); // left top
-	vertex(box.x + box.w, box.y + box.h); // left bottom
-	vertex(windowWidth, box.y + box.h); // right bottom
-	vertex(windowWidth, box.y); // right top
-	endShape(CLOSE);
-	// left
-	beginShape();
-	vertex(0, box.y); // left top
-	vertex(0, box.y + box.h); // left bottom
-	vertex(graphC - gap + 11, box.y + box.h); // right bottom
-	vertex(graphC - gap + 11, box.y); // right top
-	endShape(CLOSE);
-}
-
-function setScreenAmount() {
-	// calculate screening amount
-	let totalPosCharge = currPosBox.chargeAmount;
-	let totalNegCharge = 0;
-	for (let i = 0; i < currNegBoxes.length; i++) {
-		totalNegCharge += currNegBoxes[i].chargeAmount;
-	}
-	screenAmount = 255 - (totalNegCharge / totalPosCharge) * 255;
-}
-
 function drawBoxArrows(box, showScreen, sides) {
 	let rows;
 	let spaceBetween;
@@ -1619,14 +1555,11 @@ function drawBoxArrows(box, showScreen, sides) {
 	let offsetY = 0;
 	let fillAmount;
 
-	setScreenAmount();
-
 	if (sceneCount == 1 || sceneCount == 2 || sceneCount == 3) {
 		fillAmount = 255; // 3d fillamount
 		rows = 5;
 		spaceBetween = rows * 10;
 		spacing = 40;
-		screenAmount = 0;
 	} else {
 		fillAmount = 240; // 2d fillamount
 		rows = 4;
@@ -1647,7 +1580,6 @@ function drawBoxArrows(box, showScreen, sides) {
 						"net",
 						fillAmount,
 						showScreen,
-						screenAmount,
 						spacing,
 						sides,
 						offsetX,
@@ -1664,7 +1596,6 @@ function drawBoxArrows(box, showScreen, sides) {
 						"pos",
 						fillAmount,
 						showScreen,
-						screenAmount,
 						spacing,
 						sides,
 						offsetX,
@@ -1677,7 +1608,6 @@ function drawBoxArrows(box, showScreen, sides) {
 						"neg",
 						fillAmount,
 						showScreen,
-						screenAmount,
 						spacing,
 						sides,
 						offsetX,
@@ -1692,7 +1622,6 @@ function drawBoxArrows(box, showScreen, sides) {
 						"pos",
 						fillAmount,
 						showScreen,
-						screenAmount,
 						spacing,
 						sides,
 						offsetX,
@@ -1705,7 +1634,6 @@ function drawBoxArrows(box, showScreen, sides) {
 						"neg",
 						fillAmount,
 						showScreen,
-						screenAmount,
 						spacing,
 						sides,
 						offsetX,
@@ -1728,7 +1656,6 @@ function drawBoxArrows(box, showScreen, sides) {
 				}
 			} else {
 				fillAmount = 0;
-				screenAmount = 0;
 			}
 		}
 		spacing += spaceBetween;
@@ -1741,7 +1668,6 @@ function drawBoxArrows(box, showScreen, sides) {
 			fillAmount = 255; // 3d fillamount
 		} else {
 			fillAmount = 255;
-			setScreenAmount();
 		}
 	}
 	spacing = spaceBetween - 6;
@@ -1822,7 +1748,6 @@ function drawSets(
 	type,
 	fillAmount,
 	showScreen,
-	screenAmount,
 	spacing,
 	sides,
 	offsetX,
@@ -2178,6 +2103,7 @@ function drawSets(
 }
 
 function mousePressed() {
+	// Detect if plane is clicked
 	if (sceneCount == 1) {
 		drawScene1 = true;
 	}
