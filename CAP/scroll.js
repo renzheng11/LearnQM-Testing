@@ -15,7 +15,6 @@ StartScroll = () => {
 				resetScene();
 			} else {
 				sceneCount = 0;
-				// resetScene();
 				resetDraw();
 			}
 		})

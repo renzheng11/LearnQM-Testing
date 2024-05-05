@@ -82,7 +82,7 @@ class Box {
 		this.lineWeight += this.minusLineWeight;
 	}
 
-	updateArrowOffsetY(num) {
+	addArrowOffsetY(num) {
 		this.arrowOffsetY += num;
 	}
 

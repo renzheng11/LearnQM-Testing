@@ -855,7 +855,8 @@ function drawGraph(box) {
 
 	// pos graph lines
 	posXPoints = [graphX, graphC];
-	posHeights.push(boxLeft.chargeAmount, -boxLeft.chargeAmount);
+	posHeights.push(Number(boxLeft.chargeAmount), Number(-boxLeft.chargeAmount));
+	// console.log(posHeights);
 
 	// neg graph lines
 	// left side
@@ -884,10 +885,17 @@ function drawGraph(box) {
 		// net graph lines
 		if (currNegBoxes.length >= 1) {
 			netXPoints = [graphX, graphC, negXPoints[1]];
+
 			netHeights.push(posHeights[0] + negHeights[0]); // index 0
 			netHeights.push(-posHeights[0] + negHeights[0]); // index 1
 			netHeights.push(-posHeights[0] + negHeights[1]); // index 2
 		}
+		// console.log("xPos", posXPoints);
+		// console.log("HPos", posHeights);
+		// console.log("xNeg", negXPoints);
+		// console.log("hNeg", negHeights);
+		// console.log("Xnet", netXPoints);
+		// console.log("Hnet", netHeights);
 		if (currNegBoxes.length >= 2) {
 			netXPoints.push(negXPoints[2]);
 			netHeights.push(-posHeights[0] + negHeights[2]);
@@ -955,7 +963,7 @@ function drawGraph(box) {
 			let eField = (5.56 * chargeDensity).toFixed(2);
 
 			fill(...color.net);
-			text(` ${eField} MV/cm`, box.x + gap, eFieldY + 420);
+			text(` ${int(eField).toFixed(2)} MV/cm`, box.x + gap, eFieldY + 420);
 			gap += 72;
 		}
 		gap = 0;
@@ -980,18 +988,18 @@ function drawLines(points, rawHeights, color, colorString, drawMid) {
 		if (sceneCount == 8 && i == points.length - 2 && colorString != "pos") {
 			drawConnecting = false;
 		}
+
 		if (i == points.length - 1) {
+			// last graph line
 			if (sceneCount == 8 && (colorString == "neg" || colorString == "net")) {
 				line(points[i], heights[i - 1], boxRight1.x + boxRight1.w, heights[i]); // line
 				line(boxRight1.x + boxRight1.w, heights[i], graphEnd + 17, heights[i]); // line
-			}
-			// last graph line
-			else {
+			} else {
 				line(points[i], heights[i], graphEnd + 17, heights[i]); // line
 			}
 		} else {
+			// all other lines
 			line(points[i], heights[i], points[i + 1], heights[i]); // line
-			// if (drawMid) {
 			if (sceneCount == 4 && boxRight1.x > graphC + 4) {
 				line(points[i + 1], heights[i], points[i + 1], heights[i + 1]); // connecting
 			} else if (drawConnecting && (sceneCount != 4 || color != color.net)) {
@@ -1026,51 +1034,6 @@ function animateScreen() {
 
 	showPosArrows = true;
 	showNegArrows = true;
-
-	// if (sceneCount == 4) {
-	// 	resetHTML(".negToggle", "checked", true);
-	// 	resetHTML(".posToggle", "checked", true);
-	// 	resetHTML(".netToggle", "checked", true);
-
-	// 	if (document.getElementById("showScreen4").textContent == "Reset") {
-	// 		animate.scene4 = false;
-	// 		animated.scene4 = false;
-	// 		currPosBox.updateMinusLineWeight(boxRight1.chargeAmount);
-	// 		boxRight1.addArrowOffsetY(14);
-	// 		document.getElementById("showScreen4").textContent = "Show Screening";
-
-	// 		resetHTML(".netToggle", "display", "none");
-
-	// 		document.getElementById("label4").style.display = "none";
-	// 		showNetArrows = false;
-	// 	} else if (
-	// 		document.getElementById("showScreen4").textContent == "Show Screening"
-	// 	) {
-	// 		// scene4
-	// 		if (animate.scene4 == false) {
-	// 			// hasn't animated yet
-	// 			animate.scene4 = true;
-	// 			document.getElementById("showScreen4").textContent = "Reset";
-	// 		}
-
-	// 		if (animated.scene4 == false) {
-	// 			// finished animating
-	// 			setTimeout(() => {
-	// 				currPosBox.updateMinusLineWeight(-boxRight1.chargeAmount);
-	// 				animated.scene4 = true;
-	// 				showNetArrows = true;
-	// 				showPosArrows = false;
-	// 				showNegArrows = false;
-
-	// 				resetHTML(".posToggle", "checked", false);
-	// 				resetHTML(".negToggle", "checked", false);
-	// 				resetHTML(".netToggle", "display", "inline-block");
-
-	// 				document.getElementById("label4").style.display = "inline-block";
-	// 			}, "1200");
-	// 		}
-	// 	}
-	// }
 
 	if (sceneCount == 4 || sceneCount == 5) {
 		resetHTML(".posToggle", "checked", true);
@@ -1108,11 +1071,11 @@ function animateScreen() {
 			}
 
 			if (animated.scene5 == false) {
+				// wait for arrows to animate up
 				setTimeout(() => {
 					currPosBox.updateMinusLineWeight(-boxRight1.lineWeight);
 					if (sceneCount == 4) {
 						animated.scene4 = true;
-						console.log(animated.scene5);
 					}
 					if (sceneCount == 5) {
 						animated.scene5 = true;
@@ -1120,7 +1083,6 @@ function animateScreen() {
 					showNetArrows = true;
 					showPosArrows = false;
 					showNegArrows = false;
-
 					resetHTML(".posToggle", "checked", false);
 					resetHTML(".negToggle", "checked", false);
 					resetHTML(".netToggle", "display", "inline-block");
@@ -1458,22 +1420,30 @@ function drawArrow(
 		line(x1 + triangleSize, y, x2, y);
 		fill(...color, fillAmount);
 		noStroke();
-		drawTriangle(triangleSize, arrowDir, x1, y);
+		if (lineWeight > 0) {
+			drawTriangle(triangleSize, arrowDir, x1, y);
+		}
 	} else if (arrowLoc == "l" && arrowDir == "r") {
 		line(x1, y, x2 - triangleSize, y);
 		fill(...color, fillAmount);
 		noStroke();
-		drawTriangle(triangleSize, arrowDir, x2 - 140 + triangleSize, y);
+		if (lineWeight > 0) {
+			drawTriangle(triangleSize, arrowDir, x2 - 140 + triangleSize, y);
+		}
 	} else if (arrowLoc == "r" && arrowDir == "l") {
 		line(x1, y, x2 - triangleSize, y);
 		fill(...color, fillAmount);
 		noStroke();
-		drawTriangle(triangleSize, arrowDir, x2 - 140, y);
+		if (lineWeight > 0) {
+			drawTriangle(triangleSize, arrowDir, x2 - 140, y);
+		}
 	} else if (arrowLoc == "r" && arrowDir == "r") {
 		line(x1, y, x2 - triangleSize, y);
 		fill(...color, fillAmount);
 		noStroke();
-		drawTriangle(triangleSize, arrowDir, x2, y);
+		if (lineWeight > 0) {
+			drawTriangle(triangleSize, arrowDir, x2, y);
+		}
 	}
 }
 
@@ -1796,10 +1766,11 @@ function drawSets(
 				// net right line
 				if (i == 0) {
 					// first neg box
-					if (
-						currNegBoxes[i].x > graphC + 16 &&
-						currNegBoxes[i].chargeAmount > 0
-					) {
+					// if (
+					// 	currNegBoxes[i].x > graphC + 16 &&
+					// 	currNegBoxes[i].chargeAmount > 0
+					// ) {
+					if (currNegBoxes[i].x > graphC + 16) {
 						let lineWeight =
 							(netChargeAmount[i + 1] / chargeDivisor) * thickScale;
 						let x1 = currPosBox.x + gap; // right x
@@ -1810,6 +1781,7 @@ function drawSets(
 						if (!currAnimate && !currAnimated) {
 							y += netOffsetY;
 						}
+						console.log(lineWeight);
 						drawArrow(x1, x2, y, "r", "r", color.net, lineWeight, fillAmount);
 					}
 				} else {
@@ -1896,7 +1868,7 @@ function drawTriangle(size, dir, x, y) {
 }
 
 function updateBoxChargeAmount(value) {
-	boxLeft.updateChargeAmount(value);
+	boxRight1.updateChargeAmount(value);
 	resetCharges();
 }
 
@@ -1919,6 +1891,7 @@ function resetCharges(box) {
 function resetScene() {
 	boxRight1.updateW(boxThickness);
 	// reset boxes
+	drawScene1 = false;
 	if (sceneCount == 1) {
 		boxLeft.updateChargeType("pos");
 		boxLeft.updateChargeAmount(60);
@@ -2009,6 +1982,8 @@ function resetScene() {
 		boxRight1.updateX(380);
 	}
 
+	resetCharges();
+
 	resetHTML(".negToggle", "checked", true);
 	resetHTML(".posToggle", "checked", true);
 	resetHTML(".netToggle", "checked", false);
@@ -2018,8 +1993,6 @@ function resetScene() {
 
 	document.getElementById("flow").value = 40;
 	document.getElementById("widthSlider").value = 75;
-	// document.getElementById("showScreen4").textContent = "Show Screening";
-	// document.getElementById("showScreen5").textContent = "Show Screening";
 
 	animate.scene4 = false;
 	animated.scene4 = false;
