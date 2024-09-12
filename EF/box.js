@@ -1,68 +1,28 @@
 class Box {
-	constructor(
-		showBox,
-		foward,
-		charge,
-		sceneOrder,
-		arrowOffsetY,
-		chargeAmount,
-		midzone,
-		arrowLength,
-		showArrows,
-		showNet,
-		sides,
-		showCharges,
-		x,
-		y,
-		w,
-		d
-	) {
-		this.showBox = showBox;
-		this.foward = foward;
-		this.charge = charge;
-		this.arrowLength = arrowLength;
-		this.showArrows = showArrows;
-		this.showNet = showNet;
-		this.chargeAmount = chargeAmount;
-		this.midzone = midzone;
-		this.showCharges = showCharges;
-		this.sides = sides;
-		this.showChargeGrid = [];
-		this.sceneOrder = sceneOrder;
-		this.arrowOffsetY = arrowOffsetY;
+	constructor() {
+		this.showBox = true;
+		this.foward = false;
+		this.chargeType = "pos";
+		this.arrowLength = 440;
+		this.showArrows = true;
+		this.showNet = true;
+		this.chargeAmount = 60;
+		this.showCharges = true;
+		this.sides = "lrp";
+		this.sceneOrder = 0;
+		this.arrowOffsetY = 0;
 
-		this.x = x; // x position
-		this.y = y; // y position
+		this.x = 310; // x position
+		this.y = 140; // y position
 		this.h = 300; // height
-		this.w = w; // width
+		this.w = 1; // width
 
-		this.d = d; // depth
+		this.d = 80; // depth
 		this.a = -86; // angle
 		this.c = this.x + this.w / 2;
 
 		this.lineWeight = this.chargeAmount;
 		this.minusLineWeight = 0;
-
-		// this.showChargeGrid = [ // 5 x 20
-		//     [0, 0, 0, 1], // 1
-		//     [0, 0, 1, 1], // 2
-		//     [0, 1, 1, 1], // 3
-		//     [1, 1, 1, 1], // 4
-		//     [1, 1, 1, 1], // 5
-		//     [1, 1, 1, 1], // 6
-		//     [1, 1, 1, 1], // 7
-		//     [1, 1, 1, 1], // 8
-		//     [1, 1, 1, 1], // 9
-		//     [1, 1, 1, 1], // 10
-		//     [1, 1, 1, 1], // 11
-		//     [1, 1, 1, 1], // 12
-		//     [1, 1, 1, 1], // 13
-		//     [1, 1, 1, 1], // 14
-		//     [1, 1, 1, 1], // 15
-		//     [1, 1, 1, 0], // 16
-		//     [1, 1, 0, 0], // 17
-		//     [1, 0, 0, 0]  // 18
-		// ]
 
 		this.showChargeGrid = [
 			// 5 x 20
@@ -102,9 +62,19 @@ class Box {
 		}
 	}
 
-	updateCharge(num) {
+	// negbox8 - [charge: "neg", sceneOrder: 1, arrowOffsetY: offsetY, chargeAmount: 80, midzone: true, x = 380]
+
+	updateChargeType(charge) {
+		this.chargeType = charge;
+	}
+
+	updateChargeAmount(num) {
 		this.chargeAmount = num;
 		this.lineWeight = num - this.minusLineWeight;
+	}
+
+	updateSceneOrder(num) {
+		this.sceneOrder = num;
 	}
 
 	updateMinusLineWeight(num) {
@@ -112,22 +82,22 @@ class Box {
 		this.lineWeight += this.minusLineWeight;
 	}
 
-	updateArrowOffsetY(num) {
+	addArrowOffsetY(num) {
 		this.arrowOffsetY += num;
 	}
 
-	resetArrowOffsetY(num) {
+	updateArrowOffsetY(num) {
 		this.arrowOffsetY = num;
 	}
 
 	reverseCharge() {
-		if (this.charge == "neg") {
-			this.charge = "pos";
+		if (this.chargeType == "neg") {
+			this.chargeType = "pos";
 			blue = "#5B95CB";
 			this.color = blue;
 			this.c = this.x + this.w / 2;
-		} else if (this.charge == "pos") {
-			this.charge = "neg";
+		} else if (this.chargeType == "pos") {
+			this.chargeType = "neg";
 			red = "#C15151";
 			this.color = red;
 			// this.x = mouseX;
@@ -152,15 +122,7 @@ class Box {
 		this.sides.replace(str, "");
 	}
 
-	toggleArrows(value) {
-		this.showArrows = value;
-	}
-
-	toggleNet(value) {
-		this.showNet = value;
-	}
-
-	toggleShowBox(value) {
+	updateShowBox(value) {
 		this.showBox = value;
 	}
 }

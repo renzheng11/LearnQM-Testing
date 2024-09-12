@@ -171,6 +171,7 @@ function updateNumTransfer(value) {
  * Reset all variables for new scene
  */
 function resetScene() {
+	background(...color.bg);
 	clearTimeout(timeoutID);
 
 	fade = 255;
@@ -781,25 +782,16 @@ function drawScanner(box) {
 		xPos = mouseX - box.x;
 	}
 
-	currX = (xPos / boxD.width) * 1000;
-	if (reverse) {
-		currX = currX * 10;
-	}
+	// percentage
+	currX = xPos / boxD.width;
 
 	if (box.type == "m") {
 		// following equations
 		xMax = ((Q * 10 ** -6) / (1.6 * 10 ** 3)) * 10 ** 4;
-		actualQ = xMax * (1.6 * 10 ** 3) * 10 ** 4 * 10 ** -2;
-
-		currQ = currX * (1.6 * 10 ** 3) * 10 ** 4 * 10 ** -2;
 	} else if (box.type == "s") {
 		// following equations
 		xMax =
 			(((Q * 10 ** -6) / (1.6 * 10 ** -4)) * 10 ** 4) / (box.dopantAmount / 20);
-		actualQ = xMax * (1.6 * 10 ** -4) * 10 ** 4 * 10 ** -2;
-		currQ = currX * (1.6 * 10 ** -4) * 10 ** 4 * 10 ** -2;
-		console.log("q: ", Q);
-		console.log("actualQ: ", actualQ);
 	}
 
 	// set max of where dopants stop lighting up, stop graph
@@ -808,12 +800,13 @@ function drawScanner(box) {
 	// convert x max to pixel
 	boxMax = boxD.width * xPercent;
 
-	// if calculated Q is greater than set Q, has saturated
-	if (currQ > actualQ) {
-		currQ = Number(actualQ);
-	}
+	// calculate currQ
+	currQ = (Q * currX) / xPercent;
 
-	// if mouse off of box, set currQ to calculated Q
+	// if scanning Q is greater than set Q, has saturated
+	if (currQ > Q) {
+		currQ = Number(Q);
+	}
 
 	// light up lit dopants
 	if (!reverse) {
@@ -857,7 +850,8 @@ function drawScanner(box) {
 			xMax = "<1";
 		}
 
-		let electronsLeft = (actualQ / (1.6 * 10 ** -19)).toExponential(2);
+		// let electronsLeft = (actualQ / (1.6 * 10 ** -19)).toExponential(2);
+		let electronsLeft = (Q / (1.6 * 10 ** -19)).toExponential(2);
 		let electronsRight = (currQ / (1.6 * 10 ** -19)).toExponential(2);
 
 		fill(...color.net);
@@ -874,11 +868,7 @@ function drawScanner(box) {
 			);
 
 			// left box Q + electrons
-			text(
-				`Q: -${actualQ.toFixed(2)}µC`,
-				(boxD.xLeft + 80) * sx,
-				(box.y - 32) * sy
-			);
+			text(`Q: -${Q.toFixed(2)}µC`, (boxD.xLeft + 80) * sx, (box.y - 32) * sy);
 			text(
 				`#Electrons: ${electronsLeft}`,
 				(boxD.xLeft + 160) * sx,
@@ -898,11 +888,7 @@ function drawScanner(box) {
 			// right box Q
 			text(`Q: -${currQ.toFixed(2)}µC`, (box.x + 120) * sx, (box.y - 32) * sy);
 			// left box Q
-			text(
-				`Q: ${actualQ.toFixed(2)}µC`,
-				(boxD.xLeft + 120) * sx,
-				(box.y - 32) * sy
-			);
+			text(`Q: ${Q.toFixed(2)}µC`, (boxD.xLeft + 120) * sx, (box.y - 32) * sy);
 		}
 		styleText();
 		for (let i = 0; i < 5; i++) {
@@ -1190,45 +1176,49 @@ function drawArrows() {
 }
 
 function draw() {
-	// canvas
-	sx = windowWidth / scale_x;
-	sy = windowHeight / scale_y;
-	background(...color.bg);
+	if (sceneCount > 0) {
+		// canvas
+		sx = windowWidth / scale_x;
+		sy = windowHeight / scale_y;
+		background(...color.bg);
 
-	// ongoing functions
-	fadeFunc();
-	mouseHover();
+		// ongoing functions
+		fadeFunc();
+		mouseHover();
 
-	// boxes & charges
-	drawBox(currLeftBox);
-	drawBox(currRightBox);
-	drawCharges(currLeftBox);
-	drawCharges(currRightBox);
-	drawElectrons(currLeftBox);
-	drawElectrons(currRightBox);
-	drawElectrons(tempBox);
+		// boxes & charges
+		drawBox(currLeftBox);
+		drawBox(currRightBox);
+		drawCharges(currLeftBox);
+		drawCharges(currRightBox);
+		drawElectrons(currLeftBox);
+		drawElectrons(currRightBox);
+		drawElectrons(tempBox);
 
-	// scanner
-	if (sceneAnimated) {
-		drawScanner(currRightBox);
-	}
+		// scanner
+		if (sceneAnimated) {
+			drawScanner(currRightBox);
+		}
 
-	// battery
-	styleText();
-	fill(...color.grey);
+		// battery
+		styleText();
+		fill(...color.grey);
 
-	drawBattery();
-	styleText();
-	if (buttonState == "A") {
-		text(
-			"Click battery to reverse polarity",
-			(battery.leftX + 80) * sx,
-			(battery.y2 + 40) * sy
-		);
-	}
+		drawBattery();
+		styleText();
+		if (buttonState == "A") {
+			text(
+				"Click battery to reverse polarity",
+				(battery.leftX + 80) * sx,
+				(battery.y2 + 40) * sy
+			);
+		}
 
-	// graph
-	if (sceneCount > 2 && sceneCount != 5) {
-		drawGraph();
+		// graph
+		if (sceneCount > 2 && sceneCount != 5) {
+			drawGraph();
+		}
+	} else {
+		background(...color.bg);
 	}
 }
