@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-KC28TS4RKY"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-KC28TS4RKY');
+</script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PN Junctions</title>
+
+  <link href="./style.css" rel="stylesheet" />
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@400;700&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.0.0/lib/p5.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.7/ScrollMagic.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.7/plugins/debug.addIndicators.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.15.1/d3.min.js"></script>
+
+  <link rel="stylesheet" href="./anythingzoomer.css">
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+  <script src="./anythingZoomer.js"></script>
+
+
+  <script src="./tools.js"></script>
+  <script src="./scroll.js"></script>
+  <script src="./sketch.js"></script>
+  <script src="./circle.js"></script>
+  <script src="./graph.js"></script>
+  <script src="./particle.js"></script>
+  <script src="./particleM.js"></script>
+  <!-- <script src="./prob.js"></script> -->
+</head>
+
+<body id="body_parent" onload="StartScroll()">
+  <a href="../index.html"><img id="back-icon" src="../images/arrow-left.svg" /></a>
+  <div class="container">
+    <div class="row title-row">
+      <h1 class="col-lg-12">P-N JUNCTIONS</h1>
+      <div class="col-lg-1"></div>
+      <p class="col-lg-10">A P-N junction is one of the most important semiconductor devices with applications ranging from rectifiers to solar cells. It is also an important part of more complex devices such as transistors. In this chapter you get to play with an ideal abrupt P-N Junction.</p>
+      <div class="col-lg-1"></div>
+    </div>
+    <div class="row sub-atomic-particle-row" id="scene_0">
+    </div>
+    <div class="row sub-atomic-particle-row" id="scene_1_5">
+      <div class="col-lg-4">
+        <h1>p-n junction</h1>
+      
+        <p>
+       Imagine we magically connect P-type and N-type pieces of Si together. Let's see what happens.
+        </p>
+        <p>Doping Concentration (per cm<sup>3</sup>):  <output type="text" id = "add_h_text" val = "Math.round(add_h(this.value))"> </p>
+          <input style="width: 100%;" type="range" min="130" max="133" value="130" step = "1" id = "slider_6"
+          onchange="reset_scene1()" >
+          <div class="sliderticks">
+            <div>
+              <p>5x10<sub>13</sub></p>
+            </div>
+            <div>
+              <p>10<sub>14</sub></p>
+            </div>
+          </div>
+        <button onclick="reset_scene1()">Reset</button>
+         <p>
+       After reaching equilibrium, do you see any electrons going from the N-side to the Pside? What do they have in common?
+
+       What happens if an electron-hole pair is generated in the middle (depletion region)?
+        </p>
+      </div>
+    </div>
+
+
+    <div class="row sub-atomic-particle-row" id="scene_2">
+      <div class="col-lg-4">
+        <h1>Apply Voltage</h1>
+      
+        <p>
+
+       Let's apply a positive or negative voltage across this device and see what happens.
+        </p>
+
+
+        <p>Doping Concentration (per cm<sup>3</sup>):  <output type="text" id = "add_h_text_2" val = "Math.round(add_h(this.value))"> </p>
+          <input style="width: 100%;" type="range" min="130" max="133" value="130" step = "0.5" id = "slider_61"
+          onchange="add_h(this.value)" >
+          <div class="sliderticks">
+            <div>
+              <p>5x10<sub>13</sub></p>
+            </div>
+            <div>
+              <p>10<sub>14</sub></p>
+            </div>
+          </div>
+
+          <p>Applied Voltage (V) <output type="text" id = "" val = "Math.round(add_h(this.value))"> </p>
+            <input style="width: 100%;" type="range" min="-80" max="16" value="0" step = "1" id = "v_p"
+            onchange="apply_V_p(this.value)" >
+            <div class="sliderticks">
+              <div>
+                <p>-2.0</p>
+              </div>
+              <div>
+                <p>-1.6</p>
+              </div>
+              <div>
+                <p>-1.2</p>
+              </div>
+              <div>
+                <p>-0.8</p>
+              </div>
+              <div>
+                <p>-0.4</p>
+              </div>
+              <div>
+                <p>0</p>
+              </div>
+              <div>
+                <p>0.4</p>
+              </div>
+            </div>
+        <button onclick="reset_scene1()">Reset</button>
+      </div>
+    </div>
+
+    <div class="row sub-atomic-particle-row" id="scene_3">
+      <div class="col-lg-4">
+        <h1>Minority Carrier Concentration</h1>
+      
+        <p>
+       Minority carrier concentration changes by many orders of magnitude depending on the applied voltage. Play with the applied voltage and see if you can qualitatively explain the trends you observe.
+        </p>
+
+        <p>Doping Concentration (per cm<sup>3</sup>):  <output type="text" id = "add_h_text_3" val = "Math.round(add_h(this.value))"> </p>
+          <input style="width: 100%;" type="range" min="130" max="133" value="130" step = "0.5" id = "slider_611"
+          onchange="add_h(this.value)" >
+          <div class="sliderticks">
+            <div>
+              <p>5x10<sub>13</sub></p>
+            </div>
+            <div>
+              <p>10<sub>14</sub></p>
+            </div>
+          </div>
+
+          <p>Applied Voltage (V) <output type="text" id = "" val = "Math.round(add_h(this.value))"> </p>
+            <input style="width: 100%;" type="range" min="-80" max="16" value="0" step = "1" id = "v_p_2"
+            onchange="apply_V_p(this.value)" >
+            <div class="sliderticks">
+              <div>
+                <p>-2.0</p>
+              </div>
+              <div>
+                <p>-1.6</p>
+              </div>
+              <div>
+                <p>-1.2</p>
+              </div>
+              <div>
+                <p>-0.8</p>
+              </div>
+              <div>
+                <p>-0.4</p>
+              </div>
+              <div>
+                <p>0</p>
+              </div>
+              <div>
+                <p>0.4</p>
+              </div>
+            </div>
+
+          <p>Carrier Lifetime (&mu;s):</p>
+        <input style="width: 100%;" type="range" min="1" max="40" value="1" id = "slider_8"onchange="setDistance(this.value)">
+        <div class="sliderticks">
+
+    
+          <p>0.1</p>
+          <p>0.5</p>
+          <p>0.9</p>
+
+          <p>1.3</p>
+          <p>1.7</p>
+
+        </div>
+        <button onclick="reset_scene1()">Reset</button>
+      </div>
+    </div>
+
+    <div class="row classical-model-row" id="scene_4">
+      <div class="col-lg-4">
+      </div>
+    </div>
+    <div id="visualization">
+
+    </div>
+  </div>
+</body>
+
+</html>

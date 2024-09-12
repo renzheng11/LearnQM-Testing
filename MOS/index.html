@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-KC28TS4RKY"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-KC28TS4RKY'); 
+</script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sample: Conductor</title>
+
+  <link href="./style.css" rel="stylesheet" />
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@400;700&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.0.0/lib/p5.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.7/ScrollMagic.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.7/plugins/debug.addIndicators.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.15.1/d3.min.js"></script>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+
+  <script src="./scroll.js"></script>
+  <script src="./sketch.js"></script>
+  <script src="./circle.js"></script>
+
+</head>
+
+<body id="body_parent" onload="StartScroll()">
+  <a href="../index.html"><img id="back-icon" src="../images/arrow-left.svg" /></a>
+  <div class="container">
+    <div class="row title-row">
+      <h1 class="col-lg-12">Sample: Conductor</h1>
+      <div class="col-lg-1"></div>
+      <p class="col-lg-10">
+       //
+      </p>
+      <div class="col-lg-1"></div>
+    </div>
+
+   
+
+    <div class="row sub-atomic-particle-row" id="scene_0">
+     
+     
+   
+    </div>
+
+
+
+  
+
+    
+
+
+    <div class="row sub-atomic-particle-row" id="scene_2">
+      <div class="col-lg-4">
+        <h1>Apply Voltage</h1>
+      
+        <p>
+       ////
+        </p>
+
+
+        <p>Donor Density (per cm<sup>3</sup>):  <output type="text" id = "add_h_text_2" val = "Math.round(add_h(this.value))"> </p>
+          <input style="width: 100%;" type="range" min="130" max="133" value="130" step = "3" id = "slider_61"
+          onchange="add_h(this.value)" >
+          <div class="sliderticks">
+            <div>
+              <p>5x10<sub>16</sub></p>
+            </div>
+            <div>
+              <p>10<sub>17</sub></p>
+            </div>
+          </div>
+
+          <p>Applied Voltage (V) <output type="text" id = "" val = "Math.round(add_h(this.value))"> </p>
+            <input style="width: 100%;" type="range" min="-40" max="40" value="0" step = "8" id = "v_p"
+            onchange="apply_V_p(this.value)" >
+            <div class="sliderticks">
+              <!-- <div>
+                <p>-2</p>
+              </div> -->
+              <div>
+                <p>-2.0</p>
+              </div>
+
+              <!-- <div>
+                <p>-1.8</p>
+              </div> -->
+  
+              <div>
+                <p>-1.6</p>
+              </div>
+          
+              <!-- <div>
+                <p>-1.4</p>
+              </div> -->
+
+              <div>
+                <p>-1.2</p>
+              </div>
+
+              <!-- <div>
+                <p>-1.0</p>
+              </div> -->
+
+              <div>
+                <p>-0.8</p>
+              </div>
+
+              <!-- <div>
+                <p>-0.6</p>
+              </div> -->
+
+              <div>
+                <p>-0.4</p>
+              </div>
+
+              <!-- <div>
+                <p>-0.2</p>
+              </div> -->
+
+              <div>
+                <p>0</p>
+              </div>
+
+              <!-- <div>
+                <p>0.2</p>
+              </div> -->
+             
+              <div>
+                <p>0.4</p>
+              </div>
+
+              <!-- <div>
+                <p>0.6</p>
+              </div> -->
+
+              <div>
+                <p>0.8</p>
+              </div>
+
+              <!-- <div>
+                <p>1.0</p>
+              </div> -->
+
+              <div>
+                <p>1.2</p>
+              </div>
+
+              <!-- <div>
+                <p>1.4</p>
+              </div> -->
+            
+              <div>
+                <p>1.6</p>
+              </div>
+
+              <!-- <div>
+                <p>1.8</p>
+              </div> -->
+
+              <div>
+                <p>2.0</p>
+              </div>
+
+            </div>
+
+
+          <!-- <p>Positive Voltage (V) <output type="text" id = "" val = "Math.round(add_h(this.value))"> </p>
+            <input style="width: 100%;" type="range" min="0" max="100" value="0" step = "1" id = ""
+            onchange="apply_V_p(this.value)" >
+            <div class="sliderticks">
+              <div>
+                <p>0</p>
+              </div>
+              <div>
+                <p>2</p>
+              </div>
+            </div>
+
+            <p>Negative Voltage (V) <output type="text" id = "" val = "Math.round(add_h(this.value))"> </p>
+              <input style="width: 100%;" type="range" min="0" max="100" value="0" step = "1" id = ""
+              onchange="apply_V_n(this.value)" >
+              <div class="sliderticks">
+                <div>
+                  <p>0</p>
+                </div>
+                <div>
+                  <p>2</p>
+                </div>
+              </div> -->
+     
+
+
+        <!-- <p>Electron Velocity (cm/s): </p>
+        <input style="width: 100%;" type="range" min="1" max="9" value="5" step="1" id = "slider_6"onchange="setVelocity(this.value)">
+        <div class="sliderticks">
+
+    
+          <p>10<sub>6</sub></p>
+          <p>0.5x10<sub>7</sub></p>
+          <p>0.9x10<sub>7</sub></p>
+        </div> -->
+
+        <p>Scattering Time (fs):</p>
+        <input style="width: 100%;" type="range" min="1" max="20" value="1"id = "slider_7" onchange="setScattering(this.value)">
+        <div class="sliderticks">
+
+    
+          <p>10</p>
+
+          <p>200</p>
+
+        </div>
+
+        <!-- <p>factor E: <output type="text" id = "factor_E" val = "setFactor(this.value)"> </p>
+        <input style="width: 100%;" type="range" min="1" max="1000" value="10" step = "1"  onchange="setFactor(this.value)">
+        <div class="sliderticks">
+
+          <p>10 strong</p>
+         
+          <p>1/100 weak</p>
+
+        </div> -->
+
+        <p>Carrier Lifetime (&mu;s):</p>
+        <input style="width: 100%;" type="range" min="1" max="40" value="1" id = "slider_8"onchange="setDistance(this.value)">
+        <div class="sliderticks">
+
+    
+          <p>0.1</p>
+          <p>0.5</p>
+          <p>0.9</p>
+
+          <p>1.3</p>
+          <p>1.7</p>
+
+        </div>
+
+        <!-- <p>gap  between collision (test):</p>
+        <input style="width: 100%;" type="range" min="0" max="100" value="10" id="slider_88" onchange="E_gap_factor = parseFloat(this.value);">
+        <div class="sliderticks">
+
+    
+          <p>0</p>
+          <p>100</p>
+     
+
+        </div> -->
+
+         <p>(test) v scale:</p>
+        <input style="width: 100%;" type="range" min="0.1" max="2" value="1" step = "0.1"onchange="setScale_v(this.value);">
+        <div class="sliderticks">
+
+    
+          <p>0.1</p>
+          <p>2</p>
+     
+
+        </div>
+
+
+
+
+        <button onclick="reset_scene1()">Reset</button>
+
+        <!-- <p>  Recombine</p>
+      
+
+        <label class="switch">
+          <input id="switch_re" type="checkbox" onchange="switch_recombine()">
+          <span class="slider round"></span>
+        </label> -->
+        
+
+
+
+
+    
+      </div>
+    </div>
+
+   
+
+    <div class="row classical-model-row" id="scene_4">
+      <div class="col-lg-4">
+      
+
+      </div>
+    </div>
+
+
+  
+
+
+  
+
+
+
+
+    <div id="visualization">
+
+    </div>
+  </div>
+</body>
+
+</html>

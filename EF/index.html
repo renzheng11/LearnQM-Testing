@@ -1,238 +1,462 @@
 <!DOCTYPE html>
 <html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Charge Density & Electric Field</title>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Charge Density & Electric Field</title>
+		<link href="./style.css" rel="stylesheet" />
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.11/addons/p5.dom.min.js"></script>
+		<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+		<script
+			type="text/javascript"
+			id="MathJax-script"
+			async
+			src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"
+		></script>
+		<script
+			type="text/javascript"
+			async
+			src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+		></script>
+		<script
+			type="text/javascript"
+			async
+			src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"
+		></script>
 
-    <link href="./style.css" rel="stylesheet" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.11/addons/p5.dom.min.js"></script>
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-    <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
-    <script type="text/javascript" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.11/addons/p5.dom.min.js"></script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.11/addons/p5.dom.min.js">
-    </script>
-        </script>
+		<link
+			href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+			rel="stylesheet"
+		/>
+		<link
+			href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@400;700&display=swap"
+			rel="stylesheet"
+		/>
 
-        <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet" />
-        <link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@400;700&display=swap" rel="stylesheet">
+		<script src="https://cdn.jsdelivr.net/npm/p5@1.0.0/lib/p5.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.7/ScrollMagic.min.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.7/plugins/debug.addIndicators.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.15.1/d3.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"></script>
 
-        <script src="https://cdn.jsdelivr.net/npm/p5@1.0.0/lib/p5.js"></script>
-        <script src="//cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.7/ScrollMagic.min.js"></script>
-        <script src="//cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.7/plugins/debug.addIndicators.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.15.1/d3.min.js"></script>
-        <script src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"></script>
+		<script defer src="./tools.js"></script>
+		<script defer src="./sketch.js"></script>
+		<script defer src="./scroll.js"></script>
+		<script defer src="./box.js"></script>
+	</head>
 
-        <script src="./scroll.js"></script>
-        <script src="./box.js"></script>
-        <script src="./sketch.js"></script>
-</head>
+	<body id="body_parent" onload="StartScroll()">
+		<a href="../index.html"
+			><img id="back-icon" src="../images/arrow-left.svg"
+		/></a>
+		<div class="container">
+			<div class="row title">
+				<h1 class="col-lg-12">CHARGE DENSITY & ELECTRIC FIELD</h1>
+				<div class="col-lg-1"></div>
+				<p class="col-lg-10">
+					Before we begin looking into how transistors work, it would be helpful
+					to revisit the relationship between the distribution of charge and
+					electric field.
+				</p>
+				<div class="col-lg-1"></div>
+			</div>
+			<div class="row row1" id="scene1">
+				<div class="col-lg-4">
+					<h1>An Infinite Plane Sheet of Charge</h1>
 
-<body id="body_parent" onload="StartScroll()">
-    <a href="../index.html"><img id="back-icon" src="../images/arrow-left.svg" /></a>
-    <div class="container">
-        <div class="row title">
-            <h1 class="col-lg-12">CHARGE DENSITY & ELECTRIC FIELD</h1>
-            <div class="col-lg-1"></div>
-            <p class="col-lg-10">
-                Before we begin looking into how transistors work, it would be helpful to revisit the relationship between the distribution of charge and electric field.
-            </p>
-            <div class="col-lg-1"></div>
-        </div>
-        <div class="row row1" id="scene1">
-            <div class="col-lg-4">
-                <h1>An Infinite Plane Sheet of Charge</h1>
-                
-                <p>
-                    Let's assume we have an infinitely large two dimensional plane sheet of charge. <span class="highlight">
-Click on the plane to positively charge it.
-                    </span>
-                    <br><br>
+					<p>
+						Let's assume we have an infinitely large two dimensional plane sheet
+						of charge.
+						<span class="highlight">
+							Click on the plane to positively charge it.
+						</span>
+						<br /><br />
 
-                    In practice, the plane does not need to be infinite. If we only look at the points in space close to the plane, (i.e. x
-                    much smaller than the plane size in y and z directions) we can consider the plane infinite.
-                    <br><br>
-                    Note that charge is evenly distributed on the plane and the finite number of + signs is for representation purposes. In
-                    reality, the number of charged particles is many, many orders of magnitude larger.
-                    <br><br>
-                    Can you explain why the electric field is perpendicular to the plane? (Hint: Think about symmetry)
+						In practice, the plane does not need to be infinite. If we only look
+						at the points in space close to the plane, (i.e. x much smaller than
+						the plane size in y and z directions) we can consider the plane
+						infinite.
+						<br /><br />
+						Note that charge is evenly distributed on the plane and the finite
+						number of + signs is for representation purposes. In reality, the
+						number of charged particles is many, many orders of magnitude
+						larger.
+						<br /><br />
+						Can you explain why the electric field is perpendicular to the
+						plane? (Hint: Think about symmetry)
 
-                <br><br>
-                <br><br>
-                <br><br>
-            </p>
-            </div>
-        </div>
+						<br /><br />
+						<br /><br />
+						<br /><br />
+					</p>
+				</div>
+			</div>
 
-        <div class="row row2" id="scene2">
-            <div class="col-lg-4">
-                <h1>Charge Density</h1>
-                <p>
-                    What happens if we change the charge density?
-                    <span class="highlight">(Use the slidebar)</span>
-                    <br><br>
-                    <input style="width: 300" type="range" min="0" max="80" value="80" onchange="updateBoxChargeAmount(this.value)">
-                    <br><br>
-            </div>
-            
-        </div>
+			<div class="row row2" id="scene2">
+				<div class="col-lg-4">
+					<h1>Charge Density</h1>
+					<p>
+						What happens if we change the charge density?
+						<span class="highlight">(Use the slidebar)</span>
+						<br /><br />
+						<input
+							style="width: 300"
+							type="range"
+							min="0"
+							max="80"
+							value="80"
+							onchange="updateBoxChargeAmount(this.value)"
+						/>
+						<br /><br />
+					</p>
+				</div>
+			</div>
 
-        <div class="row row2" id="scene3">
-            <div class="col-lg-4">
-                <h1>Charge Polarity</h1>
-                <p>
-                What happens if you negatively charge the plane?</p>
-                <button class="button" type="button" onclick="reverseCharge()">Reverse Charge</button>
-                <br><br>
-                <br><br>
-                <input style="width: 300" type="range" min="0" max="80" value="80" onchange="updateBoxChargeAmount(this.value)">
-                <label for="slider5" class="labels">Negative Charge Density</label>
-            </div>
-        </div>
-        <div class="row row3" id="scene4">
-            <div class="col-lg-4">
-                <h1>Two Plane Sheets of Opposite Charges</h1>
-                <p>
-                Let’s look at what happens when we put two sheets of opposite charges together. This effect is called <em>screening</em>.
-                <br><br>
-                <span class="highlight">You can click and drag to move the negatively charged sheet... Use the buttons below to show the screening effect or
-                toggle the arrows.</span>
-                </p>
+			<div class="row row2" id="scene3">
+				<div class="col-lg-4">
+					<h1>Charge Polarity</h1>
+					<p>What happens if you negatively charge the plane?</p>
+					<button class="button" type="button" onclick="reverseCharge()">
+						Reverse Charge
+					</button>
+					<br /><br />
+					<br /><br />
+					<input
+						style="width: 300"
+						type="range"
+						min="0"
+						max="80"
+						value="80"
+						onchange="updateBoxChargeAmount(this.value)"
+					/>
+					<label for="slider5" class="labels">Negative Charge Density</label>
+				</div>
+			</div>
+			<div class="row row3" id="scene4">
+				<div class="col-lg-4">
+					<h1>Two Plane Sheets of Opposite Charges</h1>
+					<p>
+						Let’s look at what happens when we put two sheets of opposite
+						charges together. This effect is called <em>screening</em>.
+						<br /><br />
+						<span class="highlight"
+							>You can click and drag to move the negatively charged sheet...
+							Use the buttons below to show the screening effect or toggle the
+							arrows.</span
+						>
+					</p>
 
-                <input type="checkbox" class="posToggle" id="posToggle4" value="pos" onclick="toggleArrows(this.value)">
-                <label for="posToggle4" class="labels">Show the electric field due to positive charges</label><br>
+					<input
+						type="checkbox"
+						class="posToggle"
+						id="posToggle4"
+						value="pos"
+						onclick="toggleArrows(this.value)"
+					/>
+					<label for="posToggle4" class="labels"
+						>Show the electric field due to positive charges</label
+					><br />
 
-                <input type="checkbox" class="negToggle" id="negToggle4" value="neg" onclick="toggleArrows(this.value)">
-                <label for="negToggle4" class="labels">Show the electric field due to negative charges</label><br>
-                
-                <input type="checkbox" class="netToggle" id="netToggle4" value="net" onclick="toggleArrows(this.value)">
-                <label id="label4" for="netToggle4" class="labels netLabel">Show net electric field</label><br>
+					<input
+						type="checkbox"
+						class="negToggle"
+						id="negToggle4"
+						value="neg"
+						onclick="toggleArrows(this.value)"
+					/>
+					<label for="negToggle4" class="labels"
+						>Show the electric field due to negative charges</label
+					><br />
 
-                <button class="button showScreen" type="button"  onclick="animateScreen()">Show Screening</button>
-            </div>
-        </div>
-        <div class="row row4" id="scene5">
-            <div class="col-lg-4">
-                <h1>Partial Screening</h1>
-                <p> 
-                The charge density in the two plane sheets may not always match exactly. Let’s see what happens in that case.
-                </p>
+					<input
+						type="checkbox"
+						class="netToggle"
+						id="netToggle4"
+						value="net"
+						onclick="toggleArrows(this.value)"
+					/>
+					<label id="label4" for="netToggle4" class="labels netLabel"
+						>Show net electric field</label
+					><br />
 
-                <input type="checkbox" class="posToggle" id="posToggle5" value="pos" checked onclick="toggleArrows(this.value)">
-                <label for="posToggle5" class="labels">Show the electric field due to positive charges</label><br>
-                
-                <input type="checkbox" class="negToggle" id="negToggle5" value="neg" checked onclick="toggleArrows(this.value)">
-                <label for="negToggle5" class="labels">Show the electric field due to negative charges</label><br>
-                
-                <input type="checkbox" class="netToggle" id="netToggle5" checked value="net" onclick="toggleArrows(this.value)">
-                <label id="label5" for="netToggle5" class="labels netLabel">Show net electric field</label>
-                
-                <br><br>
+					<button
+						class="button showScreen"
+						type="button"
+						onclick="animateScreen()"
+					>
+						Show Screening
+					</button>
+				</div>
+			</div>
+			<div class="row row4" id="scene5">
+				<div class="col-lg-4">
+					<h1>Partial Screening</h1>
+					<p>
+						The charge density in the two plane sheets may not always match
+						exactly. Let’s see what happens in that case.
+					</p>
 
-                <!-- Negative Charge Amount -->
-                <input id="slider5" style="width: 300" type="range" min="0" max="80" value="42" onchange="updateBoxChargeAmount(this.value)">
-                <label for="slider5" class="labels">Negative Charge Density</label>
-                
-                <br><br>
-                <button class="button showScreen" type="button" onclick="animateScreen()">Show Screening</button>
-            </div>
-        </div>
-        <div class="row row5" id="scene6">
-            <div class="col-lg-4">
-                <h1>Recovering the Full Screening</h1>
-                <p>
-                    What if we add an additional plane sheet of negative charge such that the total negative charges become equal to the
-                    positive charges?
-                    
-                    
+					<input
+						type="checkbox"
+						class="posToggle"
+						id="posToggle5"
+						value="pos"
+						checked
+						onclick="toggleArrows(this.value)"
+					/>
+					<label for="posToggle5" class="labels"
+						>Show the electric field due to positive charges</label
+					><br />
 
-                </p>
-                <button class="button" type="button" id="negbox6" onclick="toggleBox()">Add Surface</button>
-                <br><br>
-                <span class="highlight">You can hover over each sheet to see its charges more clearly.</span>
+					<input
+						type="checkbox"
+						class="negToggle"
+						id="negToggle5"
+						value="neg"
+						checked
+						onclick="toggleArrows(this.value)"
+					/>
+					<label for="negToggle5" class="labels"
+						>Show the electric field due to negative charges</label
+					><br />
 
-                <br><br>
+					<input
+						type="checkbox"
+						class="netToggle"
+						id="netToggle5"
+						checked
+						value="net"
+						onclick="toggleArrows(this.value)"
+					/>
+					<label id="label5" for="netToggle5" class="labels netLabel"
+						>Show net electric field</label
+					>
 
-                <input type="checkbox" class="posToggle" id="posToggle6" value="pos" checked onclick="toggleArrows(this.value)">
-                <label for="posToggle6" class="labels">Show the electric field due to positive charges</label><br>
+					<br /><br />
 
-                <input type="checkbox" class="negToggle" id="negToggle6" value="neg" checked onclick="toggleArrows(this.value)">
-                <label for="negToggle6" class="labels">Show the electric field due to negative charges</label><br>
-                
-                <input type="checkbox" class="netToggle" id="netToggle6" checked value="net"  onclick="toggleArrows(this.value)">
-                
-                <label for="netToggle6" class="labels netLabel">Show the net electric field</label><br>
-                <svg id="d3-viz"></svg>
-            </div>
-        </div>
-        <div class="row row6" id="scene7">
-            <div class="col-lg-4">
-                <h1>Screening via Multiple Sheets of Charge</h1>
-                <p>
-                    The full screening may happen via multiple sheets of charge of varying densities.
-                    <br><br>
-                    <span class="highlight">
-                        Use the slider to gradually move negative charges left and right.
-                    </span>
+					<!-- Negative Charge Amount -->
+					<input
+						id="slider5"
+						style="width: 300"
+						type="range"
+						min="0"
+						max="80"
+						value="42"
+						onchange="updateBoxChargeAmount(this.value)"
+					/>
+					<label for="slider5" class="labels">Negative Charge Density</label>
 
-                    <br><br>
-                </p>
+					<br /><br />
+					<button
+						class="button showScreen"
+						type="button"
+						onclick="animateScreen()"
+					>
+						Show Screening
+					</button>
+				</div>
+			</div>
+			<div class="row row5" id="scene6">
+				<div class="col-lg-4">
+					<h1>Recovering the Full Screening</h1>
+					<p>
+						What if we add an additional plane sheet of negative charge such
+						that the total negative charges become equal to the positive
+						charges?
+					</p>
+					<button
+						class="button"
+						type="button"
+						id="negbox6"
+						onclick="toggleBox()"
+					>
+						Add Surface
+					</button>
+					<br /><br />
+					<span class="highlight"
+						>You can hover over each sheet to see its charges more
+						clearly.</span
+					>
 
-                <input style="width: 300;" type="range" min="0" max="40" value="40" id="flow" onchange="flowCharges(value)">
-                <br><br>
+					<br /><br />
 
-                <input type="checkbox" class="posToggle" id="posToggle7" value="pos" checked onclick="toggleArrows(this.value)">
-                <label for="posToggle7" class="labels">Show the electric field due to positive charges</label><br>
+					<input
+						type="checkbox"
+						class="posToggle"
+						id="posToggle6"
+						value="pos"
+						checked
+						onclick="toggleArrows(this.value)"
+					/>
+					<label for="posToggle6" class="labels"
+						>Show the electric field due to positive charges</label
+					><br />
 
-                <input type="checkbox" class="negToggle" id="negToggle7" value="neg" checked onclick="toggleArrows(this.value)">
-                <label for="negToggle7" class="labels">Show the electric field due to negative charges</label><br>
-                
-                <input type="checkbox" class="netToggle" id="netToggle7" checked value="net"
-                    onclick="toggleArrows(this.value)">
-                <label for="netToggle7" class="labels netLabel">Show the net electric field</label><br>
-                <svg id="d3-viz">
+					<input
+						type="checkbox"
+						class="negToggle"
+						id="negToggle6"
+						value="neg"
+						checked
+						onclick="toggleArrows(this.value)"
+					/>
+					<label for="negToggle6" class="labels"
+						>Show the electric field due to negative charges</label
+					><br />
 
-                <svg id="d3-viz-final">
+					<input
+						type="checkbox"
+						class="netToggle"
+						id="netToggle6"
+						checked
+						value="net"
+						onclick="toggleArrows(this.value)"
+					/>
 
-                </svg>
-            </div>
-        </div>
-        <div class="row row7" id="scene8">
-            <div class="col-lg-4">
-                <h1>Screening via Charge Distributed in a Volume</h1>
-                <p>
-                    What if the negative charges are evenly distributed within a given volume? One can consider this as an extreme case of having a large number of plane sheets of negative charge.
-                </p>
+					<label for="netToggle6" class="labels netLabel"
+						>Show the net electric field</label
+					><br />
+					<svg id="d3-viz"></svg>
+				</div>
+			</div>
+			<div class="row row6" id="scene7">
+				<div class="col-lg-4">
+					<h1>Screening via Multiple Sheets of Charge</h1>
+					<p>
+						The full screening may happen via multiple sheets of charge of
+						varying densities.
+						<br /><br />
+						<span class="highlight">
+							Use the slider to gradually move negative charges left and right.
+						</span>
 
-                <span class="highlight">Use the slider to change the width of the volume.</span>
-                <br><br>
-                <input id="widthSlider" style="width: 300" type="range" min="36" max="150" value="75" onchange="updateWidth(this.value)">
+						<br /><br />
+					</p>
 
-                <br><br>
-                <input type="checkbox" class="posToggle" id="posToggle8" value="pos" checked onclick="toggleArrows(this.value)">
-                <label for="posToggle" class="labels">Show the electric field due to positive charges</label><br>
-                
-                <input type="checkbox" class="negToggle" id="negToggle8" value="neg" checked onclick="toggleArrows(this.value)">
-                <label for="negToggle8" class="labels">Show the electric field due to negative charges</label><br>
-                
-                <input type="checkbox" class="netToggle" id="netToggle8" checked value="net"
-                    onclick="toggleArrows(this.value)">
-                <label for="netToggle8" class="labels netLabel">Show the net electric field</label>
-                
-                <br><br>
-                <br><br>
-                <br><br>
-                <br><br>
-                <br><br>
-                <br><br>
-            </div>
-        </div>
-        
-        <div id="visualization">
-        </div>
-    </div>
-</body>
+					<input
+						style="width: 300"
+						type="range"
+						min="0"
+						max="40"
+						value="40"
+						id="flow"
+						onchange="flowCharges(value)"
+					/>
+					<br /><br />
+
+					<input
+						type="checkbox"
+						class="posToggle"
+						id="posToggle7"
+						value="pos"
+						checked
+						onclick="toggleArrows(this.value)"
+					/>
+					<label for="posToggle7" class="labels"
+						>Show the electric field due to positive charges</label
+					><br />
+
+					<input
+						type="checkbox"
+						class="negToggle"
+						id="negToggle7"
+						value="neg"
+						checked
+						onclick="toggleArrows(this.value)"
+					/>
+					<label for="negToggle7" class="labels"
+						>Show the electric field due to negative charges</label
+					><br />
+
+					<input
+						type="checkbox"
+						class="netToggle"
+						id="netToggle7"
+						checked
+						value="net"
+						onclick="toggleArrows(this.value)"
+					/>
+					<label for="netToggle7" class="labels netLabel"
+						>Show the net electric field</label
+					><br />
+					<svg id="d3-viz"></svg>
+
+					<svg id="d3-viz-final"></svg>
+				</div>
+			</div>
+			<div class="row row7" id="scene8">
+				<div class="col-lg-4">
+					<h1>Screening via Charge Distributed in a Volume</h1>
+					<p>
+						What if the negative charges are evenly distributed within a given
+						volume? One can consider this as an extreme case of having a large
+						number of plane sheets of negative charge.
+					</p>
+
+					<span class="highlight"
+						>Use the slider to change the width of the volume.</span
+					>
+					<br /><br />
+					<input
+						id="widthSlider"
+						style="width: 300"
+						type="range"
+						min="36"
+						max="150"
+						value="75"
+						onchange="updateWidth(this.value)"
+					/>
+
+					<br /><br />
+					<input
+						type="checkbox"
+						class="posToggle"
+						id="posToggle8"
+						value="pos"
+						checked
+						onclick="toggleArrows(this.value)"
+					/>
+					<label for="posToggle" class="labels"
+						>Show the electric field due to positive charges</label
+					><br />
+
+					<input
+						type="checkbox"
+						class="negToggle"
+						id="negToggle8"
+						value="neg"
+						checked
+						onclick="toggleArrows(this.value)"
+					/>
+					<label for="negToggle8" class="labels"
+						>Show the electric field due to negative charges</label
+					><br />
+
+					<input
+						type="checkbox"
+						class="netToggle"
+						id="netToggle8"
+						checked
+						value="net"
+						onclick="toggleArrows(this.value)"
+					/>
+					<label for="netToggle8" class="labels netLabel"
+						>Show the net electric field</label
+					>
+
+					<br /><br />
+					<br /><br />
+					<br /><br />
+					<br /><br />
+					<br /><br />
+					<br /><br />
+				</div>
+			</div>
+
+			<div id="visualization"></div>
+		</div>
+	</body>
 </html>

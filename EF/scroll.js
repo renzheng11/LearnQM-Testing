@@ -1,3 +1,5 @@
+// import { resetScene } from "./sketch.js";
+
 totalScenes = 1;
 sceneCount = 0;
 let scenes = [];

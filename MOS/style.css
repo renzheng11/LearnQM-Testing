@@ -1,0 +1,473 @@
+#body_parent {
+  background-color: #121212;
+}
+
+.title-row {
+  margin-top: 300px;
+}
+
+input[type=range] {
+  -webkit-appearance: none;
+  /* Hides the slider so that custom slider can be made */
+  width: 100%;
+  /* Specific width is required for Firefox. */
+  background: transparent;
+  /* Otherwise white in Chrome */
+}
+
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+}
+
+input[type=range]:focus {
+  outline: none;
+  /* Removes the blue border. You should probably do some kind of focus styling for accessibility reasons though. */
+}
+
+input[type=range]::-ms-track {
+  width: 100%;
+  cursor: pointer;
+
+  /* Hides the slider so custom styles can be added */
+  background: transparent;
+  border-color: transparent;
+  color: transparent;
+}
+
+/* Special styling for WebKit/Blink */
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  border: 1px solid #000000;
+  height: 36px;
+  width: 16px;
+  border-radius: 3px;
+  background: #ffffff;
+  cursor: pointer;
+  margin-top: -14px;
+  /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+  /* Add cool effects to your sliders! */
+}
+
+/* All the same stuff for Firefox */
+input[type=range]::-moz-range-thumb {
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+  border: 1px solid #000000;
+  height: 36px;
+  width: 16px;
+  border-radius: 3px;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+/* All the same stuff for IE */
+input[type=range]::-ms-thumb {
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+  border: 1px solid #000000;
+  height: 36px;
+  width: 16px;
+  border-radius: 3px;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+input[type=range]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 8.4px;
+  cursor: pointer;
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+  background: #3071a9;
+  border-radius: 1.3px;
+  border: 0.2px solid #010101;
+}
+
+input[type=range]:focus::-webkit-slider-runnable-track {
+  background: #367ebd;
+}
+
+input[type=range]::-moz-range-track {
+  width: 100%;
+  height: 8.4px;
+  cursor: pointer;
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+  background: #3071a9;
+  border-radius: 1.3px;
+  border: 0.2px solid #010101;
+}
+
+input[type=range]::-ms-track {
+  width: 100%;
+  height: 8.4px;
+  cursor: pointer;
+  background: transparent;
+  border-color: transparent;
+  border-width: 16px 0;
+  color: transparent;
+}
+
+input[type=range]::-ms-fill-lower {
+  background: #2a6495;
+  border: 0.2px solid #010101;
+  border-radius: 2.6px;
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+}
+
+input[type=range]:focus::-ms-fill-lower {
+  background: #3071a9;
+}
+
+input[type=range]::-ms-fill-upper {
+  background: #3071a9;
+  border: 0.2px solid #010101;
+  border-radius: 2.6px;
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+}
+
+input[type=range]:focus::-ms-fill-upper {
+  background: #367ebd;
+}
+
+.sliderticks {
+  margin-top: -20px;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 10px;
+  margin-bottom: 20px;
+}
+
+.sliderticks p {
+  /* position: relative; */
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  width: 1px;
+  background: #D3D3D3;
+  height: 10px;
+  line-height: 40px;
+  margin: 0 0 20px 0;
+}
+
+.title-row h1 {
+
+  font-family: Agency FB;
+  font-style: normal;
+  font-weight: bold;
+  letter-spacing: 2px;
+  font-size: 48px;
+  line-height: 96px;
+  /* identical to box height */
+
+  text-align: center;
+
+  color: #FFF7AE;
+}
+
+.title-row p {
+  margin-top: 30px;
+  font-family: Bai Jamjuree;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 20px;
+  line-height: 30px;
+
+  color: #FFFFFF;
+
+  text-align: center;
+}
+
+.sub-atomic-particle-row,
+.classical-model-row,
+.real-life-row,
+.experiment-row,
+.conclusion-row,
+.graph-row {
+  margin-top: 200px;
+  opacity: 0;
+  transform: translateY(50px);
+  transition: all 0.3s ease-out;
+}
+
+.conclusion-row {
+  margin-bottom: 300px;
+}
+
+.sub-atomic-particle-row h1,
+.classical-model-row h1,
+.real-life-row h1,
+.experiment-row h1,
+.conclusion-row h1,
+.graph-row h1 {
+
+  font-family: Agency FB;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 36px;
+  line-height: 72px;
+
+  color: #FFF7AE;
+}
+
+.sub-atomic-particle-row p,
+.classical-model-row p,
+.real-life-row p,
+.experiment-row p,
+.conclusion-row p,
+.graph-row p {
+  margin-top: 30px;
+  font-family: Bai Jamjuree;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 18px;
+  line-height: 27px;
+
+  color: #FFFFFF;
+}
+
+.fade-in {
+  opacity: 1;
+  transform: translateY(0px);
+}
+
+#visualization {
+  position: fixed;
+  top: 0px;
+  right: 0px;
+  z-index: -100;
+}
+
+
+.axis line {
+  stroke: #fff;
+}
+
+.axis path {
+  fill: none;
+  stroke: #fff;
+}
+
+.label {
+  fill: #fff;
+}
+
+#d3-viz {
+  /* background-color: white; */
+  min-height: 400px;
+}
+
+label {
+  /* margin-top: 30px; */
+  font-family: Bai Jamjuree;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 20px;
+  line-height: 30px;
+
+  color: #FFFFFF;
+
+  text-align: center;
+
+  margin-left: 15px;
+}
+
+input[type='checkbox'] {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeSpeed;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  margin-right: 1px;
+  display: block;
+  float: left;
+  position: relative;
+  cursor: pointer;
+}
+
+input[type='checkbox']:after {
+  content: "";
+  vertical-align: middle;
+  text-align: center;
+  line-height: 13px;
+  position: absolute;
+  cursor: pointer;
+  height: 20px;
+  width: 20px;
+  left: 0;
+  top: 0;
+  font-size: 10px;
+  /* -webkit-box-shadow: inset 0 1px 1px black, 0 1px 0 black;
+  -moz-box-shadow: inset 0 1px 1px black, 0 1px 0 black;
+  box-shadow: inset 0 1px 1px black, 0 1px 0 black; */
+  border: #fff 1px solid;
+  background: #181818;
+}
+
+/* input[type='checkbox']:hover:after,
+input[type='checkbox']:checked:hover:after {
+  background: white;
+  content: '\2714';
+  color: #fff;
+} */
+
+#te:hover:after,
+#te:checked:hover:after {
+  background: white;
+  content: '\2714';
+  color: #fff;
+}
+
+#ppr:hover:after,
+#ppr:checked:hover:after {
+  background: #EA9FA2;
+  content: '\2714';
+  color: #fff;
+}
+
+#eer:hover:after,
+#eer:checked:hover:after {
+  background: #6ECF7F;
+  content: '\2714';
+  color: #fff;
+}
+
+#be:hover:after,
+#be:checked:hover:after {
+  background: #FFF7AE;
+  content: '\2714';
+  color: #fff;
+}
+
+input[type='checkbox']:checked:after {
+  background: white;
+  content: '\2714';
+  color: #fff;
+}
+
+#te:checked:after {
+  background: #fff !important;
+  color: black !important;
+}
+
+#ppr:checked:after {
+  background: #EA9FA2 !important;
+  color: black !important;
+}
+
+#eer:checked:after {
+  background: #6ECF7F !important;
+  color: black !important;
+}
+
+#be:checked:after {
+  background: #FFF7AE !important;
+  color: black !important;
+}
+
+#back-icon {
+  width: 36px;
+  height: 36px;
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  cursor: pointer;
+}
+
+
+.noselect {
+  -webkit-touch-callout: none;
+  /* iOS Safari */
+  -webkit-user-select: none;
+  /* Safari */
+  -khtml-user-select: none;
+  /* Konqueror HTML */
+  -moz-user-select: none;
+  /* Old versions of Firefox */
+  -ms-user-select: none;
+  /* Internet Explorer/Edge */
+  user-select: none;
+  /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked+.slider {
+  background-color: #2196F3;
+}
+
+input:focus+.slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked+.slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+.zoom {
+  width: 500px;
+}
+
+.small {
+  width: 500px;
+  height: 500px;
+  background-color: #121212;
+}
+
+.large {
+  width: 2000px;
+  height: 2000px;
+  background-color: #121212;
+}
+
+.cursor-point {
+  cursor: pointer;
+}
+
+.cursor-noselect {
+  cursor: not-allowed;
+}

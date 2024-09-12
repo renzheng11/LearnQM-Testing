@@ -160,19 +160,4 @@ StartScroll = () => {
 			}
 		})
 		.addTo(controller);
-
-	// let scene11 = new ScrollMagic.Scene({
-	// 	triggerElement: "#scene11",
-	// })
-	// 	.setClassToggle("#scene11", "fade-in")
-	// 	.on("start", () => {
-	// 		if (sceneCount == 10) {
-	// 			sceneCount = 11;
-	// 			resetScene();
-	// 		} else {
-	// 			sceneCount = 10;
-	// 			resetScene();
-	// 		}
-	// 	})
-	// 	.addTo(controller);
 };

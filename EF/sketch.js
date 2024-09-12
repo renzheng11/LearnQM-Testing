@@ -15,53 +15,45 @@ let color = {
 
 let canvas;
 
-// Toggle arrows
+// Toggle arrows based on checkboxes
 let showNegArrows;
 let showPosArrows;
 let showNetArrows;
 
 let drawScene1; // tracks if scene 1 plane has been clicked
 
-let animate;
-let animated;
+let animate; // tracks if screening (arrows moving) is currently animating
+let animated; // true if screening is complete
 
 // new boxes
-let boxLeft;
-let boxRight1;
-let boxRight2;
-let boxRight3;
+let boxLeft; // default positive box
+let boxRight1; // negative box 1
+let boxRight2; // negative box 2 (used in scene 6 + 7)
+let boxRight3; // negative box 3 (used in scene 7)
 
 // graphs
-let graphY;
-let graphW;
-let graphX;
-let graphC;
+let graphX; // graph x position
+let graphY; // graph y position
+let graphW; // graph width
+let graphC; // graph center x position
 
 // Charges
-let chargeDivisor;
-let chargeCoordinates;
-let chargeXArray;
-let chargeYArray;
-let chargeXRArray;
-let chargeYRArray;
+let thicknessScale; // factor to control arrow thickness (arbitrary)
+let chargeCoordinates; // grid for charges
 let rand; // charge random offset
-let totalNegCharge;
+let totalNegCharge; // total charge of all negative boxes in scene
 
 // Scenes
-let currPosBox;
-let currNegBoxes;
-let boxPadding;
-let flowDirection;
+let currNegBoxes; // all negative boxes in scene
+let boxPadding; // space between boxes
+let flowDirection; // For scene 7 - direction that charges are flowing
 
-let chargeDensityY;
-let eFieldY;
+let chargeDensityY; // charge density text x position
+let eFieldY; // electric field text y position
 
-let volumeWidth;
+let volumeWidth; // For scene 8 - width of negative volume box
 
-let offsetY;
-
-// Colors
-// let color;
+let offsetY; // space between arrows
 
 function setup() {
 	canvas = createCanvas((2 * windowWidth) / 4 + 40, windowHeight);
@@ -70,7 +62,8 @@ function setup() {
 	img2 = loadImage("./images/vecELabel.png");
 	imgX = loadImage("./images/xLabel.png");
 
-	chargeDivisor = 3.2;
+	thicknessScale = 16;
+
 	flowDirection = "right";
 	totalNegCharge = 0;
 
@@ -113,9 +106,7 @@ function setup() {
 
 	offsetY = 14;
 
-	// instantiate new boxes
-	let initBoxes = [boxLeft, boxRight1, boxRight2, boxRight3];
-
+	// instantiate default boxes
 	boxLeft = new Box(
 		true,
 		false,
@@ -183,14 +174,7 @@ function setup() {
 
 	volumeWidth = boxRight1.w / 75;
 
-	allPosBoxes = [boxLeft];
-	allNegBoxes = [boxRight1, boxRight2, boxRight3];
-
-	chargeXArray = [];
-	chargeYArray = [];
-	chargeXRArray = [];
-	chargeYRArray = [];
-
+	// x, y positions for top left charge
 	let Px = 15;
 	let Py = 16;
 
@@ -200,6 +184,12 @@ function setup() {
 		rand.push(Math.random() * 6);
 	}
 
+	/**
+	 * chargeCoordinates is grid system for where charges are positioned
+	 * 5 columns except in corners with less space
+	 * A random amount of space is added to x and y positions to make the positioning look more random
+	 * The factors that px and py are multiplied by determines the row and column
+	 */
 	chargeCoordinates = [
 		[
 			[0, 0],
@@ -370,29 +360,8 @@ function setup() {
 		], // 21
 	];
 
-	// less random array
-	let num = 24;
-	let col = Math.floor(num / 5);
-	let row = Math.floor(num / 2);
-
-	// box 1 ???
-	for (let r = 0; r < row; r++) {
-		for (let c = 0; c < col; c++) {
-			chargeXArray.push(boxLeft.x + c * 18 + Math.random() * 2 + 18);
-			chargeYArray.push(boxLeft.y + r * 18 + Math.random() * 2);
-		}
-	}
-
-	for (let r = 0; r < row; r++) {
-		for (let c = 0; c < col; c++) {
-			chargeXRArray.push(boxLeft.x + c * 18 + Math.random() * 2 + 18);
-			chargeYRArray.push(boxLeft.y + r * 18 + Math.random() * 2);
-		}
-	}
-
-	allBoxes = [boxLeft, boxRight1, boxRight2, boxRight3];
-
 	// populate each box's charge grid
+	allBoxes = [boxLeft, boxRight1, boxRight2, boxRight3];
 	for (let i = 0; i < allBoxes.length; i++) {
 		populateChargeGrid(allBoxes[i]);
 	}
@@ -400,28 +369,26 @@ function setup() {
 
 function draw() {
 	background(...color.bg);
-
-	if (sceneCount == 1) {
+	if (scene(1)) {
 		scene1();
-	} else if (sceneCount == 2) {
+	} else if (scene(2)) {
 		scene2();
-	} else if (sceneCount == 3) {
+	} else if (scene(3)) {
 		scene3();
-	} else if (sceneCount == 4) {
+	} else if (scene(4)) {
 		scene4();
-	} else if (sceneCount == 5) {
+	} else if (scene(5)) {
 		scene5();
-	} else if (sceneCount == 6) {
+	} else if (scene(6)) {
 		scene6();
-	} else if (sceneCount == 7) {
+	} else if (scene(7)) {
 		scene7();
-	} else if (sceneCount == 8) {
+	} else if (scene(8)) {
 		scene8();
 	}
 }
 
 function scene1() {
-	currPosBox = boxLeft;
 	currNegBoxes = [];
 
 	drawBox(boxLeft, "s");
@@ -429,7 +396,6 @@ function scene1() {
 		drawBox(boxLeft, "l");
 		drawBox(boxLeft, "s");
 		drawBox(boxLeft, "r");
-
 		drawCharges(boxLeft);
 
 		// Draw E vec symbol
@@ -440,7 +406,6 @@ function scene1() {
 }
 
 function scene2() {
-	currPosBox = boxLeft;
 	currNegBoxes = [boxLeft];
 
 	drawBox(boxLeft, "l");
@@ -455,7 +420,6 @@ function scene2() {
 }
 
 function scene3() {
-	currPosBox = boxLeft;
 	currNegBoxes = [boxLeft];
 
 	drawGraph(boxLeft);
@@ -471,7 +435,6 @@ function scene3() {
 }
 
 function scene4() {
-	currPosBox = boxLeft;
 	currNegBoxes = [boxRight1];
 
 	drawGraph(boxLeft);
@@ -488,20 +451,19 @@ function scene4() {
 	drawBox(boxLeft, "l");
 
 	drawBox(boxRight1, "lr");
-	drawBox(boxRight1, "p");
+	drawBox(boxRight1, "n");
 
 	if (mouseIsPressed) {
 		mouseX > graphC && mouseX < graphW - 10 ? boxRight1.updateX(mouseX) : null;
 	}
 
-	// animating scene 4
+	// draw screening arrow animation
 	if (animate.scene4 && boxRight1.arrowOffsetY >= 0) {
 		boxRight1.addArrowOffsetY(-0.2);
 	}
 }
 
 function scene5() {
-	currPosBox = boxLeft;
 	currNegBoxes = [boxRight1];
 
 	drawGraph(boxLeft);
@@ -515,15 +477,15 @@ function scene5() {
 
 	showPosArrows ? drawBox(boxLeft, "lr") : null;
 	drawBox(boxRight1, "lr");
-	drawBox(boxRight1, "p");
+	drawBox(boxRight1, "n");
 
+	// draw screening arrow animation
 	if (animate.scene5 && boxRight1.arrowOffsetY >= 0) {
 		boxRight1.addArrowOffsetY(-0.2);
 	}
 }
 
 function scene6() {
-	currPosBox = boxLeft;
 	currNegBoxes = [boxRight1];
 
 	drawBox(boxLeft, "s");
@@ -548,8 +510,9 @@ function scene6() {
 
 	drawBox(boxRight1, "lr");
 	drawBox(boxLeft, "lr");
-	drawBox(boxLeft, "p");
+	drawBox(boxLeft, "n");
 
+	// if boxes are hovered, brings surface and charges to front
 	if (fowardSurface(boxLeft)) {
 		drawBox(boxLeft, "s");
 		drawCharges(boxLeft);
@@ -562,14 +525,9 @@ function scene6() {
 		drawBox(boxRight2, "s");
 		drawCharges(boxRight2);
 	}
-
-	if (animate.scene6 && boxRight1.arrowOffsetY >= 0) {
-		boxRight1.addArrowOffsetY(-0.2);
-	}
 }
 
 function scene7() {
-	currPosBox = boxLeft;
 	currNegBoxes = [boxRight1, boxRight2, boxRight3];
 
 	drawGraph(boxLeft);
@@ -586,21 +544,22 @@ function scene7() {
 	drawBox(boxRight1, "s");
 	drawCharges(boxRight1);
 
-	drawBox(boxRight1, "p");
+	drawBox(boxRight1, "n");
 	drawBox(boxRight2, "s");
 	drawCharges(boxRight2);
 
-	drawBox(boxRight2, "p");
+	drawBox(boxRight2, "n");
 	drawBox(boxRight3, "s");
 	drawCharges(boxRight3);
 
-	drawBox(boxRight3, "p");
+	drawBox(boxRight3, "n");
 	drawBox(boxLeft, "r");
 
 	drawBox(boxRight1, "lr");
 	drawBox(boxRight2, "lr");
 	drawBox(boxRight3, "lr");
 
+	// if boxes are hovered, brings surface and charges to front
 	if (fowardSurface(boxLeft)) {
 		drawBox(boxLeft, "s");
 		drawCharges(boxLeft);
@@ -619,17 +578,7 @@ function scene7() {
 	}
 }
 
-function fowardSurface(box) {
-	if (mouseX > box.x && mouseX < box.x + 64) {
-		return true;
-	} else {
-		return false;
-	}
-}
-
 function scene8() {
-	//8scene
-	currPosBox = boxLeft;
 	currNegBoxes = [boxRight1];
 	drawGraph(boxLeft);
 	drawEqs(boxLeft);
@@ -642,9 +591,25 @@ function scene8() {
 
 	drawBox(boxLeft, "r");
 	drawCharges(boxRight1);
-	drawBox(boxRight1, "p");
+	drawBox(boxRight1, "n");
 }
 
+/**
+ * When hovered, draws box and its charges in front of arrows
+ * @param {*} box box to move forward
+ * @returns
+ */
+function fowardSurface(box) {
+	if (mouseX > box.x && mouseX < box.x + 64) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+/**
+ * Helper for scene 6, add or remove second negative box
+ */
 function toggleBox() {
 	resetCharges();
 
@@ -653,17 +618,21 @@ function toggleBox() {
 		boxRight2.updateShowBox(true);
 		currNegBoxes.push(boxRight2);
 
-		document.getElementById("negbox6").textContent = "Remove surface";
+		qs("#negbox6").textContent = "Remove surface";
 	} else {
 		boxRight2.updateShowBox(false);
 		if (currNegBoxes.length > 1) {
 			currNegBoxes.pop();
 		}
 
-		document.getElementById("negbox6").textContent = "Add surface";
+		qs("#negbox6").textContent = "Add surface";
 	}
 }
 
+/**
+ * Sets box's showChargeGrid (determines if charge is showing) using chargeCoordinates, based on box's charge amount.
+ * @param {*} box
+ */
 function populateChargeGrid(box) {
 	for (let r = 0; r < chargeCoordinates.length; r++) {
 		for (let c = 0; c < 5; c++) {
@@ -677,6 +646,10 @@ function populateChargeGrid(box) {
 	}
 }
 
+/**
+ * For Scene 7 (Screening via Multiple Sheets of Charge): Flows negative charges between first and last negative box (middle negative box does not change)
+ * @param {*} value
+ */
 function flowCharges(value) {
 	let chargeMapA = {};
 	let chargeMapC = {};
@@ -701,26 +674,26 @@ function flowCharges(value) {
 	resetCharges(boxRight3);
 }
 
+/**
+ * Draws numbers for charge density and electric field.
+ * @param {*} box
+ * @param {*} loc
+ */
 function drawEqs(box, loc) {
-	// E = 5.56 x 10^6 (p)
-	// Math.pow(x, y) returns x^y
-	// let ef = Math.pow(10,6)
-
-	// charge density: box.chargeAmount / max charge
-
+	// equation: charge density: box.chargeAmount / max charge
 	// example
-	// E = 5.56 x 10^6
+	// E (constant) = 5.56 x 10^6
 	// charge density: .1 microC/cm^2
 	// electric field: 5.56 x 10^5
 
 	noStroke();
 
-	let max = 80;
-	let chargeDensity = (box.chargeAmount / 80).toFixed(2);
+	let maxCharge = 80;
+	let chargeDensity = (box.chargeAmount / maxCharge).toFixed(2);
 	let eField = (5.56 * chargeDensity).toFixed(2);
 
-	if (sceneCount == 8 && box.chargeType == "neg") {
-		// charge per unit volume (mC/cm^3) = ( charge per unit area (µC/cm^2) / width (µm) ) * 10
+	if (scene(8) && box.chargeType == "neg") {
+		// equation: charge per unit volume (mC/cm^3) = (charge per unit area (µC/cm^2) / width (µm)) * 10
 		chargeDensity = ((chargeDensity / volumeWidth) * 10).toFixed(2);
 	}
 
@@ -738,7 +711,7 @@ function drawEqs(box, loc) {
 
 	if (sceneCount < 8 || box.chargeType == "pos") {
 		text(`${sign}${chargeDensity} µC/cm^2`, box.x + 46, chargeDensityY);
-	} else if (sceneCount == 8 && box.chargeType == "neg") {
+	} else if (scene(8) && box.chargeType == "neg") {
 		text(
 			`${sign}${chargeDensity} mC/cm^3`,
 			box.x + boxRight1.w / 2 + 46,
@@ -746,7 +719,7 @@ function drawEqs(box, loc) {
 		);
 	}
 
-	if (sceneCount == 8) {
+	if (scene(8)) {
 		if (box.chargeType == "neg") {
 		} else {
 			text(`± ${eField} MV/cm`, box.x + 46, eFieldY);
@@ -756,6 +729,9 @@ function drawEqs(box, loc) {
 	}
 }
 
+/**
+ * Helper for drawGraph - Draws graph axis
+ */
 function drawAxis() {
 	stroke(...color.grey); // axis color
 	strokeWeight(1);
@@ -765,7 +741,7 @@ function drawAxis() {
 	line(graphC, graphY - 76, graphC, graphY + 60); // vert
 
 	let xAxisExtend = 0;
-	sceneCount == 8 ? (xAxisExtend = 20) : null;
+	scene(8) ? (xAxisExtend = 20) : null;
 	line(graphX, graphY, graphW + xAxisExtend + 10, graphY); // hor
 
 	noStroke();
@@ -776,7 +752,7 @@ function drawAxis() {
 	textStyle(ITALIC);
 	textSize(16);
 
-	if (sceneCount == 8) {
+	if (scene(8)) {
 		text("x (µm)", graphC + graphW / 2 - 34 + xAxisExtend, graphY + 3);
 	} else {
 		text("x", graphC + graphW / 2 - 24 + xAxisExtend, graphY + 3);
@@ -816,7 +792,7 @@ function drawAxis() {
 		line(graphX, graphY, graphX + size, graphY - size);
 	}
 
-	if (sceneCount == 8) {
+	if (scene(8)) {
 		textStyle(NORMAL);
 		// x axis arrow
 		line(graphW + 14, graphY, graphW - size + 14, graphY - size);
@@ -840,23 +816,26 @@ function drawAxis() {
 	}
 }
 
+/**
+ * Calculates and draws lines on graph
+ * @param {*} box
+ */
 function drawGraph(box) {
 	drawAxis();
 	strokeWeight(2);
 
-	let posHeights = [];
-	let negHeights = [];
-	let netHeights = [];
-	let negHeightsTotal = 0;
+	let posHeights = []; // y axis vertices for positive box
+	let negHeights = []; // y axis vertices for negative boxes
+	let netHeights = []; // y axis vertices for net (EF) charge
+	let negHeightsTotal = 0; // total height for all negative boxes
 
-	let posXPoints;
-	let negXPoints;
-	let netXPoints;
+	let posXPoints; // x axis vertices for positive box
+	let negXPoints; // x axis vertices for negative boxes
+	let netXPoints; // x axis vertices for net (EF) charge
 
 	// pos graph lines
 	posXPoints = [graphX, graphC];
 	posHeights.push(Number(boxLeft.chargeAmount), Number(-boxLeft.chargeAmount));
-	// console.log(posHeights);
 
 	// neg graph lines
 	// left side
@@ -890,12 +869,6 @@ function drawGraph(box) {
 			netHeights.push(-posHeights[0] + negHeights[0]); // index 1
 			netHeights.push(-posHeights[0] + negHeights[1]); // index 2
 		}
-		// console.log("xPos", posXPoints);
-		// console.log("HPos", posHeights);
-		// console.log("xNeg", negXPoints);
-		// console.log("hNeg", negHeights);
-		// console.log("Xnet", netXPoints);
-		// console.log("Hnet", netHeights);
 		if (currNegBoxes.length >= 2) {
 			netXPoints.push(negXPoints[2]);
 			netHeights.push(-posHeights[0] + negHeights[2]);
@@ -927,7 +900,7 @@ function drawGraph(box) {
 		if (box.chargeType == "pos" && showPosArrows) {
 			drawLines(posXPoints, posHeights, color.pos, "pos", false, false);
 		}
-		if (sceneCount == 3 && boxLeft.chargeType == "neg" && showNegArrows) {
+		if (scene(3) && boxLeft.chargeType == "neg" && showNegArrows) {
 			drawLines(negXPoints, negHeights, color.neg, "neg", false, false);
 		}
 
@@ -970,6 +943,14 @@ function drawGraph(box) {
 	}
 }
 
+/**
+ * Helper for drawGraph() - Draws graph lines given the x,y vertex points
+ * @param {*} points
+ * @param {*} rawHeights
+ * @param {*} color
+ * @param {*} colorString
+ * @param {*} drawMid
+ */
 function drawLines(points, rawHeights, color, colorString, drawMid) {
 	let graphDivisor = 2;
 	let unit = 1 / graphDivisor;
@@ -985,13 +966,13 @@ function drawLines(points, rawHeights, color, colorString, drawMid) {
 	let drawConnecting = true;
 
 	for (i = 0; i < points.length; i++) {
-		if (sceneCount == 8 && i == points.length - 2 && colorString != "pos") {
+		if (scene(8) && i == points.length - 2 && colorString != "pos") {
 			drawConnecting = false;
 		}
 
 		if (i == points.length - 1) {
 			// last graph line
-			if (sceneCount == 8 && (colorString == "neg" || colorString == "net")) {
+			if (scene(8) && (colorString == "neg" || colorString == "net")) {
 				line(points[i], heights[i - 1], boxRight1.x + boxRight1.w, heights[i]); // line
 				line(boxRight1.x + boxRight1.w, heights[i], graphEnd + 17, heights[i]); // line
 			} else {
@@ -1000,7 +981,7 @@ function drawLines(points, rawHeights, color, colorString, drawMid) {
 		} else {
 			// all other lines
 			line(points[i], heights[i], points[i + 1], heights[i]); // line
-			if (sceneCount == 4 && boxRight1.x > graphC + 4) {
+			if (scene(4) && boxRight1.x > graphC + 4) {
 				line(points[i + 1], heights[i], points[i + 1], heights[i + 1]); // connecting
 			} else if (drawConnecting && (sceneCount != 4 || color != color.net)) {
 				line(points[i + 1], heights[i], points[i + 1], heights[i + 1]); // connecting
@@ -1009,6 +990,10 @@ function drawLines(points, rawHeights, color, colorString, drawMid) {
 	}
 }
 
+/**
+ * Toggle arrows according to checkboxes
+ * @param {*} value
+ */
 function toggleArrows(value) {
 	if (value == "pos") {
 		showPosArrows = !showPosArrows;
@@ -1021,10 +1006,16 @@ function toggleArrows(value) {
 	}
 }
 
+/**
+ * For Scene 2, Reverse the charge
+ */
 function reverseCharge() {
 	boxLeft.reverseCharge();
 }
 
+/**
+ * Animate arrows upward and cancel out according to charge (to represent screening)
+ */
 function animateScreen() {
 	if (currNegBoxes[0].chargeAmount == 0) {
 		alert(
@@ -1035,21 +1026,21 @@ function animateScreen() {
 	showPosArrows = true;
 	showNegArrows = true;
 
-	if (sceneCount == 4 || sceneCount == 5) {
+	if (scene(4) || scene(5)) {
 		resetHTML(".posToggle", "checked", true);
 		resetHTML(".negToggle", "checked", true);
 		resetHTML(".netToggle", "checked", true);
 
-		if (document.querySelector(".showScreen").textContent == "Reset") {
-			if (sceneCount == 5) {
+		if (qs(".showScreen").textContent == "Reset") {
+			if (scene(5)) {
 				animate.scene5 = false;
 				animated.scene5 = false;
 			}
-			if (sceneCount == 4) {
+			if (scene(4)) {
 				animate.scene4 = false;
 				animated.scene4 = false;
 			}
-			currPosBox.updateMinusLineWeight(boxRight1.chargeAmount);
+			boxLeft.updateMinusLineWeight(boxRight1.chargeAmount);
 			boxRight1.updateArrowOffsetY(14);
 			resetHTML(".showScreen", "textContent", "Show Screening");
 			resetHTML(".netToggle", "display", "none");
@@ -1057,13 +1048,13 @@ function animateScreen() {
 
 			showNetArrows = false;
 		} else if (boxRight1.chargeAmount > 0) {
-			if (sceneCount == 4) {
+			if (scene(4)) {
 				if (animate.scene4 == false) {
 					animate.scene4 = true;
 					resetHTML(".showScreen", "textContent", "Reset");
 				}
 			}
-			if (sceneCount == 5) {
+			if (scene(5)) {
 				if (animate.scene5 == false) {
 					animate.scene5 = true;
 					resetHTML(".showScreen", "textContent", "Reset");
@@ -1073,11 +1064,11 @@ function animateScreen() {
 			if (animated.scene5 == false) {
 				// wait for arrows to animate up
 				setTimeout(() => {
-					currPosBox.updateMinusLineWeight(-boxRight1.lineWeight);
-					if (sceneCount == 4) {
+					boxLeft.updateMinusLineWeight(-boxRight1.lineWeight);
+					if (scene(4)) {
 						animated.scene4 = true;
 					}
-					if (sceneCount == 5) {
+					if (scene(5)) {
 						animated.scene5 = true;
 					}
 					showNetArrows = true;
@@ -1092,37 +1083,41 @@ function animateScreen() {
 		}
 	}
 
-	if (sceneCount == 6) {
+	if (scene(6)) {
 		if (animate.scene6 == false) {
 			animate.scene6 = true;
 		}
 
 		if (animated.scene6 == false) {
 			setTimeout(() => {
-				currPosBox.updateMinusLineWeight(-boxRight1.lineWeight);
+				boxLeft.updateMinusLineWeight(-boxRight1.lineWeight);
 				animated.scene6 = true;
 			}, "1200");
 		}
 	}
 }
 
+/**
+ * Draws box outline
+ * @param {*} box
+ */
 function drawSurface(box) {
 	strokeWeight(1.4);
 	let surfaceOpacity = 0;
 
-	if (sceneCount == 6 && box == boxRight2) {
+	if (scene(6) && box == boxRight2) {
 		surfaceOpacity = surfaceOpacity + 40;
 	}
 
-	if (sceneCount == 7 && box == boxRight2) {
+	if (scene(7) && box == boxRight2) {
 		surfaceOpacity = surfaceOpacity + 40;
 	}
-	if (sceneCount == 7 && box == boxRight3) {
+	if (scene(7) && box == boxRight3) {
 		surfaceOpacity = surfaceOpacity + 80;
 	}
 
 	// surface color
-	if (sceneCount == 1 || sceneCount == 2 || sceneCount == 3) {
+	if (scene(1) || scene(2) || scene(3)) {
 		box.chargeType == "pos" ? stroke(...color.pos) : stroke(...color.neg);
 		fill(...color.bg);
 	} else {
@@ -1154,6 +1149,11 @@ function drawSurface(box) {
 	endShape(CLOSE);
 }
 
+/**
+ * Draw box arrows according to sides parameter
+ * @param {*} box
+ * @param {*} sides
+ */
 function drawBox(box, sides) {
 	noStroke();
 	fill(...color.grey);
@@ -1162,8 +1162,8 @@ function drawBox(box, sides) {
 		image(img, 120, 90, img.width / 1.5, img.height / 1.5);
 	}
 
-	if (sides.includes("p")) {
-		drawBoxArrows(box, false, "p");
+	if (sides.includes("n")) {
+		drawBoxArrows(box, false, "n");
 	}
 
 	if (sides.includes("l") && box.showArrows) {
@@ -1179,6 +1179,10 @@ function drawBox(box, sides) {
 	}
 }
 
+/**
+ * Draw box's charges
+ * @param {*} box
+ */
 function drawCharges(box) {
 	let showCharges = box.showChargeGrid;
 	let chargeSize = 11;
@@ -1194,7 +1198,7 @@ function drawCharges(box) {
 		fill(...color.neg, chargeOpacity);
 	}
 
-	if (sceneCount == 8 && box == boxRight1) {
+	if (scene(8) && box == boxRight1) {
 		Px = 0;
 		Py = 18;
 		let margin = 12;
@@ -1241,7 +1245,7 @@ function drawCharges(box) {
 					circle(chargeX, chargeY, chargeSize);
 					strokeWeight(1);
 
-					if (sceneCount == 1 || sceneCount == 2 || sceneCount == 3) {
+					if (scene(1) || scene(2) || scene(3)) {
 						stroke(...color.neg, signOpacity + 30); // neg sign
 					} else {
 						stroke(...color.neg, signOpacity); // neg sign
@@ -1272,6 +1276,12 @@ function drawCharges(box) {
 	}
 }
 
+/**
+ * Helper for draw box - draws arrows
+ * @param {*} box
+ * @param {*} showScreen
+ * @param {*} sides
+ */
 function drawBoxArrows(box, showScreen, sides) {
 	let rows;
 	let spaceBetween;
@@ -1280,7 +1290,7 @@ function drawBoxArrows(box, showScreen, sides) {
 	let offsetY = 0;
 	let fillAmount;
 
-	if (sceneCount == 1 || sceneCount == 2 || sceneCount == 3) {
+	if (scene(1) || scene(2) || scene(3)) {
 		fillAmount = 255; // 3d fillamount
 		rows = 5;
 		spaceBetween = rows * 10;
@@ -1299,7 +1309,8 @@ function drawBoxArrows(box, showScreen, sides) {
 		// for each set in z axis
 		for (let i = 0; i < 4; i++) {
 			if (sceneCount != 1 && sceneCount != 2 && sceneCount != 3) {
-				if (sides.includes("p") && showNetArrows) {
+				// net arrows
+				if (sides.includes("n") && showNetArrows) {
 					drawSets(
 						box,
 						"net",
@@ -1313,8 +1324,8 @@ function drawBoxArrows(box, showScreen, sides) {
 				}
 			}
 
-			if (sceneCount == 1 || sceneCount == 2 || sceneCount == 3) {
-				// 3D
+			if (scene(1) || scene(2) || scene(3)) {
+				// 3D positive arrows
 				if (box.chargeType == "pos" && showPosArrows) {
 					drawSets(
 						box,
@@ -1327,6 +1338,7 @@ function drawBoxArrows(box, showScreen, sides) {
 						offsetY
 					);
 				}
+				// 3D negative arrows
 				if (box.chargeType == "neg" && showNegArrows) {
 					drawSets(
 						box,
@@ -1340,7 +1352,7 @@ function drawBoxArrows(box, showScreen, sides) {
 					);
 				}
 			} else {
-				//2D
+				// 2D positive arrows (scene4+)
 				if (box.chargeType == "pos" && showPosArrows && box.showArrows) {
 					drawSets(
 						box,
@@ -1353,6 +1365,7 @@ function drawBoxArrows(box, showScreen, sides) {
 						offsetY
 					);
 				}
+				// 2D negative arrows (scene4+)
 				if (box.chargeType == "neg" && showNegArrows && box.showArrows) {
 					drawSets(
 						box,
@@ -1367,115 +1380,51 @@ function drawBoxArrows(box, showScreen, sides) {
 				}
 			}
 
+			// offsets for 3d arrows to give dimensional effect
 			offsetX += 20;
 			offsetY -= 24;
-			if (sceneCount == 1 || sceneCount == 2 || sceneCount == 3) {
+
+			// lower alpha as arrows go into z-axes for visual depth
+			if (scene(1) || scene(2) || scene(3)) {
 				if (i == 0) {
-					fillAmount -= fillAmount / 3; // change for 3d // 40 - 255
+					// 1st layer
+					fillAmount -= fillAmount / 3;
 				} else if (i == 1) {
-					fillAmount -= fillAmount / 3; // change for 3d // 40 - 255
+					// 2nd layer
+					fillAmount -= fillAmount / 3;
 				} else if (i == 2) {
-					fillAmount -= fillAmount / 3; // change for 3d // 40 - 255
+					// 3rd layer
+					fillAmount -= fillAmount / 3;
 				} else if (i == 3) {
-					fillAmount -= fillAmount / 3; // change for 3d // 40 - 255
+					// 4th layer
+					fillAmount -= fillAmount / 3;
 				}
 			} else {
 				fillAmount = 0;
 			}
 		}
+
+		// reset values for next set of arrows
 		spacing += spaceBetween;
 		offsetX = 0;
 		offsetY = 0;
 		zRow = 1;
-
-		// reset fillAmount
-		if (sceneCount == 1 || sceneCount == 2 || sceneCount == 3) {
-			fillAmount = 255; // 3d fillamount
-		} else {
-			fillAmount = 255;
-		}
+		fillAmount = 255;
 	}
 	spacing = spaceBetween - 6;
 }
 
-// currfunction
-function drawArrow(
-	x1,
-	x2,
-	y,
-	arrowLoc,
-	arrowDir,
-	color,
-	lineWeight,
-	fillAmount
-) {
-	// draw line + triangle together
-	strokeCap(SQUARE);
-	strokeWeight(lineWeight);
-	stroke(...color, fillAmount);
-
-	let triangleSize = 12;
-
-	if (arrowLoc == "l" && arrowDir == "l") {
-		line(x1 + triangleSize, y, x2, y);
-		fill(...color, fillAmount);
-		noStroke();
-		if (lineWeight > 0) {
-			drawTriangle(triangleSize, arrowDir, x1, y);
-		}
-	} else if (arrowLoc == "l" && arrowDir == "r") {
-		line(x1, y, x2 - triangleSize, y);
-		fill(...color, fillAmount);
-		noStroke();
-		if (lineWeight > 0) {
-			drawTriangle(triangleSize, arrowDir, x2 - 140 + triangleSize, y);
-		}
-	} else if (arrowLoc == "r" && arrowDir == "l") {
-		line(x1, y, x2 - triangleSize, y);
-		fill(...color, fillAmount);
-		noStroke();
-		if (lineWeight > 0) {
-			drawTriangle(triangleSize, arrowDir, x2 - 140, y);
-		}
-	} else if (arrowLoc == "r" && arrowDir == "r") {
-		line(x1, y, x2 - triangleSize, y);
-		fill(...color, fillAmount);
-		noStroke();
-		if (lineWeight > 0) {
-			drawTriangle(triangleSize, arrowDir, x2, y);
-		}
-	}
-}
-
-function getEField() {
-	let fieldCharges = [];
-	let pos = currPosBox.chargeAmount;
-	let neg1 = currNegBoxes[0].chargeAmount;
-	let neg2 = 0;
-	let neg3 = 0;
-
-	if (currNegBoxes[1]) {
-		neg2 = currNegBoxes[1].chargeAmount;
-	}
-
-	if (currNegBoxes[2]) {
-		neg3 = currNegBoxes[2].chargeAmount;
-	}
-
-	// left = pos - all neg
-	fieldCharges.push(pos - (neg1 + neg2 + neg3));
-	// first =  pos + neg1 + neg2 + neg 3
-	fieldCharges.push(int(pos) + int(neg1) + int(neg2) + int(neg3));
-	// second = pos - (neg 1)
-	fieldCharges.push(pos - neg1);
-	// third = pos - (neg 1 + neg 2)
-	fieldCharges.push(pos - (neg1 + neg2));
-	// last = pos - all neg
-	fieldCharges.push(pos - (neg1 + neg2 + neg3));
-
-	return fieldCharges;
-}
-
+/**
+ * Helper for drawBoxArrows
+ * @param {*} box
+ * @param {*} type
+ * @param {*} fillAmount
+ * @param {*} showScreen
+ * @param {*} spacing
+ * @param {*} sides
+ * @param {*} offsetX
+ * @param {*} offsetY
+ */
 function drawSets(
 	box,
 	type,
@@ -1486,7 +1435,6 @@ function drawSets(
 	offsetX,
 	offsetY
 ) {
-	let thickScale = 0.2;
 	let gap = 3;
 	let lineSize = 255;
 
@@ -1495,33 +1443,24 @@ function drawSets(
 
 	let animatedOffset = 18;
 
-	if (sceneCount == 4) {
+	if (scene(4)) {
 		currAnimate = animate.scene4;
 		currAnimated = animated.scene4;
 	}
-	if (sceneCount == 5) {
+	if (scene(5)) {
 		currAnimate = animate.scene5;
 		currAnimated = animated.scene5;
 	}
 
 	if (type == "pos") {
-		let lineWeight = (currPosBox.chargeAmount / chargeDivisor) * thickScale;
+		let lineWeight = boxLeft.chargeAmount / thicknessScale;
 		// pos left lines
-		lineWeight = (currPosBox.chargeAmount / chargeDivisor) * thickScale;
-		if (
-			sides.includes("l") &&
-			currPosBox.chargeAmount != 0 &&
-			lineWeight != 0
-		) {
-			if (
-				sceneCount == 4 ||
-				sceneCount == 5 ||
-				sceneCount == 6 ||
-				sceneCount == 7
-			) {
-				let x1 = currPosBox.c - lineSize - gap + offsetX;
-				let x2 = currPosBox.c - gap + offsetX - 2;
-				let y = currPosBox.y + spacing + offsetY;
+		lineWeight = boxLeft.chargeAmount / thicknessScale;
+		if (sides.includes("l") && boxLeft.chargeAmount != 0 && lineWeight != 0) {
+			if (scene(4) || scene(5) || scene(6) || scene(7)) {
+				let x1 = boxLeft.c - lineSize - gap + offsetX;
+				let x2 = boxLeft.c - gap + offsetX - 2;
+				let y = boxLeft.y + spacing + offsetY;
 
 				if (currAnimated) {
 					y += animatedOffset;
@@ -1530,30 +1469,21 @@ function drawSets(
 				drawArrow(x1, x2, y, "l", "l", color.pos, lineWeight, fillAmount);
 			} else {
 				// 3d
-				let x1 = currPosBox.c - lineSize - gap + offsetX;
-				let x2 = currPosBox.c - gap + offsetX - 2;
-				let y = currPosBox.y + spacing + offsetY;
+				let x1 = boxLeft.c - lineSize - gap + offsetX;
+				let x2 = boxLeft.c - gap + offsetX - 2;
+				let y = boxLeft.y + spacing + offsetY;
 
 				drawArrow(x1, x2, y, "l", "l", color.pos, lineWeight, fillAmount);
 			}
 		}
 
 		// pos right lines
-		if (
-			sides.includes("r") &&
-			currPosBox.chargeAmount != 0 &&
-			lineWeight != 0
-		) {
-			if (
-				sceneCount == 4 ||
-				sceneCount == 5 ||
-				sceneCount == 6 ||
-				sceneCount == 7
-			) {
-				lineWeight = (currPosBox.chargeAmount / chargeDivisor) * thickScale;
-				let x1 = gap + currPosBox.c + offsetX;
-				let x2 = gap + currPosBox.c + lineSize + offsetX;
-				let y = currPosBox.y + spacing + offsetY;
+		if (sides.includes("r") && boxLeft.chargeAmount != 0 && lineWeight != 0) {
+			if (scene(4) || scene(5) || scene(6) || scene(7)) {
+				lineWeight = boxLeft.chargeAmount / thicknessScale;
+				let x1 = gap + boxLeft.c + offsetX;
+				let x2 = gap + boxLeft.c + lineSize + offsetX;
+				let y = boxLeft.y + spacing + offsetY;
 
 				if (currAnimated) {
 					y += animatedOffset;
@@ -1561,9 +1491,9 @@ function drawSets(
 
 				drawArrow(x1, x2, y, "r", "r", color.pos, lineWeight, fillAmount);
 			} else {
-				let x1 = gap + currPosBox.c + offsetX;
-				let x2 = gap + currPosBox.c + lineSize + offsetX;
-				let y = currPosBox.y + spacing + offsetY;
+				let x1 = gap + boxLeft.c + offsetX;
+				let x2 = gap + boxLeft.c + lineSize + offsetX;
+				let y = boxLeft.y + spacing + offsetY;
 
 				drawArrow(x1, x2, y, "r", "r", color.pos, lineWeight, fillAmount);
 			}
@@ -1571,10 +1501,10 @@ function drawSets(
 	}
 
 	if (type == "neg") {
-		let lineWeight = (box.chargeAmount / chargeDivisor) * thickScale;
+		let lineWeight = box.chargeAmount / thicknessScale;
 		stroke(...color.neg, fillAmount); // HERE
 
-		if (sceneCount == 1 || sceneCount == 2 || sceneCount == 3) {
+		if (scene(1) || scene(2) || scene(3)) {
 			// 3D
 			if (sides.includes("r")) {
 				let x1 = gap + box.x + box.w + offsetX;
@@ -1604,9 +1534,8 @@ function drawSets(
 			offsetY = box.arrowOffsetY;
 			// neg right side
 			if (sides.includes("r") && box.chargeAmount > 0) {
-				// if (sides.includes("r") && offsetY > 0 && box.chargeAmount > 0) {
 				// scene 8 sloped arrows
-				if (sceneCount == 8) {
+				if (scene(8)) {
 					fill(...color.neg, fillAmount);
 					noStroke();
 
@@ -1662,28 +1591,18 @@ function drawSets(
 
 			// neg left arrows
 			if (sides.includes("l") && box.chargeAmount > 0) {
-				if (
-					sceneCount == 4 ||
-					sceneCount == 5 ||
-					sceneCount == 6 ||
-					sceneCount == 7
-				) {
-					let lineWeight = (box.chargeAmount / chargeDivisor) * thickScale;
+				if (scene(4) || scene(5) || scene(6) || scene(7)) {
+					let lineWeight = box.chargeAmount / thicknessScale;
 					let x1 = 52;
 					let x2 = box.x - gap;
 					let y = box.y + spacing + offsetY;
-
-					// if (currAnimated) {
-					//     x1 = currPosBox.x + gap;
-					//     y += animatedOffset * 2;
-					// }
 
 					if (currAnimated) {
 						y += animatedOffset * 2;
 					}
 
 					drawArrow(x1, x2, y, "r", "r", color.neg, lineWeight, fillAmount);
-				} else if (sceneCount == 8) {
+				} else if (scene(8)) {
 					// right
 					fill(...color.neg, fillAmount);
 					noStroke();
@@ -1711,7 +1630,7 @@ function drawSets(
 					let y = boxRight1.y + spacing + offsetY; // left y
 					drawTriangle(12, "r", x, y);
 				} else {
-					let lineWeight = (box.chargeAmount / chargeDivisor) * thickScale;
+					let lineWeight = box.chargeAmount / thicknessScale;
 					let x1 = 52;
 					let x2 = box.x - gap;
 					let y = box.y + spacing + offsetY;
@@ -1726,10 +1645,10 @@ function drawSets(
 		let netOffsetY = 32;
 		let netOffsetX = -6;
 
-		sceneCount == 6 ? (netOffsetY = 42) : null;
-		sceneCount == 7 ? (netOffsetY = 54) : null;
+		scene(6) ? (netOffsetY = 42) : null;
+		scene(7) ? (netOffsetY = 54) : null;
 
-		if (sceneCount == 8) {
+		if (scene(8)) {
 			// draw thinning arrow
 			fill(...color.net, fillAmount);
 			noStroke();
@@ -1758,22 +1677,17 @@ function drawSets(
 			// for each negative box
 			for (i = 0; i <= currNegBoxes.length - 1; i++) {
 				let lineWeight =
-					(currNegBoxes[i].chargeAmount / chargeDivisor) * thickScale +
-					(currPosBox.chargeAmount / chargeDivisor) * thickScale;
+					currNegBoxes[i].chargeAmount / thicknessScale +
+					boxLeft.chargeAmount / thicknessScale;
 
 				let netChargeAmount = getEField();
 
 				// net right line
 				if (i == 0) {
 					// first neg box
-					// if (
-					// 	currNegBoxes[i].x > graphC + 16 &&
-					// 	currNegBoxes[i].chargeAmount > 0
-					// ) {
 					if (currNegBoxes[i].x > graphC + 16) {
-						let lineWeight =
-							(netChargeAmount[i + 1] / chargeDivisor) * thickScale;
-						let x1 = currPosBox.x + gap; // right x
+						let lineWeight = netChargeAmount[i + 1] / thicknessScale;
+						let x1 = boxLeft.x + gap; // right x
 						let x2 = currNegBoxes[i].x + netOffsetX + 4; // left x
 
 						let y = currNegBoxes[i].y + spacing; // left y (no offset after animation)
@@ -1787,8 +1701,7 @@ function drawSets(
 				} else {
 					// in betweens
 					// calculate line weights up to now
-					let lineWeight =
-						(netChargeAmount[i + 1] / chargeDivisor) * thickScale;
+					let lineWeight = netChargeAmount[i + 1] / thicknessScale;
 					let x1 = currNegBoxes[i - 1].x + gap; // right x
 					let x2 = currNegBoxes[i].x + netOffsetX + 3; // left x
 					let y = currNegBoxes[i].y + spacing + netOffsetY; // left y
@@ -1804,8 +1717,7 @@ function drawSets(
 					totalNegCharge = float(totalNegCharge);
 
 					let lineWeight =
-						((currPosBox.chargeAmount - totalNegCharge) / chargeDivisor) *
-						thickScale;
+						(boxLeft.chargeAmount - totalNegCharge) / thicknessScale;
 
 					if (
 						currNegBoxes[i].x > graphC + 16 &&
@@ -1835,30 +1747,88 @@ function drawSets(
 		}
 		totalNegCharge = float(totalNegCharge);
 
-		let lineWeight =
-			((currPosBox.chargeAmount - totalNegCharge) / chargeDivisor) * thickScale;
+		let lineWeight = (boxLeft.chargeAmount - totalNegCharge) / thicknessScale;
 
-		let x1 = currPosBox.c - lineSize - 3; // left x
-		let x2 = currPosBox.c - gap; // right x
+		let x1 = boxLeft.c - lineSize - 3; // left x
+		let x2 = boxLeft.c - gap; // right x
 		let y = currNegBoxes[0].y + spacing; // right y
 		if (!currAnimate && !currAnimated) {
 			y += netOffsetY;
 		}
 
-		if (totalNegCharge != 0 && totalNegCharge != currPosBox.chargeAmount) {
+		if (totalNegCharge != 0 && totalNegCharge != boxLeft.chargeAmount) {
 			//  && currPoxBox
 			drawArrow(x1, x2, y, "l", "l", color.net, lineWeight, fillAmount);
 		}
 	}
 }
 
-function mousePressed() {
-	// Detect if plane is clicked
-	if (sceneCount == 1) {
-		drawScene1 = true;
+/**
+ * Draws individual arrow
+ * @param {*} x1
+ * @param {*} x2
+ * @param {*} y
+ * @param {*} arrowLoc
+ * @param {*} arrowDir
+ * @param {*} color
+ * @param {*} lineWeight
+ * @param {*} fillAmount
+ */
+function drawArrow(
+	x1,
+	x2,
+	y,
+	arrowLoc,
+	arrowDir,
+	color,
+	lineWeight,
+	fillAmount
+) {
+	// draw line + triangle together
+	strokeCap(SQUARE);
+	strokeWeight(lineWeight);
+	stroke(...color, fillAmount);
+
+	let triangleSize = 12;
+
+	if (arrowLoc == "l" && arrowDir == "l") {
+		line(x1 + triangleSize, y, x2, y);
+		fill(...color, fillAmount);
+		noStroke();
+		if (lineWeight > 0) {
+			drawTriangle(triangleSize, arrowDir, x1, y);
+		}
+	} else if (arrowLoc == "l" && arrowDir == "r") {
+		line(x1, y, x2 - triangleSize, y);
+		fill(...color, fillAmount);
+		noStroke();
+		if (lineWeight > 0) {
+			drawTriangle(triangleSize, arrowDir, x2 - 140 + triangleSize, y);
+		}
+	} else if (arrowLoc == "r" && arrowDir == "l") {
+		line(x1, y, x2 - triangleSize, y);
+		fill(...color, fillAmount);
+		noStroke();
+		if (lineWeight > 0) {
+			drawTriangle(triangleSize, arrowDir, x2 - 140, y);
+		}
+	} else if (arrowLoc == "r" && arrowDir == "r") {
+		line(x1, y, x2 - triangleSize, y);
+		fill(...color, fillAmount);
+		noStroke();
+		if (lineWeight > 0) {
+			drawTriangle(triangleSize, arrowDir, x2, y);
+		}
 	}
 }
 
+/**
+ * Helper for drawArrow, draws the triangle
+ * @param {*} size
+ * @param {*} dir
+ * @param {*} x
+ * @param {*} y
+ */
 function drawTriangle(size, dir, x, y) {
 	if (dir == "l") {
 		triangle(x, y, x + size, y - size / 1.7, x + size, y + size / 1.7);
@@ -1867,16 +1837,71 @@ function drawTriangle(size, dir, x, y) {
 	}
 }
 
+/**
+ * Calculates electric field charge
+ * @returns EF charge
+ */
+function getEField() {
+	let fieldCharges = [];
+	let pos = boxLeft.chargeAmount;
+	let neg1 = currNegBoxes[0].chargeAmount;
+	let neg2 = 0;
+	let neg3 = 0;
+
+	if (currNegBoxes[1]) {
+		neg2 = currNegBoxes[1].chargeAmount;
+	}
+
+	if (currNegBoxes[2]) {
+		neg3 = currNegBoxes[2].chargeAmount;
+	}
+
+	// left = pos - all neg
+	fieldCharges.push(pos - (neg1 + neg2 + neg3));
+	// first =  pos + neg1 + neg2 + neg 3
+	fieldCharges.push(int(pos) + int(neg1) + int(neg2) + int(neg3));
+	// second = pos - (neg 1)
+	fieldCharges.push(pos - neg1);
+	// third = pos - (neg 1 + neg 2)
+	fieldCharges.push(pos - (neg1 + neg2));
+	// last = pos - all neg
+	fieldCharges.push(pos - (neg1 + neg2 + neg3));
+
+	return fieldCharges;
+}
+
+/**
+ * For scene 1, if clicked - charges the box
+ */
+function mousePressed() {
+	// Detect if plane is clicked
+	if (scene(1)) {
+		drawScene1 = true;
+	}
+}
+
+/**
+ * For scene 2 + 3, updates charge amount
+ * @param {*} value
+ */
 function updateBoxChargeAmount(value) {
 	boxRight1.updateChargeAmount(value);
 	resetCharges();
 }
 
+/**
+ * For scene 8, updates width of volume box
+ * @param {*} value
+ */
 function updateWidth(value) {
 	boxRight1.updateW(int(value));
 	volumeWidth = boxRight1.w / 75;
 }
 
+/**
+ * Resets charges when scene changes to prevent other scene's values from transferring to current scene
+ * @param {*} box
+ */
 function resetCharges(box) {
 	if (box) {
 		populateChargeGrid(box);
@@ -1884,27 +1909,30 @@ function resetCharges(box) {
 		for (let i = 0; i < currNegBoxes.length; i++) {
 			populateChargeGrid(currNegBoxes[i]);
 		}
-		populateChargeGrid(currPosBox);
+		populateChargeGrid(boxLeft);
 	}
 }
 
+/**
+ * Reset all variables and reset each scene's specific values
+ */
 function resetScene() {
 	boxRight1.updateW(boxThickness);
 	// reset boxes
 	drawScene1 = false;
-	if (sceneCount == 1) {
+	if (scene(1)) {
 		boxLeft.updateChargeType("pos");
 		boxLeft.updateChargeAmount(60);
 	}
-	if (sceneCount == 2) {
+	if (scene(2)) {
 		boxLeft.updateChargeType("pos");
 		boxLeft.updateChargeAmount(60);
 	}
-	if (sceneCount == 3) {
+	if (scene(3)) {
 		boxLeft.updateChargeType("pos");
 		boxLeft.updateChargeAmount(60);
 	}
-	if (sceneCount == 4) {
+	if (scene(4)) {
 		//
 		boxLeft.updateChargeType("pos");
 		boxLeft.updateChargeAmount(80);
@@ -1915,7 +1943,7 @@ function resetScene() {
 		boxRight1.updateArrowOffsetY(14);
 		boxRight1.updateX(400);
 	}
-	if (sceneCount == 5) {
+	if (scene(5)) {
 		//
 		boxLeft.updateChargeType("pos");
 		boxLeft.updateChargeAmount(80);
@@ -1927,7 +1955,7 @@ function resetScene() {
 		boxRight1.updateX(400);
 	}
 
-	if (sceneCount == 6) {
+	if (scene(6)) {
 		//
 		boxLeft.updateChargeType("pos");
 		boxLeft.updateChargeAmount(80);
@@ -1946,7 +1974,7 @@ function resetScene() {
 		boxRight2.updateShowBox(false);
 	}
 
-	if (sceneCount == 7) {
+	if (scene(7)) {
 		//
 		boxLeft.updateChargeType("pos");
 		boxLeft.updateChargeAmount(80);
@@ -1969,7 +1997,7 @@ function resetScene() {
 		boxRight3.updateArrowOffsetY(offsetY * 3);
 		boxRight3.updateX(310 + boxPadding * 3);
 	}
-	if (sceneCount == 8) {
+	if (scene(8)) {
 		//
 		boxLeft.updateChargeType("pos");
 		boxLeft.updateChargeAmount(80);
@@ -1991,8 +2019,8 @@ function resetScene() {
 	resetHTML(".netLabel", "display", "none");
 	resetHTML(".showScreen", "textContent", "Show Screening");
 
-	document.getElementById("flow").value = 40;
-	document.getElementById("widthSlider").value = 75;
+	qs("#flow").value = 40;
+	qs("#widthSlider").value = 75;
 
 	animate.scene4 = false;
 	animated.scene4 = false;
@@ -2003,24 +2031,30 @@ function resetScene() {
 	showPosArrows = true;
 	showNegArrows = true;
 
-	if (sceneCount == 4 || sceneCount == 5) {
+	if (scene(4) || scene(5)) {
 		showNetArrows = false;
 	}
 }
 
+/**
+ * Reset all checkboxes and button/text content
+ * @param {*} selector
+ * @param {*} type
+ * @param {*} value
+ */
 function resetHTML(selector, type, value) {
 	if (type == "checked") {
-		const selected = document.querySelectorAll(selector);
+		const selected = qsa(selector);
 		selected.forEach((control) => {
 			control.checked = value;
 		});
 	} else if (type == "display") {
-		const selected = document.querySelectorAll(selector);
+		const selected = qsa(selector);
 		selected.forEach((control) => {
 			control.style.display = value;
 		});
 	} else if (type == "textContent") {
-		const selected = document.querySelectorAll(selector);
+		const selected = qsa(selector);
 		selected.forEach((control) => {
 			control.textContent = value;
 		});
