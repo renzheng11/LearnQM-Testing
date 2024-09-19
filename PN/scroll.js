@@ -26,15 +26,6 @@ let StartScroll = () => {
 
 				setConcentration(1);
 
-				array_positive_y_0 = [];
-				array_negative_y_0 = [];
-				array_plot_0 = [];
-				for (var i = 0; i < point_count; i++) {
-					array_plot[i] = [];
-					array_positive_y[i] = [];
-					array_negative_y[i] = [];
-				}
-
 				d3bands_0();
 			} else {
 				sceneCount = 0;
@@ -43,7 +34,7 @@ let StartScroll = () => {
 		})
 		.addTo(controller);
 
-	let scene_1_5 = new ScrollMagic.Scene({
+	let scene_1 = new ScrollMagic.Scene({
 		triggerElement: "#scene_1_5",
 	})
 		.setClassToggle("#scene_1_5", "fade-in")
@@ -53,7 +44,7 @@ let StartScroll = () => {
 				opening = 1;
 
 				sceneCount = 1;
-				add_h(130);
+				addInitialCharges(130);
 				setVelocity(9);
 				setDistance(9);
 				setScattering(20);
@@ -63,32 +54,6 @@ let StartScroll = () => {
 				factor_new = 0.3;
 
 				switch_1 = 2; //both
-
-				array_positive_y_0 = [];
-				array_negative_y_0 = [];
-				array_plot_0 = [];
-
-				array_positive_y_0_e = [];
-				array_negative_y_0_e = [];
-				array_plot_e_0 = [];
-
-				array_positive_y_0_h = [];
-				array_negative_y_0_h = [];
-				array_plot_h_0 = [];
-
-				for (var i = 0; i < point_count; i++) {
-					array_plot[i] = [];
-					array_positive_y[i] = [];
-					array_negative_y[i] = [];
-
-					array_plot_e[i] = [];
-					array_positive_y_e[i] = [];
-					array_negative_y_e[i] = [];
-
-					array_plot_h[i] = [];
-					array_positive_y_h[i] = [];
-					array_negative_y_h[i] = [];
-				}
 
 				constant_fermi =
 					Math.round(((1000 * -0.28 * 0.026) / 300) * constant_temperature) /
@@ -117,7 +82,7 @@ let StartScroll = () => {
 
 				sceneCount = 2;
 
-				add_h(130);
+				addInitialCharges(130);
 
 				setScattering(20);
 				document.getElementById("slider_61").value = 130;
@@ -129,34 +94,6 @@ let StartScroll = () => {
 
 				switch_1 = 2; //both
 
-				array_positive_y_0 = [];
-				array_negative_y_0 = [];
-				array_plot_0 = [];
-
-				array_positive_y_0_e = [];
-				array_negative_y_0_e = [];
-				array_plot_e_0 = [];
-
-				array_positive_y_0_h = [];
-				array_negative_y_0_h = [];
-				array_plot_h_0 = [];
-
-				for (var i = 0; i < point_count; i++) {
-					array_plot[i] = [];
-					array_positive_y[i] = [];
-					array_negative_y[i] = [];
-
-					array_plot_e[i] = [];
-					array_positive_y_e[i] = [];
-					array_negative_y_e[i] = [];
-
-					array_plot_h[i] = [];
-					array_positive_y_h[i] = [];
-					array_negative_y_h[i] = [];
-				}
-				// constant_fermi = Math.round(1000*-0.28*0.026)/1000
-				// console.log(constant_fermi)
-				// console.log(constant_temperature)
 				constant_fermi =
 					Math.round(((1000 * -0.28 * 0.026) / 300) * constant_temperature) /
 					1000;
@@ -172,31 +109,6 @@ let StartScroll = () => {
 
 				document.getElementById("slider_6").value = 130;
 
-				array_positive_y_0 = [];
-				array_negative_y_0 = [];
-				array_plot_0 = [];
-
-				array_positive_y_0_e = [];
-				array_negative_y_0_e = [];
-				array_plot_e_0 = [];
-
-				array_positive_y_0_h = [];
-				array_negative_y_0_h = [];
-				array_plot_h_0 = [];
-
-				for (var i = 0; i < point_count; i++) {
-					array_plot[i] = [];
-					array_positive_y[i] = [];
-					array_negative_y[i] = [];
-
-					array_plot_e[i] = [];
-					array_positive_y_e[i] = [];
-					array_negative_y_e[i] = [];
-
-					array_plot_h[i] = [];
-					array_positive_y_h[i] = [];
-					array_negative_y_h[i] = [];
-				}
 				resetScene();
 			}
 		})
@@ -219,36 +131,10 @@ let StartScroll = () => {
 				hole_add = 0;
 
 				apply_V_p(0);
-				add_h(130);
+				addInitialCharges(130);
 				setScattering(20);
 
 				switch_1 = 2; //both
-
-				array_positive_y_0 = [];
-				array_negative_y_0 = [];
-				array_plot_0 = [];
-
-				array_positive_y_0_e = [];
-				array_negative_y_0_e = [];
-				array_plot_e_0 = [];
-
-				array_positive_y_0_h = [];
-				array_negative_y_0_h = [];
-				array_plot_h_0 = [];
-
-				for (var i = 0; i < point_count; i++) {
-					array_plot[i] = [];
-					array_positive_y[i] = [];
-					array_negative_y[i] = [];
-
-					array_plot_e[i] = [];
-					array_positive_y_e[i] = [];
-					array_negative_y_e[i] = [];
-
-					array_plot_h[i] = [];
-					array_positive_y_h[i] = [];
-					array_negative_y_h[i] = [];
-				}
 				constant_fermi =
 					Math.round(((1000 * -0.28 * 0.026) / 300) * constant_temperature) /
 					1000;
@@ -262,7 +148,6 @@ let StartScroll = () => {
 
 				setScattering(1);
 				setConcentration(1);
-				setVelocity(1);
 				setVelocity(9);
 				document.getElementById("slider_61").value = 130;
 				document.getElementById("v_p").value = 0;
@@ -270,7 +155,7 @@ let StartScroll = () => {
 				apply_V_p(0);
 				concentration = 50 / 3;
 
-				add_h(130);
+				addInitialCharges(130);
 
 				resetScene();
 			}

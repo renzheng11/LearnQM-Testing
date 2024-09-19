@@ -51,14 +51,14 @@
     </div>
     <div class="row sub-atomic-particle-row" id="scene_1_5">
       <div class="col-lg-4">
-        <h1>P-N Junction</h1>
+        <h1>p-n junction</h1>
       
         <p>
        Imagine we magically connect P-type and N-type pieces of Si together. Let's see what happens.
         </p>
-        <p>Doping Concentration (per cm<sup>3</sup>):  <output type="text" id = "addInitialCharges" val = "Math.round(addInitialCharges(this.value))"> </p>
+        <p>Doping Concentration (per cm<sup>3</sup>):  <output type="text" id = "addInitialCharges" val = "Math.round(add_h(this.value))"> </p>
           <input style="width: 100%;" type="range" min="130" max="133" value="130" step = "1" id = "slider_6"
-          onchange="addInitialCharges(this.value)" >
+          onchange="reset_scene1()" >
           <div class="sliderticks">
             <div>
               <p>5x10<sub>13</sub></p>
@@ -87,9 +87,11 @@
         </p>
 
 
-        <p>Doping Concentration (per cm<sup>3</sup>):  <output type="text" id = "addInitialCharges_scene2" val = "Math.round(addInitialCharges(this.value))"> </p>
+        <p>Donor Density (per cm<sup>3</sup>):  <output type="text" id = "add_h_text" val = "Math.round(add_h(this.value))"> </p>
+
+        <p>Doping Concentration (per cm<sup>3</sup>):  <output type="text" id = "add_h_text" val = "Math.round(add_h(this.value))"> </p>
           <input style="width: 100%;" type="range" min="130" max="133" value="130" step = "0.5" id = "slider_61"
-          onchange="addInitialCharges(this.value)" >
+          onchange="add_h(this.value)" >
           <div class="sliderticks">
             <div>
               <p>5x10<sub>13</sub></p>
@@ -99,7 +101,7 @@
             </div>
           </div>
 
-          <p>Applied Voltage (V) <output type="text" id = "" val = "Math.round(addInitialCharges(this.value))"> </p>
+          <p>Applied Voltage (V) <output type="text" id = "" val = "Math.round(add_h(this.value))"> </p>
             <input style="width: 100%;" type="range" min="-80" max="16" value="0" step = "1" id = "v_p"
             onchange="apply_V_p(this.value)" >
             <div class="sliderticks">
@@ -137,9 +139,9 @@
        Minority carrier concentration changes by many orders of magnitude depending on the applied voltage. Play with the applied voltage and see if you can qualitatively explain the trends you observe.
         </p>
 
-        <p>Doping Concentration (per cm<sup>3</sup>):  <output type="text" id = "addInitialCharges_scene3" val = "Math.round(addInitialCharges(this.value))"> </p>
+        <p>Doping Concentration (per cm<sup>3</sup>):  <output type="text" id = "addInitialCharges_3" val = "Math.round(add_h(this.value))"> </p>
           <input style="width: 100%;" type="range" min="130" max="133" value="130" step = "0.5" id = "slider_611"
-          onchange="addInitialCharges(this.value)" >
+          onchange="add_h(this.value)" >
           <div class="sliderticks">
             <div>
               <p>5x10<sub>13</sub></p>
@@ -149,7 +151,7 @@
             </div>
           </div>
 
-          <p>Applied Voltage (V) <output type="text" id = "" val = "Math.round(addInitialCharges(this.value))"> </p>
+          <p>Applied Voltage (V) <output type="text" id = "" val = "Math.round(add_h(this.value))"> </p>
             <input style="width: 100%;" type="range" min="-80" max="16" value="0" step = "1" id = "v_p_2"
             onchange="apply_V_p(this.value)" >
             <div class="sliderticks">
