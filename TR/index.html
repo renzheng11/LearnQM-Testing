@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Capacitors</title>
+		<link href="./style.css" rel="stylesheet" />
+		<link
+			href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+			rel="stylesheet"
+		/>
+		<link
+			href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@400;700&display=swap"
+			rel="stylesheet"
+		/>
+
+		<script
+			defer
+			src="https://cdn.jsdelivr.net/npm/p5@1.0.0/lib/p5.js"
+		></script>
+		<script
+			defer
+			src="//cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.7/ScrollMagic.min.js"
+		></script>
+		<script
+			defer
+			src="//cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.7/plugins/debug.addIndicators.min.js"
+		></script>
+		<script
+			defer
+			src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.15.1/d3.min.js"
+		></script>
+		<script
+			defer
+			src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
+		></script>
+
+		<script defer src="./tools.js"></script>
+		<script defer src="./scroll.js"></script>
+		<script defer src="./sketch.js"></script>
+	</head>
+
+	<body id="body_parent" onload="StartScroll()">
+		<!-- <a href="../index.html"><img id="back-icon" src="../images/arrow-left.svg" /></a> -->
+		<div class="container">
+			<div class="row title">
+				<h1 class="col-lg-12">MOS Transistors</h1>
+				<div class="col-lg-1"></div>
+				<p class="col-lg-10">Introduction paragraph</p>
+				<div class="col-lg-1"></div>
+			</div>
+			<div class="row row1" id="scene1">
+				<div class="col-lg-4">
+					<h1>Scene 1 Title</h1>
+
+					<p>Prompt</p>
+					<button class="button xxButton" type="button" onclick="">
+						Button
+					</button>
+				</div>
+			</div>
+
+			<div class="row row2" id="scene2">
+				<div class="col-lg-4">
+					<h1>Scene 2</h1>
+					<p>Prompt</p>
+
+					<input class="xxSlider" type="range" list="tickmarks" onchange="" />
+
+					<datalist>
+						<option value="0" label="x"></option>
+						<option value="100" label="x"></option>
+					</datalist>
+					<label for="xxSlider" class="labels">Charge Q</label>
+					<br /><br />
+					<button class="button xxButton" type="button" onclick="">
+						Button
+					</button>
+				</div>
+			</div>
+
+			<div class="row row3" id="scene3">
+				<div class="col-lg-4">
+					<h1>Scene 3</h1>
+					<p>Paragraph</p>
+
+					<input class="xxSlider" type="range" list="tickmarks" onchange="" />
+
+					<datalist>
+						<option value="0" label="x"></option>
+						<option value="100" label="x"></option>
+					</datalist>
+					<label for="xxSlider" class="labels">Charge Q</label>
+					<br /><br />
+
+					<br /><br />
+					<button class="button xxButton" type="button" onclick="">
+						Apply Charge
+					</button>
+				</div>
+			</div>
+			<div class="row row4" id="scene4">
+				<div class="col-lg-4">
+					<h1>Scene 4</h1>
+
+					<p>
+						paragraph
+
+						<br /><br />
+
+						<input class="xxSlider" type="range" list="tickmarks" onchange="" />
+
+						<datalist>
+							<option value="0" label="x"></option>
+							<option value="100" label="x"></option>
+						</datalist>
+						<label for="xxSlider" class="labels"> Label </label>
+						<br /><br />
+						<br /><br />
+
+						<button class="button xxButton" type="button" onclick="">
+							Button
+						</button>
+					</p>
+				</div>
+			</div>
+			<div class="row row5" id="scene5">
+				<div class="col-lg-4">
+					<h1>Scene 5</h1>
+					<p>Paragraph</p>
+
+					<button class="button chargeButton5" type="button" onclick="">
+						Button
+					</button>
+				</div>
+			</div>
+			<div id="visualization"></div>
+		</div>
+	</body>
+</html>

@@ -1,4 +1,4 @@
-class Vehicle {
+class Charge {
 	constructor(x, y, diameter, id, color) {
 		this.x = x;
 		this.y = y;
@@ -31,7 +31,7 @@ class Vehicle {
 		this.swap = 0;
 		this.dead = 0;
 		this.box = 0;
-		this.vehicleCreated = false; // add a flag variable
+		this.chargeCreated = false; // add a flag variable
 		this.origin = createVector(0, 0);
 		this.near_index = 0;
 		this.within = 0;
@@ -49,25 +49,12 @@ class Vehicle {
 	checkProperties() {
 		// Check if the top is 1 and origin is {x: 0, y: 0}
 		if (this.top == 1 && V_applied_p <= 0) {
-			// if (this.color == 0){    //electron
-			//      console.log(this.position.x)}
-
 			if (this.color == 0) {
 				if (this.position.x < (550 + (400 / 8) * count_pn_num) * s_x) {
 					this.show = 0;
 				}
 				this.origin.x = 0;
 				this.origin.y = 0;
-				console.log("The conditions are met for a vehicle instance.");
-				// }
-
-				//electron && (this.position.x>(550+(400)/8*count_pn_num)*s_x)
-				//&& this.x>700*s_x
-				//electron
-
-				// this.show = 0
-
-				// this.direction.x = 10
 				// console.log("The conditions are met for a vehicle instance.");
 			} else if (this.color == 1) {
 				//electron
@@ -77,19 +64,7 @@ class Vehicle {
 				}
 				this.origin.x = 0;
 				this.origin.y = 0;
-				//  console.log(this.x)
-				//  this.direction.x = -10
-				//  console.log("The conditions are met for a vehicle instance.");
 			}
-			// if（this.color ==0 && this.x>700*s_x ) {
-
-			// } else if (this.color ==1 && this.x<300*s_x){
-
-			// this.origin.x = 0
-			// this.origin.y = 0
-			// console.log("The conditions are met for a vehicle instance.");
-			// }
-			// Additional code here if conditions are met
 		}
 	}
 
@@ -204,7 +179,7 @@ class Vehicle {
 					//yellow
 					ellipse(
 						this.position.x,
-						(-array_band2[99] +
+						(-electronBand[99] +
 							array_band_hardcode[99] +
 							72 -
 							array_band_hardcode[99] -
@@ -214,43 +189,29 @@ class Vehicle {
 					);
 
 					this.position2.y =
-						(-array_band2[99] +
+						(-electronBand[99] +
 							array_band_hardcode[99] +
 							72 -
 							array_band_hardcode[99] -
 							this.botz * 8.8 * 0.2 * changeV) *
 						s_y;
 
-					// this.position2.y=(-array_band2[99]+array_band_hardcode[99]+72-array_band_hardcode[99]-this.botz*this.botz*(8.8)*0.3)*s_y
 					this.position2.x = this.position.x;
 				} else {
 					if (this.straight == 0) {
-						// console.log(this.origin.x)
-
 						fill(254, 246, 182, 100);
 						stroke(254, 246, 182, 100);
 						ellipse(this.position.x, this.origin.x - 4, 5);
-						// ellipse(this.position.x,((this.origin.x-line_yellow[99][1])-array_band2[99]+72-this.botz*this.botz*(8.8)*0.2)*s_y,5)
 
 						this.position2.y = this.origin.x - 4;
-						// this.position2.y=((this.origin.x-line_yellow[99][1])-array_band2[99]+72-this.botz*this.botz*(8.8)*0.2)*s_y
 
 						this.position2.x = this.position.x;
-
-						// ellipse(this.position.x,((-array_band2[99])+(this.origin.x-line_yellow[99][1])+72)*s_y,15)
-
-						// ellipse(this.position.x,(-array_band2[99]+array_band_hardcode[99]+72-array_band_hardcode[99]-this.botz*this.botz*(8.8)*0.3)*s_y,5)
-
-						// console.log(this.origin.x)
 					} else {
 						fill(254, 246, 182, 100);
 						stroke(254, 246, 182, 100);
-						ellipse(this.position.x, line_yellow_data[0].y - 4, 5);
-						// ellipse(this.position.x,((this.origin.x-line_yellow[99][1])-array_band2[99]+72-this.botz*this.botz*(8.8)*0.2)*s_y,5)
+						ellipse(this.position.x, electronLineData[0].y - 4, 5);
 
 						this.position2.y = this.origin.x - 4;
-						// this.position2.y=((this.origin.x-line_yellow[99][1])-array_band2[99]+72-this.botz*this.botz*(8.8)*0.2)*s_y
-
 						this.position2.x = this.position.x;
 					}
 				}
@@ -261,11 +222,11 @@ class Vehicle {
 
 				let k = 0;
 				let s = 0;
-				if (sceneCount == 2 || sceneCount == 3) {
+				if (scene(2) || scene(3)) {
 					k = -30;
 				}
 
-				if (sceneCount == 1.5) {
+				if (scene(1)) {
 					s = 0;
 				}
 
@@ -273,7 +234,6 @@ class Vehicle {
 					noFill();
 					stroke(125, 241, 148, 100); //green
 					strokeWeight(1);
-					// ellipse(this.position.x,(-3+(k+144)*s_y+this.botz*this.botz*(8.8)*0.2)*s_y,5)
 
 					//dense area
 
@@ -284,30 +244,16 @@ class Vehicle {
 						5
 					);
 
-					// this.position2.y=(-3+(k+144)*s_y+this.botz*this.botz*(8.8)*0.2)*s_y
-
 					this.position2.y = (s + 111 + this.botz * 8.8 * 0.2 * changeV) * s_y;
 
 					this.position2.x = this.position.x;
-
-					// console.log(this.position.x)
 				} else {
 					if (this.straight == 0) {
 						noFill();
 						stroke(125, 241, 148, 100); //green
 						strokeWeight(1);
 
-						//old
-						// ellipse(this.position.x,(-3+(this.origin.y-155.7)+(k+144+16)*s_y+this.botz*this.botz*(8.8)*0.2)*s_y,5)
-
-						// console.log (this.origin)
-						//new test
 						ellipse(this.position.x, this.origin.y + 4 - 30 * s_y, 5);
-						// ellipse(this.position.x,((s+this.origin.y+111-line_green[0][1]-array_band2[0])+this.botz*this.botz*(8.8)*0.2)*s_y,5)
-
-						// ellipse(this.position.x,((this.origin.x-line_yellow[99][1])-array_band2[99]+array_band_hardcode[99]+75-array_band_hardcode[99]-this.botz*(-array_band_hardcode[99]-array_band_hardcode[0])*0.3)*s_y,5)
-
-						// this.position2.y=(-3+(this.origin.y-155.7)+(k+144+16)+this.botz*this.botz*(8.8)*0.2)*s_y
 
 						this.position2.y = this.origin.y + 4 - 30 * s_y;
 
@@ -317,20 +263,8 @@ class Vehicle {
 						stroke(125, 241, 148, 100); //green
 						strokeWeight(1);
 
-						//old
-						// ellipse(this.position.x,(-3+(this.origin.y-155.7)+(k+144+16)*s_y+this.botz*this.botz*(8.8)*0.2)*s_y,5)
-
-						// console.log (this.origin)
-						//new test
-						ellipse(this.position.x, line_green_data[99].y + 4, 5);
-						// ellipse(this.position.x,((s+this.origin.y+111-line_green[0][1]-array_band2[0])+this.botz*this.botz*(8.8)*0.2)*s_y,5)
-
-						// ellipse(this.position.x,((this.origin.x-line_yellow[99][1])-array_band2[99]+array_band_hardcode[99]+75-array_band_hardcode[99]-this.botz*(-array_band_hardcode[99]-array_band_hardcode[0])*0.3)*s_y,5)
-
-						// this.position2.y=(-3+(this.origin.y-155.7)+(k+144+16)+this.botz*this.botz*(8.8)*0.2)*s_y
-
+						ellipse(this.position.x, holeLineData[99].y + 4, 5);
 						this.position2.y = this.origin.y + 4 - 30 * s_y;
-
 						this.position2.x = this.position.x;
 					}
 				}
@@ -366,9 +300,6 @@ class Vehicle {
 	}
 
 	straight_walk() {
-		// let uPOS = p5.Vector.mult(this.direction, this.movingVelocity);
-		// this.position.add(uPOS);
-
 		try {
 			let uPOS = p5.Vector.mult(this.direction, this.movingVelocity);
 			this.position.add(uPOS);
@@ -383,73 +314,16 @@ class Vehicle {
 	}
 
 	random_walk() {
-		// if (this.straight ==1) {
-
-		// if (this.color == 0) {
-		//     this.movingVelocity = this.botz*5*parseInt(5)/5*3
-		//     if (scatter_tf == false) {
-		//         //if false no scatter
-		//                 } else {this.direction = createVector(-1, random(-1,1));}
-
-		//                 if (this.position.x < (90+70)*s_x) {this.direction.x = 1;}
-
-		//                 if ((this.position.x > 940*s_x)&& (opening ==1)) {this.direction.x = 10;}
-
-		//                 if ((this.position.x > 940*s_x) && (opening == 0)) {this.direction.x = -1;}
-		//                 if (this.position.y < (20+385)*s_y) {this.direction.y = 1;}
-		//                 if (this.position.y > 770*s_y) {this.direction.y = -1;}
-
-		// } else if (this.color == 1){
-		//     this.movingVelocity = this.botz*5*parseInt(5)/5*3
-		//     if (scatter_tf == false) {
-		//         //if false no scatter
-		//                 } else {this.direction = createVector(1, random(-1,1));}
-
-		//                 if (this.position.x < (90+70)*s_x) {this.direction.x = 1;}
-
-		//                 if ((this.position.x > 940*s_x)&& (opening ==1)) {this.direction.x = 10;}
-
-		//                 if ((this.position.x > 940*s_x) && (opening == 0)) {this.direction.x = -1;}
-		//                 if (this.position.y < (20+385)*s_y) {this.direction.y = 1;}
-		//                 if (this.position.y > 770*s_y) {this.direction.y = -1;}
-
-		// }
-
-		// }else {
-
-		// scattering_velocity = 5;
 		this.movingVelocity = (this.botz * 5 * parseInt(scattering_velocity)) / 5;
-		// console.log (this.movingVelocity);
-		// console.log("debut")
 
 		if (this.botz == 4 || this.botz == 5) {
 			this.movingVelocity =
 				(4 * this.botz * 5 * parseInt(scattering_velocity)) / 5;
 			this.direction.y = this.direction.y * 0.1;
-
-			// if (this.id =="h"){
-			//     if (this.velocity.x >0){
-			//         this.velocity = createVector(this.velocity.x*5,this.velocity.y)
-			//     }else {
-			//         this.velocity = createVector(this.velocity.x*0.2,this.velocity.y)
-			//     }
-
-			//     console.log(this.velocity)
-			// }
-			// if (this.id =="e"){
-			//     if (this.velocity.x >0){
-			//         this.velocity = createVector(this.velocity.x*0.2,this.velocity.y)
-			//     }else {
-			//         this.velocity = createVector(this.velocity.x*5,this.velocity.y)
-			//     }
-
-			//     console.log(this.velocity)
-			// }
 		}
 
 		if (isNaN(this.movingVelocity)) {
 			this.movingVelocity = 0;
-			// console.log("??????");
 		}
 
 		try {
@@ -459,28 +333,22 @@ class Vehicle {
 			//
 			this.position.add(createVector(0, 0));
 		}
-		// let uPOS = p5.Vector.mult(this.direction, this.movingVelocity);
-		// this.position.add(uPOS);
 
-		// if object needs to accelerate, adjust the direction accordingly
-		// if (this.id === 'e' || this.id === 'h') {
 		this.accelerate(); // accelerate() will update this.velocity
 
 		this.position.add(this.velocity); // add the effect of acceleration to position
-		// console.log("nnn")
 		// }
 
 		const r = floor(random(10));
 		const r2 = floor(random(10));
 
-		if (sceneCount == 1.5 || sceneCount == 2 || sceneCount == 3) {
+		if (scene(1) || scene(2) || scene(3)) {
 			if (
 				this.position.x > (550 - (400 / 8) * count_pn_num) * s_x &&
 				this.position.x <
 					(550 - (400 / 8) * count_pn_num + (400 / 8) * count_pn_num * 2) * s_x
 			) {
 				this.within = 1;
-				// console.log (this.position.x)
 				// ellipse(this.position.x, this.position.y, 30);
 			} else {
 				this.within = 0;
@@ -493,26 +361,24 @@ class Vehicle {
 				this.direction = createVector(random(-1, 1), random(-1, 1));
 			}
 
-			//   } else if (floor(this.position.x) % r == 0 && floor(this.position.y) % r2 ==0) {this.direction = createVector(random(-1,1), random(-1,1));}
-			// if (this.position.x < (90+70)*s_x) {this.direction.x = 1;}
 			if (this.position.x > 940 * s_x && opening == 1 && this.straight == 0) {
 				this.direction.x = 10;
 				this.show = 0;
-				if (this.id == "e" && !this.vehicleCreated) {
+				if (this.id == "e" && !this.chargeCreated) {
 					// holeArray.push(new Vehicle(160*s_x, 600*s_y, 10, "h", 1));
-					var vehicle = new Vehicle(
+					var newCharge = new Charge(
 						950 * s_x,
 						random(400, 760) * s_y,
 						10,
 						"e",
 						0
 					);
-					vehicle.direction = createVector(-1, random(-1, 1));
-					vehicle.movingVelocity = this.movingVelocity;
-					vehicle.velocity = createVector(-10, 0);
-					vehicle.botz = this.botz;
-					oldElectronArray.push(vehicle);
-					this.vehicleCreated = true;
+					newCharge.direction = createVector(-1, random(-1, 1));
+					newCharge.movingVelocity = this.movingVelocity;
+					newCharge.velocity = createVector(-10, 0);
+					newCharge.botz = this.botz;
+					generatedElectrons.push(newCharge);
+					this.chargeCreated = true;
 				}
 			}
 
@@ -524,21 +390,20 @@ class Vehicle {
 			if (this.position.x < 150 * s_x && opening == 1 && this.straight == 0) {
 				this.direction.x = -10;
 				this.show = 0;
-				if (this.id == "h" && !this.vehicleCreated) {
-					// holeArray.push(new Vehicle(160*s_x, 600*s_y, 10, "h", 1));
-					var vehicle = new Vehicle(
+				if (this.id == "h" && !this.chargeCreated) {
+					var newCharge = new Charge(
 						140 * s_x,
 						random(400, 760) * s_y,
 						10,
 						"h",
 						1
 					);
-					vehicle.direction = createVector(1, random(-1, 1));
-					vehicle.movingVelocity = this.movingVelocity;
-					vehicle.velocity = createVector(10, 0);
-					vehicle.botz = this.botz;
-					oldHoleArray.push(vehicle);
-					this.vehicleCreated = true;
+					newCharge.direction = createVector(1, random(-1, 1));
+					newCharge.movingVelocity = this.movingVelocity;
+					newCharge.velocity = createVector(10, 0);
+					newCharge.botz = this.botz;
+					generatedHoles.push(newCharge);
+					this.chargeCreated = true;
 				}
 			}
 
@@ -557,41 +422,37 @@ class Vehicle {
 				this.direction.y = -1;
 			}
 
-			if (sceneCount == 2 || sceneCount == 3) {
+			if (scene(2) || scene(3)) {
 				if (this.color == 0) {
 					//electron
 					let smallestDifference = Math.abs(
-						line_yellow_data[0].y - this.position2.y
+						electronLineData[0].y - this.position2.y
 					);
 
-					for (let i = 0; i < line_yellow_data.length; i++) {
-						let difference = Math.abs(line_yellow_data[i].y - this.position2.y);
+					for (let i = 0; i < electronLineData.length; i++) {
+						let difference = Math.abs(electronLineData[i].y - this.position2.y);
 
 						if (difference < smallestDifference) {
 							smallestDifference = difference;
 							this.near_index = i;
-							// console.log(vehicle.near_index)
 						}
 					}
 				}
 				if (this.color == 1) {
 					//hole
 					let smallestDifference = Math.abs(
-						line_green_data[0].y - this.position2.y
+						holeLineData[0].y - this.position2.y
 					);
 
-					for (let i = 0; i < line_green_data.length; i++) {
-						let difference = Math.abs(line_green_data[i].y - this.position2.y);
+					for (let i = 0; i < holeLineData.length; i++) {
+						let difference = Math.abs(holeLineData[i].y - this.position2.y);
 
 						if (difference < smallestDifference) {
 							smallestDifference = difference;
 							this.near_index = i;
 						}
 					}
-					// console.log(this.near_index)
 				}
-
-				// if (this.botz <3) {
 
 				// Utility functions
 				function lerp(start, end, t) {
@@ -599,13 +460,12 @@ class Vehicle {
 				}
 
 				//wrong
-				// console.log(line_green_data[this.near_index].x-E_gap_factor)
 				try {
 					if (this.near_index < 60) {
 						if (
 							this.color == 1 &&
 							this.position2.x >=
-								line_green_data[this.near_index].x - E_gap_factor - 10
+								holeLineData[this.near_index].x - E_gap_factor - 10
 						) {
 							// {this.direction.x = -2; }
 
@@ -613,7 +473,6 @@ class Vehicle {
 								// Increment elapsed time
 								this.elapsedTime++;
 
-								// console.log(this.direction.x)
 								// Calculate delta
 								let delta = this.elapsedTime / this.transitionTime;
 
@@ -624,44 +483,28 @@ class Vehicle {
 								this.direction.x = -2;
 							}
 						}
-						// {this.position.x = 30; console.log(this.near_index + "??????")}
 					}
-					//hole
-				} catch (error) {
-					//
-				}
+				} catch (error) {}
 
 				try {
-					// if (this.near_index<50)  {
-
 					if (
 						this.color == 0 &&
 						this.position2.x <=
-							line_yellow_data[this.near_index].x + E_gap_factor + 10
+							electronLineData[this.near_index].x + E_gap_factor + 10
 					) {
 						this.direction.x = 2;
 					}
-
-					// }
-
-					//elecctron
 				} catch (error) {
 					//
 				}
-
-				// }
-
-				// else {
-				//     console.log ("hi")
-				// }
-			} else if (sceneCount == 1.5) {
+			} else if (scene(1)) {
 				if (this.color == 0) {
 					let smallestDifference = Math.abs(
-						line_yellow_data[0].y - this.position2.y
+						electronLineData[0].y - this.position2.y
 					);
 
 					for (let i = 99; i >= 0; i--) {
-						let difference = Math.abs(line_yellow_data[i].y - this.position2.y);
+						let difference = Math.abs(electronLineData[i].y - this.position2.y);
 
 						if (difference < smallestDifference) {
 							smallestDifference = difference;
@@ -671,26 +514,18 @@ class Vehicle {
 				}
 				if (this.color == 1) {
 					let smallestDifference = Math.abs(
-						line_green_data[0].y - this.position2.y
+						holeLineData[0].y - this.position2.y
 					);
 
 					for (let i = 99; i >= 0; i--) {
-						let difference = Math.abs(line_green_data[i].y - this.position2.y);
+						let difference = Math.abs(holeLineData[i].y - this.position2.y);
 
 						if (difference < smallestDifference) {
 							smallestDifference = difference;
 							this.near_index = i;
-							//   console.log(this.near_index)
 						}
 					}
-					// console.log(this.near_index)
 				}
-
-				// if (this.color ==0 && this.position2.x <= (line_yellow_data[this.near_index].x+E_gap_factor )) {this.direction.x = 2;}
-
-				// //wrong
-				// // console.log(line_green_data[this.near_index].x-E_gap_factor)
-				// if (this.color ==1 && this.position2.x >= (line_green_data[this.near_index].x-E_gap_factor)) {this.direction.x = -2; }
 
 				function lerp(start, end, t) {
 					return start * (1 - t) + end * t;
@@ -700,36 +535,12 @@ class Vehicle {
 					if (
 						this.color == 1 &&
 						this.position2.x >=
-							line_green_data[this.near_index].x - E_gap_factor - 10
+							holeLineData[this.near_index].x - E_gap_factor - 10
 					) {
 						this.direction.x = -2;
 					} else if (this.color == 1 && this.straight == 1) {
 						this.direction.x = 3;
 					}
-
-					// // if (this.near_index<60)  {
-					// if (this.color ==1 && (this.position2.x) > (line_green_data[this.near_index].x-E_gap_factor))
-					// // {this.direction.x = -2; }
-					// {
-					//     if (this.elapsedTime < this.transitionTime) {
-					//         // Increment elapsed time
-					//         this.elapsedTime++;
-
-					//         // console.log(this.direction.x)
-					//         // Calculate delta
-					//         let delta = this.elapsedTime / this.transitionTime;
-
-					//         // Update direction.x with lerp
-					//         this.direction.x = lerp(0, -2, delta);
-					//     } else {
-					//         // After the transition, make sure direction.x stays at -2
-					//         // this.direction.x = -2;
-					//     }
-					// }
-					// {this.position.x = 30; console.log(this.near_index + "??????")}
-
-					// }
-					//hole
 				} catch (error) {
 					//
 				}
@@ -740,7 +551,7 @@ class Vehicle {
 					if (
 						this.color == 0 &&
 						this.position2.x <=
-							line_yellow_data[this.near_index].x + E_gap_factor + 10
+							electronLineData[this.near_index].x + E_gap_factor + 10
 					) {
 						this.direction.x = 2;
 					} else if (this.color == 0 && this.straight == 1) {
@@ -754,45 +565,6 @@ class Vehicle {
 					//
 				}
 			}
-
-			//  // Finding the nearest y-value to this.position2.y in line_yellow_data
-			//  let nearestIndex = 0;
-			//  let smallestDifference = Math.abs(line_yellow_data[0].y - this.position2.y);
-
-			//  this.position2.y=(-array_band2[99]+array_band_hardcode[99]+72-array_band_hardcode[99]-this.botz*this.botz*(8.8)*0.6)*s_y
-			//  this.position2.x=this.position.x
-
-			//  for (let i = 0; i < line_yellow_data.length; i++) {
-			//      let difference = Math.abs(line_yellow_data[i].y - this.position2.y);
-			//     //  console.log(line_yellow_data[i].y)
-			//     //  console.log(this.position2.y)
-			//     //  console.log("new")
-			//      if (difference < smallestDifference) {
-			//          smallestDifference = difference;
-			//          nearestIndex = i;
-			//         //  console.log(nearestIndex)
-
-			//      }
-			//  }
-
-			// //  console.log("new")
-			// //  console.log(this.position.x)
-			// //  console.log(line_yellow_data[nearestIndex].x)
-			// //  console.log(nearestIndex)
-
-			//  // Check the x-value for the found nearest y-value
-			//  if (this.position2.x <= (line_yellow_data[nearestIndex].x)) {
-			//      this.direction.x *= 1;
-			//     //  console.log("yesss")
-			//     //  console.log(this.position.x)
-			//     //  console.log(this.position2.x)
-			//     //  console.log(line_yellow_data[nearestIndex].x)
-			//  }
-
-			// if (this.intersectsCurve()) {
-			//     // Reflect the velocity to simulate a bounce
-			//     this.direction.x*= -1;
-			// }
 		} else {
 			if (scatter_tf == false) {
 				//if false no scatter
@@ -866,7 +638,6 @@ class Vehicle {
 					this.velocity
 				);
 			} else {
-				// console.log(this.id)
 			}
 		} else if (
 			this.position.x > 550 * s_x &&
@@ -886,7 +657,6 @@ class Vehicle {
 						(550 * s_x - (550 - (400 / 8) * count_pn_num) * s_x);
 
 				this.acceleration = (-a / 140) * factor_new;
-				// console.log(a)
 
 				this.velocity = p5.Vector.add(
 					createVector(this.acceleration, 0),
@@ -907,7 +677,6 @@ class Vehicle {
 					this.velocity
 				);
 			} else {
-				// console.log(this.id)
 			}
 		} else {
 			this.velocity = createVector(0, 0);
@@ -977,12 +746,6 @@ class Appear {
 				//stroke(255, 121, 97, this.alpha);
 				strokeWeight(2);
 				noFill();
-
-				// line(this.position.x-10,this.position.y-10,this.position.x+10,this.position.y+10);
-				// line(this.position.x-10,this.position.y+10,this.position.x+10,this.position.y-10);
-
-				// noStroke();
-				// fill(125, 241, 148, this.alpha);
 
 				ellipse(this.position.x, this.position.y, this.dd);
 
@@ -1069,14 +832,6 @@ class Appear {
 		this.steer.limit(this.maxforce);
 
 		this.applyForce(this.steer);
-
-		// if(abs(this.position.x-target.x)<1
-		// && abs(this.position.y-target.y)<1 ){
-		//     this.zap -= 20;
-		//     this.acceleration = createVector(0, 0);
-		//     this.velocity = createVector(0, 0);
-		//     // console.log("ssss")
-		// }
 	}
 
 	applyForce(force) {
@@ -1175,7 +930,7 @@ class LatticeAtom {
 	}
 
 	show() {
-		// if (sceneCount == 1) {
+		// if (scene(1)) {
 		//     stroke(255, 255, 255, this.fadee );
 		//     line(this.x, this.y, this.x + 90, this.y);
 		//     line(this.x, this.y, this.x, this.y + 90);
@@ -1185,7 +940,7 @@ class LatticeAtom {
 
 		if (this.selected == false) {
 			//selected !!!
-			if (sceneCount == 2) {
+			if (scene(2)) {
 				drawingContext.setLineDash([]);
 				noStroke();
 				fill(254, 246, 182, this.opacity);
@@ -1193,7 +948,7 @@ class LatticeAtom {
 				ellipse(this.x - width / 45, this.y, 10, 10);
 				ellipse(this.x, this.y + width / 45, 10, 10);
 				ellipse(this.x, this.y - width / 45, 10, 10);
-			} else if (sceneCount == 3) {
+			} else if (scene(3)) {
 				if (this.num == 1) {
 					drawingContext.setLineDash([]);
 					noStroke();
@@ -1257,7 +1012,7 @@ class LatticeAtom {
 		}
 
 		if (this.selected) {
-			if (sceneCount == 0.5 || sceneCount == 1 || sceneCount == 0.7) {
+			if (sceneCount == 0.5 || scene(1) || sceneCount == 0.7) {
 				//normal
 				drawingContext.setLineDash([]);
 				noStroke();
@@ -1271,7 +1026,7 @@ class LatticeAtom {
 				noStroke();
 				fill(148, 163, 243, this.opacity);
 				ellipse(this.x, this.y, 30, 30);
-			} else if (sceneCount == 2) {
+			} else if (scene(2)) {
 				//electron
 				drawingContext.setLineDash([]);
 				noStroke();
@@ -1281,13 +1036,10 @@ class LatticeAtom {
 				ellipse(this.x, this.y + width / 45, 10, 10);
 				ellipse(this.x, this.y - width / 45, 10, 10);
 
-				// free_electron.push(new freeElectron(this.x+width/45, this.y-width/45));
-				// ellipse(this.x+width/45, this.y-width/45, 10, 10);  //new item to move around
-
 				noStroke();
 				fill(148, 163, 243, this.opacity);
 				ellipse(this.x, this.y, 30, 30);
-			} else if (sceneCount == 3) {
+			} else if (scene(3)) {
 				//hole
 				drawingContext.setLineDash([]);
 				noStroke();
@@ -1296,9 +1048,6 @@ class LatticeAtom {
 				ellipse(this.x - width / 45, this.y, 10, 10);
 				ellipse(this.x, this.y + width / 45, 10, 10);
 				ellipse(this.x, this.y - width / 45, 10, 10);
-
-				// free_electron.push(new freeElectron(this.x+width/45, this.y-width/45));
-				// ellipse(this.x+width/45, this.y-width/45, 10, 10);  //new item to move around
 
 				noStroke();
 				fill(148, 163, 243, this.opacity);
@@ -1313,11 +1062,6 @@ class LatticeAtom {
 				ellipse(this.x, this.y + width / 45, 10, 10);
 				ellipse(this.x, this.y - width / 45, 10, 10);
 
-				// free_electron.push(new freeElectron(this.x+width/45, this.y-width/45));
-				// ellipse(this.x+width/45, this.y-width/45, 10, 10);  //new item to move around
-
-				// this.fadee -=5;
-
 				noStroke();
 				noFill();
 				fill(148, 163, 243, this.fadee);
@@ -1326,7 +1070,7 @@ class LatticeAtom {
 		} else if (this.boundary) {
 			// clicked
 
-			if (sceneCount == 2 || sceneCount == 3) {
+			if (scene(2) || scene(3)) {
 				fill(198, 92, 255, this.opacity + 30);
 				ellipse(this.x, this.y, 30, 30);
 
@@ -1341,7 +1085,7 @@ class LatticeAtom {
 				if (this.count < 0) {
 					this.appear1 += 20;
 				}
-			} else if (sceneCount == 3) {
+			} else if (scene(3)) {
 				if (this.num == 1) {
 					fill(198, 92, 255, this.opacity + 30); //e
 					ellipse(this.x, this.y, 30, 30);
@@ -1357,11 +1101,8 @@ class LatticeAtom {
 						this.appear1 += 20;
 					}
 				} else if (this.num == 2) {
-					// fill(71, 172, 255, this.opacity+30); //h
-					// ellipse(this.x, this.y, 30, 30);
 				}
-				// fill(71, 172, 255, this.opacity+30);
-			} else if (sceneCount == 3) {
+			} else if (scene(3)) {
 				if (this.num == 1) {
 					fill(198, 92, 255, this.fadee); //e
 					ellipse(this.x, this.y, 30, 30);
@@ -1369,25 +1110,18 @@ class LatticeAtom {
 					fill(71, 172, 255, this.fadee); //h
 					ellipse(this.x, this.y, 30, 30);
 				}
-				// this.fadee -=3;
 			}
-		} else {
-			// fill(225, 163, 243, 50);
-			// noStroke();
-			// fill(228, 163, 243, this.opacity);
 		}
 
-		//   drawingContext.setLineDash([, ]);
-
 		if (this.mouseHover() && this.opacity > 0) {
-			if (sceneCount == 2 || sceneCount == 3) {
+			if (scene(2) || scene(3)) {
 				textAlign(CENTER, CENTER);
 				textSize(18);
 				fill(255);
 				noStroke();
 				text("Replace Silicon Atom with Donor Atom", this.x, this.y + 50);
 				textAlign(LEFT, BASELINE);
-			} else if (sceneCount == 3) {
+			} else if (scene(3)) {
 				textAlign(CENTER, CENTER);
 				textSize(18);
 				fill(255);
@@ -1423,16 +1157,6 @@ class freeElectron {
 	}
 
 	show_1() {
-		// if (sceneCount ==1 ) {
-		//     noStroke();
-		//     fill(254,246,182,190)
-		//     ellipse(this.position.x, this.position.y, 10, 10);
-		// } else  if (sceneCount ==2) {
-		//     // noFill();
-		//     // strokeWeight(2);
-		//     // stroke(125, 241, 148, 225);  //green
-
-		//     // ellipse(this.position.x, this.position.y, 10, 10);
 		if (this.scene == 1) {
 			noStroke();
 			fill(254, 246, 182, 190);
@@ -1444,21 +1168,6 @@ class freeElectron {
 
 			ellipse(this.position.x, this.position.y, 10, 10);
 		}
-
-		// } else if (sceneCount ==2.5) {
-		//     if (this.scene ==1) {
-		//         noStroke();
-		//     fill(254,246,182,190)
-		//     ellipse(this.position.x, this.position.y, 10, 10);
-		//     } else if (this.scene ==2) {
-		//     fill(18);
-		//     strokeWeight(2);
-		//     stroke(125, 241, 148, 225);  //green
-
-		//     ellipse(this.position.x, this.position.y, 10, 10);
-		// }
-
-		// }
 	}
 
 	update_1() {
@@ -1494,18 +1203,6 @@ class freeElectron {
 		}
 
 		if (this.scene == 2) {
-			// let ran_num = random(-7,7);
-
-			// let random_direction = createVector(width / 2 + 2 * 90 +width/45,height / 2 + 2 * 90);
-
-			// let d = int(dist(this.position.x, this.position.y, goToHole[this.id].x, goToHole[this.id].y));
-			//     if (d < 2) {
-			//         goToHole[this.id] = random(electronLatticePositions);
-			//       }
-
-			//     random_hole[this.id] = createVector(width / 2 +ran_x*int(random(-3,3)) * 90 ,height/2 + ran_y*int(random(-3,3))* 90+width/45);
-
-			//     random_hole[this.id] = createVector(this.position.x+random(random_num1).x*random(random_num1).z* 90 ,this.position.y + random(random_num1).y*random(random_num1).z* 90);
 			let d = int(
 				dist(
 					this.position.x,
@@ -1543,27 +1240,17 @@ class freeElectron {
 			if (d < 15) {
 				this.position = random_hole[this.id];
 				let numm = int(random(-5, 5));
-				// this.direction  = createVector(this.position.x+random(random_num1).x*numm* 90 ,this.position.y + random(random_num1).y*numm* 90);
 				random_hole[this.id] = createVector(
 					this.position.x + random(random_num1).x * numm * 90,
 					this.position.y + random(random_num1).y * numm * 90
 				);
 			}
-
-			//    this.position.x = lerp(this.position.x, random_hole[this.id].x, 0.5);
-			//     this.position.y = lerp(this.position.y, random_hole[this.id].y, 0.5);
-
-			// this.position.x = lerp(this.position.x, goToHole[this.id].x, 0.2);
-			// this.position.y = lerp(this.position.y, goToHole[this.id].y, 0.2);
-
 			this.direction = p5.Vector.sub(
 				random_hole[this.id],
 				this.position
 			).normalize();
 			let uPOS = p5.Vector.mult(this.direction, this.movingVelocity);
 			this.position.add(uPOS);
-
-			// console.log(d )
 		}
 	}
 }
