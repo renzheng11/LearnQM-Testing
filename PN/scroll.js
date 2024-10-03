@@ -77,7 +77,7 @@ let StartScroll = () => {
 				document.getElementById("slider_61").value = 130;
 				document.getElementById("v_p").value = 0;
 
-				setChangeV(2);
+				setBandDiagramVScale(2);
 
 				updateAppliedVoltage(0);
 
@@ -89,7 +89,7 @@ let StartScroll = () => {
 			} else {
 				sceneCount = 1;
 
-				setChangeV(1);
+				setBandDiagramVScale(1);
 				setScattering(20);
 
 				document.getElementById("slider_6").value = 130;

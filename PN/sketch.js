@@ -216,33 +216,40 @@ function mouseClicked() {
 	// text("Electric Field", 273 * sx, 223 * sy);
 
 	// charge density
-	// if (abs(160 * sx - mouseX) < 30 * sx && abs(223 * sy - mouseY) < 9 * sy)
-
-	// charge density button clicked
-	if (
-		abs(mouseX) > 160 * sx &&
-		abs(mouseX) < 160 + 76 * sx &&
-		abs(mouseY) > 200 * sy &&
-		abs(mouseY) < (223 + 20) * sy
-	) {
-		if (switchGraph == true) switchGraph = false;
-		// else switchGraph = true;
-	}
-	// electric field button clicked
-	else if (
-		abs(mouseX) > 273 * sx &&
-		abs(mouseX) < 273 + 70 * sx &&
-		abs(mouseY) > 200 * sy &&
-		abs(mouseY) < (223 + 10) * sy
-	) {
-		if (switchGraph == false) switchGraph = true;
-		// else switchGraph = false;
-	}
-
-	// if (abs(910 * sx - mouseX) < 30 * sx && abs(377 * sy - mouseY) < 9 * sy) {
+	// if (abs(160 * sx - mouseX) < 30 * sx && abs(223 * sy - mouseY) < 9 * sy) {
 	// 	if (switchGraph == true) switchGraph = false;
-	// 	else switchGraph = true;
+	// 	if (switchGraph == false) switchGraph = true;
 	// }
+
+	// console.log(abs(mouseX) * sx);
+	// console.log(abs(mouseY));
+	// console.log(160 * sx);
+	// charge density button clicked
+	// if (
+	// 	abs(mouseX) * sx > 160 * sx &&
+	// 	abs(mouseX) * sx < 160 + 76 * sx &&
+	// 	abs(mouseY) * sy > 200 * sy &&
+	// 	abs(mouseY) * sy < (223 + 20) * sy
+	// ) {
+	// 	if (switchGraph == true) switchGraph = false;
+	// 	// else switchGraph = true;
+	// }
+	// // electric field button clicked
+	// else if (
+	// 	abs(mouseX) > 273 * sx &&
+	// 	abs(mouseX) < 273 + 70 * sx &&
+	// 	abs(mouseY) > 200 * sy &&
+	// 	abs(mouseY) < (223 + 10) * sy
+	// ) {
+	// 	if (switchGraph == false) switchGraph = true;
+	// 	// else switchGraph = false;
+	// }
+
+	if (abs(910 * sx - mouseX) < 30 * sx && abs(377 * sy - mouseY) < 9 * sy) {
+		// canvas.cursor("grab");
+		if (switchGraph == true) switchGraph = false;
+		else switchGraph = true;
+	}
 }
 
 function scaleWindow() {
@@ -1628,7 +1635,7 @@ function zap(array1, array2, num) {
 		}
 	}
 
-	console.log("Recombin_Prob", Recombin_Prob);
+	// console.log("Recombin_Prob", Recombin_Prob);
 	for (let i = 0; i < array1.length; i++) {
 		for (let k = 0; k < array2.length; k++) {
 			// check if electron and hole are close and they are showing, not same ID
@@ -1763,20 +1770,19 @@ function draw() {
 	// if (switchGraph) {
 	// 	fill(...color.white);
 	// } else {
-	// 	fill(...color.blue, 100);
-	// }
+	fill(...color.blue, 100);
 
-	// noStroke();
-	// rect(879 * sx, 368 * sy, 50 * sx, 16 * sy, 5 * sy, 5 * sy);
+	noStroke();
+	rect(879 * sx, 368 * sy, 50 * sx, 16 * sy, 5 * sy, 5 * sy);
 
-	// textSize(12 * sx);
-	// if (switchGraph) {
-	// 	fill(...color.black);
-	// 	text("SWITCH", 880 * sx, 380 * sy);
-	// } else {
-	// 	fill(...color.white);
-	// 	text("SWITCH", 880 * sx, 380 * sy);
-	// }
+	textSize(12 * sx);
+	if (switchGraph) {
+		fill(...color.white);
+		text("SWITCH", 880 * sx, 380 * sy);
+	} else {
+		fill(...color.white);
+		text("SWITCH", 880 * sx, 380 * sy);
+	}
 }
 
 resetScene = () => {
@@ -2030,8 +2036,8 @@ updateDopingConcentration = (a) => {
 	if (a == 133) {
 		dopingConcentration_new = Math.pow(10, 14);
 	}
-	console.log("dopingConcentration_new new", dopingConcentration_new);
-	console.log("a", a);
+	// console.log("dopingConcentration_new new", dopingConcentration_new);
+	// console.log("a", a);
 	// array_band_hardcode = [
 	// 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	// 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -0.008894972236313038,
@@ -2067,13 +2073,13 @@ updateDopingConcentration = (a) => {
 	//console.log ("mm", mm);
 	let pp = mm.toExponential(1);
 
-	console.log("pp", pp);
+	// console.log("pp", pp);
 	document.getElementById("updateDopingConcentration").value = pp;
 	document.getElementById("updateDopingConcentration_scene2").value = pp;
 	document.getElementById("updateDopingConcentration_scene3").value = pp;
 	//dopingConcentration_new = mm;
 
-	console.log("dopingConcentration", dopingConcentration);
+	// console.log("dopingConcentration", dopingConcentration);
 	timelectronCount = 0;
 	fixedCharges = [];
 
@@ -2375,9 +2381,9 @@ updateAppliedVoltage = (a) => {
 		) *
 		Math.pow(10, 6);
 
-	console.log("xp", voltageDepletionWidth);
-	console.log("appliedVoltage", appliedVoltage / 2);
-	console.log("dopingConcentration_new", dopingConcentration_new);
+	// console.log("xp", voltageDepletionWidth);
+	// console.log("appliedVoltage", appliedVoltage / 2);
+	// console.log("dopingConcentration_new", dopingConcentration_new);
 	//for (var i = 0; i < 100; i++) {
 	//(800)/100*i
 	// 	if (
@@ -2416,7 +2422,7 @@ updateAppliedVoltage = (a) => {
 		baseBand[i] = baseBand[100 - i];
 	}
 
-	console.log("baseband", baseBand);
+	// console.log("baseband", baseBand);
 
 	for (var i = 0; i < 100; i++) {
 		baseBand[i] = baseBand[i] / 3;
