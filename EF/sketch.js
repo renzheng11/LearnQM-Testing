@@ -8,9 +8,12 @@ let color = {
 	grey: [152, 152, 152],
 	bg: [18, 18, 18],
 	white: [255, 255, 255],
-	pos: [125, 241, 148],
-	neg: [255, 247, 174],
-	net: [117, 190, 255],
+	// pos: [125, 241, 148],
+	pos: [255, 122, 121],
+	// neg: [255, 247, 174],
+	neg: [60, 163, 255],
+	// net: [117, 190, 255],
+	net: [255, 241, 116],
 };
 
 let canvas;
@@ -1188,7 +1191,7 @@ function drawCharges(box) {
 	let chargeSize = 11;
 	let signSize = chargeSize - 4;
 	let chargeOpacity = 100;
-	let signOpacity = 80;
+	let signOpacity = 180;
 
 	noStroke();
 
@@ -1246,9 +1249,17 @@ function drawCharges(box) {
 					strokeWeight(1);
 
 					if (scene(1) || scene(2) || scene(3)) {
-						stroke(...color.neg, signOpacity + 30); // neg sign
+						if (box.chargeType == "pos") {
+							stroke(...color.pos, signOpacity + 30);
+						} else if (box.chargeType == "neg") {
+							stroke(...color.neg, signOpacity + 30);
+						}
 					} else {
-						stroke(...color.neg, signOpacity); // neg sign
+						if (box.chargeType == "pos") {
+							stroke(...color.pos, signOpacity);
+						} else if (box.chargeType == "neg") {
+							stroke(...color.neg, signOpacity);
+						}
 					}
 
 					// cross line
@@ -1885,7 +1896,11 @@ function mousePressed() {
  * @param {*} value
  */
 function updateBoxChargeAmount(value) {
-	boxRight1.updateChargeAmount(value);
+	if (sceneCount != 2 && sceneCount != 3) {
+		boxRight1.updateChargeAmount(value);
+	} else {
+		boxLeft.updateChargeAmount(value);
+	}
 	resetCharges();
 }
 

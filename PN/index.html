@@ -53,7 +53,7 @@
        Imagine we magically connect P-type and N-type pieces of Si together. Let's see what happens.
         </p>
         <p>Doping Concentration (per cm<sup>3</sup>):  <output type="text" id = "updateDopingConcentration" val = "Math.round(updateDopingConcentration(this.value))"> </p>
-        <input style="width: 100%;" type="range" min="130" max="133" value="130" step = "1" id = "slider_6"
+        <input style="width: 100%;" type="range" min="130" max="133" value="130" step = "3" id = "slider_6"
         onchange="updateDopingConcentration(this.value)" >
         <div class="sliderticks">
           <div>
@@ -84,7 +84,7 @@
 
 
         <p>Doping Concentration (per cm<sup>3</sup>):  <output type="text" id = "updateDopingConcentration_scene2" val = "Math.round(updateDopingConcentration(this.value))"> </p>
-          <input style="width: 100%;" type="range" min="130" max="133" value="130" step = "0.5" id = "slider_61"
+          <input style="width: 100%;" type="range" min="130" max="133" value="130" step = "3" id = "slider_61"
           onchange="updateDopingConcentration(this.value)" >
           <div class="sliderticks">
             <div>
@@ -131,7 +131,7 @@
         </p>
 
         <p>Doping Concentration (per cm<sup>3</sup>):  <output type="text" id = "updateDopingConcentration_scene3" val = "Math.round(updateDopingConcentration(this.value))"> </p>
-          <input style="width: 100%;" type="range" min="130" max="133" value="130" step = "0.5" id = "slider_611"
+          <input style="width: 100%;" type="range" min="130" max="133" value="130" step = "3" id = "slider_611"
           onchange="updateDopingConcentration(this.value)" >
           <div class="sliderticks">
             <div>
@@ -143,12 +143,9 @@
           </div>
 
           <p>Applied Voltage (V) <output type="text" id = "" val = "Math.round(updateDopingConcentration(this.value))"> </p>
-            <input style="width: 100%;" type="range" min="-80" max="16" value="0" step = "1" id = "v_p_2"
+            <input style="width: 100%;" type="range" min="-64" max="16" value="0" step = "1" id = "v_p_2"
             onchange="updateAppliedVoltage(this.value)" >
             <div class="sliderticks">
-              <div>
-                <p>-2.0</p>
-              </div>
               <div>
                 <p>-1.6</p>
               </div>
