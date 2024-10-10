@@ -46,8 +46,6 @@ let StartScroll = () => {
 
 				factor_new = 0.3;
 
-				switch_1 = 2; //both
-
 				constant_fermi =
 					Math.round(((1000 * -0.28 * 0.026) / 300) * constant_temperature) /
 					1000;
@@ -80,8 +78,6 @@ let StartScroll = () => {
 				setBandDiagramVScale(2);
 
 				updateAppliedVoltage(0);
-
-				switch_1 = 2; //both
 
 				constant_fermi =
 					Math.round(((1000 * -0.28 * 0.026) / 300) * constant_temperature) /
@@ -119,7 +115,6 @@ let StartScroll = () => {
 				updateDopingConcentration(130);
 				setScattering(20);
 
-				switch_1 = 2; //both
 				constant_fermi =
 					Math.round(((1000 * -0.28 * 0.026) / 300) * constant_temperature) /
 					1000;
