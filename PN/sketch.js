@@ -26,10 +26,11 @@ let sy;
 const color = {
 	bg: [18, 18, 18],
 	blue: [102, 194, 255],
-	pink: [218, 112, 214],
-	pink2: [200, 146, 182],
-	electricFieldOpacity: 50,
-	chargeDensityOpacity: 100,
+	EFColor: [218, 112, 214],
+	EFColor2: [200, 146, 182],
+	CDColor: [2, 104, 255], // charge density
+	electricFieldOpacity: 160,
+	chargeDensityOpacity: 160,
 	white: [255],
 	black: [0],
 	black2: [30],
@@ -149,47 +150,24 @@ var blink;
 let interval_blink = 1000;
 
 // Functions  ===================================================================
-
+function keyPressed() {
+	if (switchGraph) {
+		switchGraph = false; // show electric field graph
+	} else {
+		switchGraph = true;
+	}
+}
 // Switch from Charge Density graph to Electric Field graph
 function mouseClicked() {
-	// true: Electric Field
-	// false: Charge Density
+	let xCondition = 270 * sx - mouseX;
+	let yCondition = abs(220 * sy - mouseY);
 
-	// text("Charge Density", 160 * sx, 223 * sy);
-	// text(" / ", 260 * sx, 223 * sy);
-	// text("Electric Field", 273 * sx, 223 * sy);
+	console.log(mouseX, xCondition);
 
-	// charge density
-	// if (abs(160 * sx - mouseX) < 30 * sx && abs(223 * sy - mouseY) < 9 * sy) {
-	// 	if (switchGraph == true) switchGraph = false;
-	// 	if (switchGraph == false) switchGraph = true;
-	// }
-
-	// charge density button clicked
-	// if (
-	// 	abs(mouseX) * sx > 160 * sx &&
-	// 	abs(mouseX) * sx < 160 + 76 * sx &&
-	// 	abs(mouseY) * sy > 200 * sy &&
-	// 	abs(mouseY) * sy < (223 + 20) * sy
-	// ) {
-	// 	if (switchGraph == true) switchGraph = false;
-	// 	// else switchGraph = true;
-	// }
-	// // electric field button clicked
-	// else if (
-	// 	abs(mouseX) > 273 * sx &&
-	// 	abs(mouseX) < 273 + 70 * sx &&
-	// 	abs(mouseY) > 200 * sy &&
-	// 	abs(mouseY) < (223 + 10) * sy
-	// ) {
-	// 	if (switchGraph == false) switchGraph = true;
-	// 	// else switchGraph = false;
-	// }
-
-	if (abs(910 * sx - mouseX) < 30 * sx && abs(377 * sy - mouseY) < 9 * sy) {
-		// canvas.cursor("grab");
-		if (switchGraph == true) switchGraph = false;
-		else switchGraph = true;
+	if (xCondition < 100 * sx && xCondition < 0 && yCondition < 12 * sy) {
+		switchGraph = true; // show electric field graph
+	} else if (abs(162 * sx - mouseX) < 120 * sx && yCondition < 16 * sy) {
+		switchGraph = false; // show charge density graph
 	}
 }
 
@@ -296,7 +274,7 @@ function recombineArrays() {
 	}
 }
 
-function zapLoopsIDK() {
+function updateCharges() {
 	for (let i = 0; i < generatedElectrons.length; i++) {
 		if (generatedElectrons[i].dead == 0) {
 			generatedElectrons[i].display();
@@ -634,31 +612,49 @@ function drawGraph() {
 	text("5 \u00B5m", 790 * sx, 313 * sy);
 	text("-5 \u00B5m", 290 * sx, 313 * sy);
 
-	textSize(17);
-	noStroke();
-	strokeWeight(1);
-
-	fill(...color.blue);
-
-	textSize(14 * sx);
-
-	text("Band Diagram", 160 * sx, 30 * sy);
-	text("Charge Density", 160 * sx, 223 * sy);
-	text(" / ", 260 * sx, 223 * sy);
-	text("Electric Field", 273 * sx, 223 * sy);
-
 	if (switchGraph) {
-		fill(...color.pink, color.electricFieldOpacity);
-		rect(271 * sx, 210 * sy, 85 * sx, 18 * sy, 5 * sy, 5 * sy);
+		// electric field is showing
+		stroke(...color.EFColor);
+		fill(...color.EFColor, 80);
+		rect(276 * sx, 210 * sy, 95 * sx, 24 * sy, 5 * sy, 5 * sy);
+
+		// charge density
+		stroke(...color.blue);
+		noFill();
+		rect();
+		rect(158 * sx, 210 * sy, 110 * sx, 24 * sy, 5 * sy, 5 * sy);
 	} else {
-		fill(...color.yellow, color.chargeDensityOpacity);
-		rect(158 * sx, 210 * sy, 100 * sx, 18 * sy, 5 * sy, 5 * sy);
+		// charge density is showing
+		stroke(...color.CDColor);
+		fill(...color.CDColor, 80);
+		rect(158 * sx, 210 * sy, 110 * sx, 24 * sy, 5 * sy, 5 * sy);
+
+		stroke(...color.blue);
+		noFill();
+		rect();
+		rect(276 * sx, 210 * sy, 95 * sx, 24 * sy, 5 * sy, 5 * sy);
+
+		// stroke(...color.black);
+		// text("Charge Density", 160 * sx, 223 * sy);
 	}
 
 	noStroke();
 	fill(...color.blue);
+	// textSize(14 * sx);
+	textSize(14 * sx);
 
-	if (voltageDepletionWidth >= initialDepletionWidth) {
+	// text("Band Diagram", 160 * sx, 30 * sy);
+	// text("Charge Density", 164 * sx, 226 * sy);
+	// text("Electric Field", 283 * sx, 226 * sy);
+
+	text("Band Diagram", 160 * sx, 30 * sy);
+	text("Charge Density", 163 * sx, 226 * sy);
+	text("Electric Field", 283 * sx, 226 * sy);
+
+	noStroke();
+	fill(...color.blue);
+
+	if (voltageDepletionWidth >= initialDepletionWidth && appliedVoltage == 0) {
 		text("Equilibrium", 760 * sx, 223 * sy);
 	}
 }
@@ -905,7 +901,7 @@ function countConcentration() {
 function drawElectricFieldData() {
 	noFill();
 
-	fill(...color.pink, 100);
+	fill(...color.EFColor, color.electricFieldOpacity);
 
 	// E- field data
 	if (switchGraph == true) {
@@ -946,7 +942,7 @@ function drawElectricFieldData() {
 
 function drawChargeDensityData() {
 	noStroke();
-	fill(...color.yellow, color.chargeDensityOpacity);
+	fill(...color.CDColor, color.chargeDensityOpacity);
 
 	if (scene(1)) {
 		bandDiagramHeight = Math.pow(10, -13) * addedDopants;
@@ -1650,7 +1646,7 @@ function draw() {
 	if (scene(1) || scene(2) || scene(3)) {
 		drawOutlines();
 		// timeRateIDK();
-		zapLoopsIDK();
+		updateCharges();
 		recombineArrays();
 		drawChargeDensityData();
 		drawElectricFieldData();
@@ -1674,19 +1670,19 @@ function draw() {
 	}
 
 	// style button background
-	fill(...color.blue, 100);
-	noStroke();
+	// fill(...color.blue, 100);
+	// noStroke();
 
-	textSize(12 * sx);
-	if (switchGraph & (scene(1) || scene(2) || scene(3))) {
-		rect(879 * sx, 368 * sy, 50 * sx, 16 * sy, 5 * sy, 5 * sy); // button background
-		fill(...color.white);
-		text("SWITCH", 880 * sx, 380 * sy);
-	} else if (scene(1) || scene(2) || scene(3)) {
-		rect(879 * sx, 368 * sy, 50 * sx, 16 * sy, 5 * sy, 5 * sy); // button background
-		fill(...color.white);
-		text("SWITCH", 880 * sx, 380 * sy);
-	}
+	// textSize(12 * sx);
+	// if (switchGraph & (scene(1) || scene(2) || scene(3))) {
+	// 	rect(879 * sx, 368 * sy, 50 * sx, 16 * sy, 5 * sy, 5 * sy); // button background
+	// 	fill(...color.white);
+	// 	text("SWITCH", 880 * sx, 380 * sy);
+	// } else if (scene(1) || scene(2) || scene(3)) {
+	// 	rect(879 * sx, 368 * sy, 50 * sx, 16 * sy, 5 * sy, 5 * sy); // button background
+	// 	fill(...color.white);
+	// 	text("SWITCH", 880 * sx, 380 * sy);
+	// }
 }
 
 function resetScene() {

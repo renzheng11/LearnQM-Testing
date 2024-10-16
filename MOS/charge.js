@@ -199,15 +199,15 @@ class Charge {
 		//if ((this.position.x > 940*sx) && (opening == 0)) {this.direction.x = -1;}
 		if (this.position.y < yMin * sy) {
 			this.velocity.y = -this.velocity.y;
-			this.position.y = 410 * sy;
+			// this.position.y = 410 * sy;
 		}
 		if (this.position.y > yMax * sy) {
 			this.velocity.y = -this.velocity.y;
-			this.position.y = 765 * sy;
+			// this.position.y = 765 * sy;
 		}
 		if (this.position.x < 260 * sx) {
 			this.velocity.x = Math.abs(this.velocity.x);
-			this.position.x = 263 * sx;
+			// this.position.x = 263 * sx;
 		}
 
 		// if ((this.position.x > 943*sx)) {

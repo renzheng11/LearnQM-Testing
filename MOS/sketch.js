@@ -15,6 +15,25 @@ let sy; //scale for y-axis adaptive window
 
 let xSlide = 60; //
 
+// color
+const color = {
+	bg: [18, 18, 18],
+	blue: [102, 194, 255],
+	EFColor: [218, 112, 214],
+	EFColor2: [200, 146, 182],
+	CDColor: [2, 104, 255], // charge density
+	electricFieldOpacity: 160,
+	chargeDensityOpacity: 160,
+	white: [255],
+	black: [0],
+	black2: [30],
+	red: [255],
+	red2: [255, 40, 0],
+	green: [125, 241, 148],
+	greenBright: [0, 255, 0],
+	yellow: [254, 246, 182],
+};
+
 /******************************
  * Section: set variables
  *******************************/
@@ -78,7 +97,6 @@ let bandLength = 134;
 var current_Electron_c = 0; //electron count // ???
 let electron_add = 0; //added electron number // ???
 
-// CHANGE SWITCH!!!
 let switchGraph = false; //turn on or off the switch between charge density and electric field graph
 
 // Intervals
@@ -588,22 +606,14 @@ function checkRecombines() {
 
 // switch graph
 function mouseClicked() {
-	if (
-		abs(mouseX) > 160 * sx &&
-		abs(mouseX) < 170 + 76 * sx &&
-		abs(mouseY) > 180 * sy &&
-		abs(mouseY) < 220 * sy
-	) {
-		// switch to charge density graph
-		if (switchGraph == true) switchGraph = false;
-	} else if (
-		abs(mouseX) > 273 * sx &&
-		abs(mouseX) < 273 + 70 * sx &&
-		abs(mouseY) > 180 * sy &&
-		abs(mouseY) < 220 * sy
-	) {
-		// switch to electric field graph
-		if (switchGraph == false) switchGraph = true;
+	let xCondition = 270 * sx - mouseX; // left border of right button
+	let yCondition = abs(205 * sy - mouseY); // top border of right button
+	if (xCondition < 100 * sx && xCondition < 0 && yCondition < 16 * sy) {
+		console.log("EF");
+		switchGraph = true; // show charge density graph
+	} else if (abs(164 * sx - mouseX) < 100 * sx && yCondition < 16 * sy) {
+		console.log("charge density");
+		switchGraph = false; // show electric field graph
 	}
 }
 
@@ -698,6 +708,33 @@ function drawGraph() {
 		fill(102, 194, 255, 100);
 	}
 
+	//choosing the E-field or charge density box around text
+	if (switchGraph) {
+		// electric field is showing
+		stroke(...color.EFColor);
+		fill(...color.EFColor, 80);
+		rect(272 * sx, 186 * sy, 94 * sx, 24 * sy, 5 * sy, 5 * sy);
+
+		// charge density
+		stroke(...color.blue);
+		noFill();
+		rect();
+
+		rect(158 * sx, 186 * sy, 108 * sx, 24 * sy, 5 * sy, 5 * sy);
+	} else {
+		// charge density is showing
+		stroke(...color.CDColor);
+		fill(...color.CDColor, 80);
+		rect(158 * sx, 186 * sy, 108 * sx, 24 * sy, 5 * sy, 5 * sy);
+
+		// electric field
+		stroke(...color.blue);
+		noFill();
+		rect();
+
+		rect(272 * sx, 186 * sy, 94 * sx, 24 * sy, 5 * sy, 5 * sy);
+	}
+
 	// text
 
 	stroke(125, 241, 148, 100);
@@ -710,18 +747,8 @@ function drawGraph() {
 
 	text("Band Diagram", 160 * sx, 30 * sy);
 
-	text("Charge Density", 160 * sx, 204 * sy);
-	text(" / ", 260 * sx, 204 * sy);
-	text("Electric Field", 273 * sx, 204 * sy);
-
-	//choosing the E-field or charge density box around text
-	if (switchGraph) {
-		fill(218, 112, 214, 50);
-		rect(271 * sx, 192 * sy, 85 * sx, 18 * sy, 5 * sy, 5 * sy);
-	} else {
-		fill(255, 40);
-		rect(158 * sx, 192 * sy, 100 * sx, 18 * sy, 5 * sy, 5 * sy);
-	}
+	text("Charge Density", 164 * sx, 203 * sy);
+	text("Electric Field", 278 * sx, 203 * sy);
 
 	noStroke();
 
@@ -845,7 +872,6 @@ function drawGraph() {
 				minorityDensity =
 					Math.pow(10, 20) /
 					Math.pow(dopingConcentration_new * Math.pow(10, 3), 2);
-				console.log("min den", minorityDensity);
 				for (let i = 0; i < bandLength; i++) {
 					let y1 =
 						-1.6 *
@@ -1248,38 +1274,42 @@ function generateCharges(num) {
 		} else if (timeElapsed == 0) {
 			// at beggining of scene
 			for (let i = 0; i < num; i++) {
-				let a = random(250 * sx, 930 * sx);
-				let b = random((20 + 385) * sy, 770 * sy);
+				let buffer = 14; // make sure charges don't get stuck bouncing on edge
+				let xPosition = random((xMin + buffer) * sx, (xMax - buffer) * sx);
+				let yPosition = random((yMin + buffer) * sy, (yMax - buffer) * sy);
 
-				generationEffects.push(new Appear(a, b, 10, 0));
+				generationEffects.push(new Appear(xPosition, yPosition, 10, 0));
 
-				let xx = findClosestValue(electronBand, a);
+				let closestValueToElectronBand = findClosestValue(
+					electronBand,
+					xPosition
+				);
 
-				let aa = new Charge(a, b, 10, chargeID, 0);
-				aa.origin.x = xx;
-				aa.top = 1;
+				let newCharge = new Charge(xPosition, yPosition, 10, chargeID, 0);
+				newCharge.origin.x = closestValueToElectronBand;
+				newCharge.top = 1;
 				////botz is the velocity here, and it comes from a randomly generated number list
-				aa.botz =
+				newCharge.botz =
 					getRandomBotz[Math.floor(Math.random() * getRandomBotz.length)];
-				generatedElectrons.push(aa);
+				generatedElectrons.push(newCharge);
 
-				let yy = findClosestValue(holeBand, a);
+				let closestValueToHoleBand = findClosestValue(holeBand, xPosition);
 
 				let color = 0;
 				if (scene(2)) {
 					color = 1;
 				}
-				let bb = new Charge(a, b, 10, chargeID, color);
+				let newHole = new Charge(xPosition, yPosition, 10, chargeID, color);
 
-				bb.origin.y = yy;
-				bb.top = 1;
-				bb.botz =
+				newHole.origin.y = closestValueToHoleBand;
+				newHole.top = 1;
+				newHole.botz =
 					getRandomBotz[Math.floor(Math.random() * getRandomBotz.length)];
 
 				if (scene(1)) {
-					generatedHoles.push(bb);
+					generatedHoles.push(newHole);
 				} else if (scene(2)) {
-					generatedElectrons.push(bb);
+					generatedElectrons.push(newHole); // ???
 				}
 
 				chargeID += 1;
