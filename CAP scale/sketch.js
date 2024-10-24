@@ -130,6 +130,7 @@ function setup() {
 	sy = windowHeight / scale_y;
 	canvas = createCanvas((2 * windowWidth) / 4 + 40, windowHeight);
 	canvas.parent("visualization");
+
 	batteryPosImg = loadImage("batteryPos.png");
 	batteryNegImg = loadImage("batteryNeg.png");
 	mosImg = loadImage("mos.png");
@@ -763,6 +764,7 @@ function drawScanner(box) {
 	scannerWidth = scannerNM * scale; // 1nm
 
 	// if mouse is in box
+
 	if (mouseX / sx < box.x + boxD.width && mouseX / sx > box.x) {
 		xPos = mouseX / sx - box.x;
 	}
@@ -1104,12 +1106,11 @@ function drawArrows() {
 }
 
 function draw() {
-	sx = (windowWidth / scale_x) * 0.98;
-	sy = (windowHeight / scale_y) * 0.98;
 	scale(sx);
 	if (sceneCount > 0) {
 		// canvas
-
+		sx = (windowWidth / scale_x) * 0.98;
+		sy = (windowHeight / scale_y) * 0.98;
 		background(...color.bg);
 
 		// ongoing functions
