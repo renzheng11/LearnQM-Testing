@@ -39,21 +39,21 @@ const color = {
  *******************************/
 
 // Arrays for storing charges
-let fixedCharges = [];
-let initHoles = []; // initial holes
-let initElectrons = []; // initial electrons
-let genElectrons = []; // generated electrons
-let genHoles = []; // generated holes
+let fixedCharges = []; //appear list
+let initialHoles = []; //green dot list
+let initialElectrons = []; //yellow dot list
+let generatedElectrons = []; //yellow dot storing
+let generatedHoles = []; //green dot storing
 let chargeID = 0; // charge id
 
 // Effects for generation and recombination
-let genEffects = []; // generation animation
-let recomEffects = []; // recombination aimation
-let recomEffectsPositions = []; // position of effect
-let recomDistance = 9; //distance for recombine
-let recomEffectsForElectrons = []; //circles disappear animation
-let recomEffectsForHoles = []; //circles  disappear animation
-let recomCount = 0; //disappear number count
+let generationEffects = []; // generation animation
+let recombineEffects = []; // recombination aimation
+let recombineEffectsPositions = []; // position of effect
+let recombineDistance = 9; //distance for recombine
+let recombineEffectsForElectrons = []; //circles disappear animation
+let recombineEffectsForHoles = []; //circles  disappear animation
+let recombineCount = 0; //disappear number count
 
 // factors
 let appliedVoltage = 0; //added voltage for p dopant
@@ -61,8 +61,8 @@ let generationRate = 1000; //generation rate
 let generationRateInterval; //generation rate interval
 let temp = 270; //set temperature
 let recombineOn = true; //recombine on or off
-let dopingConcen = 0; // doping concentration
-let dopingConcen_new = 0; // doping concentration
+let dopingConcentration = 0;
+let dopingConcentration_new = 0;
 var timeElapsed = 0; //count down for timeIt functionn
 
 // scattering
@@ -76,7 +76,7 @@ let scatteringCount = 0; //scattering count
 let NumXAxisTicks = 3; //draw ticker
 
 // band diagram
-let bandScale = 1; //change the verticle distribution scale of band diagram
+let bandDiagramVScale = 1; //change the verticle distribution scale of band diagram
 let getRandomBotz = []; //velocity of random distribution
 let boltzDistribution = []; //New random velocity distribution added by Azad
 let electronBand = []; //graph yellow line
@@ -132,7 +132,7 @@ let insulatorLabel;
 // boundaries
 
 let xMin = 260;
-let xMax = 900;
+let xMax = 820;
 let yMin = 380;
 let yMax = 710;
 
@@ -306,9 +306,9 @@ function draw() {
 
 	if (scene(1) || scene(2)) {
 		drawOutlines();
-		drawGraph();
 		updateChargeMovement();
 		checkRecombines();
+		drawGraph();
 		drawBandDiagram();
 	}
 }
@@ -355,9 +355,9 @@ function doRecombine(chargeArray1, chargeArray2) {
 		for (let k = 0; k < chargeArray2.length; k++) {
 			if (
 				abs(chargeArray1[i].position.x - chargeArray2[k].position.x) <
-					recomDistance &&
+					recombineDistance &&
 				abs(chargeArray1[i].position.y - chargeArray2[k].position.y) <
-					recomDistance &&
+					recombineDistance &&
 				chargeArray1[i].id != chargeArray2[k].id &&
 				chargeArray1[i].showing &&
 				chargeArray2[k].showing
@@ -369,36 +369,36 @@ function doRecombine(chargeArray1, chargeArray2) {
 				chargeArray1[i].deactivate();
 				chargeArray2[k].deactivate();
 
-				recomEffectsPositions[recomCount] = p5.Vector.div(
+				recombineEffectsPositions[recombineCount] = p5.Vector.div(
 					p5.Vector.add(chargeArray2[k].position, chargeArray1[i].position),
 					2
 				);
 
 				//effects
 
-				recomEffects[recomCount] = new Effect(
-					recomEffectsPositions[recomCount].x,
-					recomEffectsPositions[recomCount].y,
+				recombineEffects[recombineCount] = new Effect(
+					recombineEffectsPositions[recombineCount].x,
+					recombineEffectsPositions[recombineCount].y,
 					10,
 					"h",
-					recomCount
+					recombineCount
 				);
-				recomEffectsForElectrons[recomCount] = new Effect(
+				recombineEffectsForElectrons[recombineCount] = new Effect(
 					chargeArray1[i].position.x,
 					chargeArray1[i].position.y,
 					10,
 					"gen",
-					recomCount
+					recombineCount
 				);
-				recomEffectsForHoles[recomCount] = new Effect(
+				recombineEffectsForHoles[recombineCount] = new Effect(
 					chargeArray2[k].position.x,
 					chargeArray2[k].position.y,
 					10,
 					"recom",
-					recomCount
+					recombineCount
 				);
 
-				recomCount++;
+				recombineCount++;
 
 				let b = chargeArray1[i].position.y;
 
@@ -412,13 +412,13 @@ function doRecombine(chargeArray1, chargeArray2) {
 }
 
 function checkRecombines() {
-	//////////// if recombination is turned on, recombine happen, recomDistance is the distance between each recombine (carrier lifetime)
+	//////////// if recombination is turned on, recombine happen, recombineDistance is the distance between each recombine (carrier lifetime)
 	if (recombineOn) {
 		//disappear
-		doRecombine(genElectrons, genHoles);
-		doRecombine(genElectrons, initHoles);
-		doRecombine(initElectrons, genHoles);
-		doRecombine(initElectrons, initHoles);
+		doRecombine(generatedElectrons, generatedHoles);
+		doRecombine(generatedElectrons, initialHoles);
+		doRecombine(initialElectrons, generatedHoles);
+		doRecombine(initialElectrons, initialHoles);
 	}
 }
 
@@ -518,11 +518,11 @@ function drawGraph() {
 	fill(254, 246, 182, 100);
 
 	//////////////////////////////////////////////////// graph switch on and off change looks
-	// if (switchGraph) {
-	// 	fill("white");
-	// } else {
-	// 	fill(102, 194, 255, 100);
-	// }
+	if (switchGraph) {
+		fill("white");
+	} else {
+		fill(102, 194, 255, 100);
+	}
 
 	//choosing the E-field or charge density box around text
 	if (switchGraph) {
@@ -531,10 +531,10 @@ function drawGraph() {
 		fill(...color.EFColor, 80);
 		rect(272 * sx, 186 * sy, 94 * sx, 24 * sy, 5 * sy, 5 * sy);
 
-		// charge density outline when not active
-		stroke(...color.CDColor);
-		// noStroke();
+		// charge density
+		stroke(...color.blue);
 		noFill();
+
 		rect(158 * sx, 186 * sy, 108 * sx, 24 * sy, 5 * sy, 5 * sy);
 	} else {
 		// charge density is showing
@@ -542,152 +542,42 @@ function drawGraph() {
 		fill(...color.CDColor, 80);
 		rect(158 * sx, 186 * sy, 108 * sx, 24 * sy, 5 * sy, 5 * sy);
 
-		// electric field outline
-		stroke(...color.EFColor);
-		// strokeWeight(8);
+		// electric field
+		stroke(...color.blue);
 		noFill();
+
 		rect(272 * sx, 186 * sy, 94 * sx, 24 * sy, 5 * sy, 5 * sy);
 	}
 
 	// text
 
+	stroke(125, 241, 148, 100);
 	noStroke();
-	fill(...color.blue);
+	strokeWeight(1);
 
-	// strokeWeight(1);
 	fill(102, 194, 255, 180);
+
 	textSize(14 * sx);
 
 	text("Band Diagram", 160 * sx, 30 * sy);
+
 	text("Charge Density", 164 * sx, 203 * sy);
 	text("Electric Field", 278 * sx, 203 * sy);
 
-	noFill();
-	textSize(14);
-	stroke("#fff");
-
-	context.stroke();
-
-	drawChargeDensityData();
-	drawElectricFieldData();
-
-	function drawChargeDensityData() {
-		//////////////////////////////////////////////////// draw charge density when switch is False
-		if (switchGraph == false) {
-			noStroke();
-			fill(254, 246, 182, 100);
-			if (electronBand_data_v1.length > 0) {
-				//if (hole_new == 50000000000000 && electronBand_data_v1.length>0)
-				//test case for v_data_1.json
-
-				minorityDensity =
-					Math.pow(10, 20) / Math.pow(dopingConcen_new * Math.pow(10, 3), 2);
-				for (let i = 0; i < bandLength; i++) {
-					let y1 =
-						-1.6 *
-						Math.pow(10, -2) *
-						dopingConcen_new *
-						Math.pow(10, 3) *
-						(-1 +
-							Math.exp(-current_array[i] / 0.026) -
-							minorityDensity * Math.exp(current_array[i] / 0.026));
-					//let y1 = 1.6*Math.pow(10,-13)*dopingConcen_new*Math.pow(10,3)*(-1)
-					charge_density_temp_data[i] = { x: electronBand_data_v1[i].x, y: y1 };
-				}
-
-				if (appliedVoltage > 0 || appliedVoltage < 0) {
-					///charge density graph
-					beginShape();
-
-					vertex(250 * sx, (385 / 2 + 96.25) * sy);
-
-					// Add all points as curve vertices
-					for (let i = 0; i < charge_density_temp_data.length; i++) {
-						let x = charge_density_temp_data[i].x;
-						let y =
-							charge_density_temp_data[i].y / Math.pow(10, 14) +
-							(385 / 2 + 96.25) * sy;
-						//let y = 20 + (10+385/2+96.25) * sy;
-						vertex(x, y);
-					}
-
-					endShape();
-				} else if (appliedVoltage == 0) {
-				}
-			}
-		}
-	}
-	function drawElectricFieldData() {
-		//////////////////////////////////////////////////// draw E-field graph on second graph when switch is On, and draw charge density graph when not clicked switch
-		if (switchGraph == true) {
-			noStroke();
-
-			fill(218, 112, 214, 100);
-			if (electronBand_data_v1.length > 0) {
-				if (appliedVoltage > 0 || appliedVoltage < 0) {
-					///charge density graph
-					beginShape();
-
-					vertex(250 * sx, (385 / 2 + 96.25) * sy);
-
-					// Add all points as curve vertices
-					for (let i = 0; i < E_field_temp_data.length; i++) {
-						let x = E_field_temp_data[i].x;
-						let y =
-							(E_field_temp_data[i].y / Math.pow(10, 4)) * 2 +
-							(385 / 2 + 96.25) * sy;
-
-						vertex(x, y);
-					}
-					vertex(
-						E_field_temp_data[bandLength - 2].x,
-						E_field_temp_data[bandLength - 2].y / Math.pow(10, 5) +
-							(385 / 2 + 96.25) * sy
-					);
-
-					endShape();
-				} else if (appliedVoltage == 0) {
-				}
-			}
-		}
-	}
-
-	// draw rectangles to block charge density graph overflow
-	// stroke(125, 241, 148, 100);
-
-	noFill();
-	fill(30);
 	noStroke();
-	// top
-	rect(
-		outlineX * sx,
-		bandDiagramY * sy,
-		(outlineWidth + xSlide) * sx,
-		(outlineHeight - 12) * sy
-	);
 
-	// bottom
-	rect(
-		outlineX * sx,
-		capacitorDiagramY * sy,
-		(outlineWidth + xSlide) * sx,
-		capacitorHeight * sy
-	);
+	stroke(125, 241, 148, 100);
+	noFill();
 
-	fill(...color.bg);
-	rect(0 * sx, 0 * sy, 1000, 9.6 * sy);
-	fill(...color.bg);
-	rect(
-		outlineX * sx,
-		(capacitorDiagramY + capacitorHeight + 2) * sy,
-		1000,
-		80 * sy
-	);
+	textSize(14);
 
-	stroke("white");
-	fill(30);
+	stroke("#fff");
+	// context.setLineDash([10, 10]);
+
 	// draw metal on left side
 	rect(metalX * sx, metalY * sy, metalWidth * sx, metalHeight * sy);
+
+	stroke("#fff");
 
 	// draw Insulator
 	rect(
@@ -778,6 +668,109 @@ function drawGraph() {
 		(outlineX + outlineWidth - 26 + xSlide) * sx,
 		(batteryY + batteryPosImg.height / 2 - 5) * sy
 	);
+
+	context.stroke();
+
+	drawChargeDensityData();
+	drawElectricFieldData();
+
+	function drawChargeDensityData() {
+		//////////////////////////////////////////////////// draw charge density when switch is False
+		if (switchGraph == false) {
+			noStroke();
+			fill(254, 246, 182, 100);
+			if (electronBand_data_v1.length > 0) {
+				//if (hole_new == 50000000000000 && electronBand_data_v1.length>0)
+				//test case for v_data_1.json
+
+				minorityDensity =
+					Math.pow(10, 20) /
+					Math.pow(dopingConcentration_new * Math.pow(10, 3), 2);
+				for (let i = 0; i < bandLength; i++) {
+					let y1 =
+						-1.6 *
+						Math.pow(10, -2) *
+						dopingConcentration_new *
+						Math.pow(10, 3) *
+						(-1 +
+							Math.exp(-current_array[i] / 0.026) -
+							minorityDensity * Math.exp(current_array[i] / 0.026));
+					//let y1 = 1.6*Math.pow(10,-13)*dopingConcentration_new*Math.pow(10,3)*(-1)
+					charge_density_temp_data[i] = { x: electronBand_data_v1[i].x, y: y1 };
+				}
+
+				if (appliedVoltage > 0 || appliedVoltage < 0) {
+					///charge density graph
+					beginShape();
+
+					vertex(250 * sx, (385 / 2 + 96.25) * sy);
+
+					// Add all points as curve vertices
+					for (let i = 0; i < charge_density_temp_data.length; i++) {
+						let x = charge_density_temp_data[i].x;
+						let y =
+							charge_density_temp_data[i].y / Math.pow(10, 14) +
+							(385 / 2 + 96.25) * sy;
+						//let y = 20 + (10+385/2+96.25) * sy;
+						vertex(x, y);
+					}
+
+					endShape();
+				} else if (appliedVoltage == 0) {
+				}
+			}
+		}
+	}
+	function drawElectricFieldData() {
+		//////////////////////////////////////////////////// draw E-field graph on second graph when switch is On, and draw charge density graph when not clicked switch
+		if (switchGraph == true) {
+			noStroke();
+
+			fill(218, 112, 214, 100);
+			if (electronBand_data_v1.length > 0) {
+				if (appliedVoltage > 0 || appliedVoltage < 0) {
+					///charge density graph
+					beginShape();
+
+					vertex(250 * sx, (385 / 2 + 96.25) * sy);
+
+					// Add all points as curve vertices
+					for (let i = 0; i < E_field_temp_data.length; i++) {
+						let x = E_field_temp_data[i].x;
+						let y =
+							(E_field_temp_data[i].y / Math.pow(10, 4)) * 2 +
+							(385 / 2 + 96.25) * sy;
+
+						vertex(x, y);
+					}
+					vertex(
+						E_field_temp_data[bandLength - 2].x,
+						E_field_temp_data[bandLength - 2].y / Math.pow(10, 5) +
+							(385 / 2 + 96.25) * sy
+					);
+
+					endShape();
+				} else if (appliedVoltage == 0) {
+				}
+			}
+		}
+	}
+	function drawRedZone() {
+		/////////////////////////////////draw red dashed line ox
+
+		stroke(255, 58, 23, 210);
+		context.beginPath();
+		context.setLineDash([10, 10]);
+		context.rect(
+			150 * sx,
+			(10 + 385) * sy,
+			(400 / 8) * 1 * 2 * sx,
+			(770 / 2) * sy
+		);
+		context.closePath();
+		context.stroke();
+		context.setLineDash([]);
+	}
 }
 
 function drawBandDiagram() {
@@ -919,10 +912,10 @@ function drawBandDiagram() {
 }
 //reset button
 function reset_scene1() {
-	genElectrons = [];
-	genHoles = [];
-	initElectrons = [];
-	initHoles = [];
+	generatedElectrons = [];
+	generatedHoles = [];
+	initialElectrons = [];
+	initialHoles = [];
 	fixedCharges = [];
 
 	if (scene(1) || scene(2)) {
@@ -936,15 +929,15 @@ function reset_scene1() {
 
 //set carrier lifetime slider
 function setDistance(te) {
-	recomDistance = te;
+	recombineDistance = te;
 }
 
 //
 function setConcentration(te) {
 	concentration = te / 3;
 
-	genElectrons = [];
-	genHoles = [];
+	generatedElectrons = [];
+	generatedHoles = [];
 }
 
 //turn on or off recombine
@@ -998,24 +991,26 @@ function scattering() {
 
 	function moveCharges(chargeArray, band) {
 		for (let i = 0; i < chargeArray.length; i++) {
-			chargeArray[i].botz =
-				getRandomBotz[Math.floor(Math.random() * getRandomBotz.length)];
-			let closestToBand = findClosestValue(band, chargeArray[i].position.x);
-			chargeArray[i].origin.y = closestToBand;
-			chargeArray[i].movingVelocity = chargeArray[i].botz;
-			chargeArray[i].direction = createVector(random(-1, 1), random(-1, 1));
-			chargeArray[i].velocity = p5.Vector.mult(
-				chargeArray[i].direction,
-				chargeArray[i].movingVelocity
-			);
+			if (chargeArray[i].push == 0) {
+				chargeArray[i].botz =
+					getRandomBotz[Math.floor(Math.random() * getRandomBotz.length)];
+				let closestToBand = findClosestValue(band, chargeArray[i].position.x);
+				chargeArray[i].origin.y = closestToBand;
+				chargeArray[i].movingVelocity = chargeArray[i].botz;
+				chargeArray[i].direction = createVector(random(-1, 1), random(-1, 1));
+				chargeArray[i].velocity = p5.Vector.mult(
+					chargeArray[i].direction,
+					chargeArray[i].movingVelocity
+				);
+			}
 		}
 	}
 
 	if (scatteringCount == 0) {
-		moveCharges(initElectrons, electronBand);
-		moveCharges(genElectrons, electronBand);
-		moveCharges(initHoles, holeBand);
-		moveCharges(genHoles, holeBand);
+		moveCharges(initialElectrons, electronBand);
+		moveCharges(generatedElectrons, electronBand);
+		moveCharges(initialHoles, holeBand);
+		moveCharges(generatedHoles, holeBand);
 		scatteringCount = parseInt(scatteringCountInput) + 2;
 	}
 }
@@ -1031,16 +1026,16 @@ function generateCharges(num) {
 
 	if (scene(2) || scene(1)) {
 		if (timeElapsed > 0) {
-			genElectrons = [];
-			genHoles = [];
+			generatedElectrons = [];
+			generatedHoles = [];
 		} else if (timeElapsed == 0) {
 			// at beggining of scene
 			for (let i = 0; i < num; i++) {
-				const buffer = 16; // make sure charges don't get stuck bouncing on edge
+				let buffer = 14; // make sure charges don't get stuck bouncing on edge
 				let xPosition = random((xMin + buffer) * sx, (xMax - buffer) * sx);
 				let yPosition = random((yMin + buffer) * sy, (yMax - buffer) * sy);
 
-				genEffects.push(new Effect(xPosition, yPosition, 10, "e"));
+				generationEffects.push(new Effect(xPosition, yPosition, 10, "e"));
 
 				let closestValueToElectronBand = findClosestValue(
 					electronBand,
@@ -1056,7 +1051,7 @@ function generateCharges(num) {
 				newCharge.botz =
 					getRandomBotz[Math.floor(Math.random() * getRandomBotz.length)];
 
-				genElectrons.push(newCharge);
+				generatedElectrons.push(newCharge);
 
 				// create new generated hole
 				let closestValueToHoleBand = findClosestValue(holeBand, xPosition);
@@ -1068,7 +1063,7 @@ function generateCharges(num) {
 				newHole.botz =
 					getRandomBotz[Math.floor(Math.random() * getRandomBotz.length)];
 
-				genHoles.push(newHole);
+				generatedHoles.push(newHole);
 
 				chargeID += 1;
 			}
@@ -1085,7 +1080,7 @@ function updateDopingConcentration(a) {
 	hole_new = Math.pow(10, ((10 / 10) * (a - 124) + 124) / 10) * 5;
 
 	//// Azad: Doping concentration * 0.001/5
-	dopingConcen = Math.pow(10, a / 10);
+	dopingConcentration = Math.pow(10, a / 10);
 
 	// same as above
 	electron_add = Math.pow(10, a / 10);
@@ -1094,17 +1089,17 @@ function updateDopingConcentration(a) {
 	let mm = Math.pow(10, ((10 / 10) * (a - 124) + 124) / 10) * 5;
 
 	/// this is later is used for calculating charge density
-	dopingConcen_new = mm;
+	dopingConcentration_new = mm;
 
 	timeElapsed = 0;
 
 	getRandomBotz = [];
 
 	////
-	genElectrons = [];
-	genHoles = [];
-	initElectrons = [];
-	initHoles = [];
+	generatedElectrons = [];
+	generatedHoles = [];
+	initialElectrons = [];
+	initialHoles = [];
 	fixedCharges = [];
 
 	//add ---- hhhh left
@@ -1176,35 +1171,32 @@ function updateDopingConcentration(a) {
 		///////hole
 
 		let numFixedCharges =
-			Math.pow(100, (Math.log10(Math.round(dopingConcen)) - 8) / 2) / 1000;
+			Math.pow(100, (Math.log10(Math.round(dopingConcentration)) - 8) / 2) /
+			1000;
 
 		////////add fixed charges + free charges /////////////////////////////////////////////////////////////////////////
 
 		for (let i = 0; i < numFixedCharges; i++) {
-			// let a = random(xMin * sx, xMax * sx);
-			// let b = random(yMin * sy, yMax * sy);
-
-			const buffer = 16;
-			let xPosition = random((xMin + buffer) * sx, (xMax - buffer) * sx);
-			let yPosition = random((yMin + buffer) * sy, (yMax - buffer) * sy);
+			let a = random(xMin * sx, xMax * sx);
+			let b = random(yMin * sy, yMax * sy);
 
 			if (scene(1)) {
 				// p-doped
-				fixedCharges.push(new Effect(xPosition, yPosition, 10, "fixneg", i)); // fixed negative charges
+				fixedCharges.push(new Effect(a, b, 10, "fixneg", i)); // fixed negative charges
 
 				// free holes
-				var Charge2 = new Charge(xPosition, yPosition, 10, "h", "h");
+				var Charge2 = new Charge(a, b, 10, "h", "h");
 				Charge2.botz = getRandomBotz[i];
-				initHoles.push(Charge2);
+				initialHoles.push(Charge2);
 				chargeID += 1;
 			} else if (scene(2)) {
 				// n-doped
-				fixedCharges.push(new Effect(xPosition, yPosition, 10, "fixpos", i)); // fixed positive charges
+				fixedCharges.push(new Effect(a, b, 10, "fixpos", i)); // fixed positive charges
 
 				// free electron
-				var Charge2 = new Charge(xPosition, yPosition, 10, "e", "e");
+				var Charge2 = new Charge(a, b, 10, "e", "e");
 				Charge2.botz = getRandomBotz[i];
-				initElectrons.push(Charge2); // working
+				initialElectrons.push(Charge2); // working
 				chargeID += 1;
 			}
 		}
@@ -1259,81 +1251,115 @@ function toggleRecombine() {
 
 // the function to update the electron hole movements and animations
 function updateChargeMovement() {
-	function moveHelper(chargeArray) {
-		for (let i = 0; i < chargeArray.length; i++) {
-			if (chargeArray[i].active) {
-				chargeArray[i].display();
-				chargeArray[i].updateOpacity();
-				chargeArray[i].update();
+	for (let i = 0; i < generatedElectrons.length; i++) {
+		if (generatedElectrons[i].active) {
+			generatedElectrons[i].display();
+			generatedElectrons[i].updateOpacity();
+			generatedElectrons[i].update();
 
-				if (chargeArray[i].opacity > 255) {
-					chargeArray[i].random_walk();
-				}
+			if (generatedElectrons[i].opacity > 255) {
+				generatedElectrons[i].random_walk();
 			}
 		}
 	}
 
-	let chargeArrays = [initElectrons, genElectrons, initHoles, genHoles];
-	for (let i = 0; i < chargeArrays.length; i++) {
-		moveHelper(chargeArrays[i]);
-	}
+	for (let i = 0; i < generatedHoles.length; i++) {
+		if (generatedHoles[i].active) {
+			generatedHoles[i].display();
+			generatedHoles[i].updateOpacity();
+			generatedHoles[i].update();
 
-	for (let i = 0; i < genEffects.length; i++) {
-		if (genEffects[i].generationOpacity < 1) {
-			genEffects.splice(i, 1);
+			if (generatedHoles[i].opacity > 255) {
+				generatedHoles[i].random_walk();
+			}
 		}
 	}
 
-	function displayCharges(array) {
-		for (let i = 0; i < array.length; i++) {
-			array[i].display();
-			array[i].update();
+	for (let i = 0; i < initialHoles.length; i++) {
+		initialHoles[i].display();
+		initialHoles[i].updateOpacity();
+		initialHoles[i].update();
+
+		if (initialHoles[i].opacity > 255) {
+			initialHoles[i].random_walk();
 		}
 	}
 
-	const displayArrays = [fixedCharges, genEffects, recomEffects];
+	for (let i = 0; i < initialElectrons.length; i++) {
+		initialElectrons[i].display();
+		initialElectrons[i].updateOpacity();
+		initialElectrons[i].update();
 
-	for (let i = 0; i < displayArrays.length; i++) {
-		displayCharges(displayArrays[i]);
+		if (initialElectrons[i].opacity > 255) {
+			initialElectrons[i].random_walk();
+		}
+	}
+
+	for (let i = 0; i < generationEffects.length; i++) {
+		if (generationEffects[i].generationOpacity < 1) {
+			generationEffects.splice(i, 1);
+		}
+	}
+
+	//generation visual effect
+	for (let i = 0; i < generationEffects.length; i++) {
+		generationEffects[i].display();
+		generationEffects[i].update();
+	}
+
+	//negative signs appear
+	for (let i = 0; i < fixedCharges.length; i++) {
+		fixedCharges[i].display();
+		fixedCharges[i].update();
+	}
+
+	// (recombination visual effect
+	for (let i = 0; i < recombineEffects.length; i++) {
+		if (typeof recombineEffects[i] != "undefined") {
+			recombineEffects[i].display();
+			recombineEffects[i].update();
+		}
 	}
 
 	// (recombination visual effect, electron fading )
-	for (let i = 0; i < recomEffectsForElectrons.length; i++) {
-		if (typeof recomEffectsForElectrons[i] != "undefined") {
-			recomEffectsForElectrons[i].display();
-			recomEffectsForElectrons[i].update_circle();
-			recomEffectsForElectrons[i].update_location();
+	for (let i = 0; i < recombineEffectsForElectrons.length; i++) {
+		if (typeof recombineEffectsForElectrons[i] != "undefined") {
+			recombineEffectsForElectrons[i].display();
+			recombineEffectsForElectrons[i].update_circle();
+			recombineEffectsForElectrons[i].update_location();
 		}
 	}
 
 	//(recombination visual effect, hole fading)
-	for (let i = 0; i < recomEffectsForHoles.length; i++) {
-		if (typeof recomEffectsForHoles[i] != "undefined") {
-			recomEffectsForHoles[i].display();
-			recomEffectsForHoles[i].update_circle();
-			recomEffectsForHoles[i].update_location();
+	for (let i = 0; i < recombineEffectsForHoles.length; i++) {
+		if (typeof recombineEffectsForHoles[i] != "undefined") {
+			recombineEffectsForHoles[i].display();
+			recombineEffectsForHoles[i].update_circle();
+			recombineEffectsForHoles[i].update_location();
 		}
 	}
 
-	for (let i = 0; i < recomEffectsForHoles.length; i++) {
-		if (typeof recomEffectsForHoles[i] != "undefined") {
-			for (let k = 0; k < recomEffectsForElectrons.length; k++) {
-				if (typeof recomEffectsForElectrons[k] != "undefined") {
-					if (recomEffectsForHoles[i].id == recomEffectsForElectrons[k].id) {
-						recomEffectsForElectrons[k].seek(
+	for (let i = 0; i < recombineEffectsForHoles.length; i++) {
+		if (typeof recombineEffectsForHoles[i] != "undefined") {
+			for (let k = 0; k < recombineEffectsForElectrons.length; k++) {
+				if (typeof recombineEffectsForElectrons[k] != "undefined") {
+					if (
+						recombineEffectsForHoles[i].id == recombineEffectsForElectrons[k].id
+					) {
+						recombineEffectsForElectrons[k].seek(
 							p5.Vector.div(
 								p5.Vector.add(
-									recomEffectsForElectrons[k].position,
-									recomEffectsForHoles[i].position
+									recombineEffectsForElectrons[k].position,
+									recombineEffectsForHoles[i].position
 								),
 								2
 							)
 						);
-						recomEffectsForHoles[i].seek(
+						recombineEffectsForHoles[i].seek(
 							p5.Vector.div(
 								p5.Vector.add(
-									recomEffectsForElectrons[k].position,
-									recomEffectsForHoles[i].position
+									recombineEffectsForElectrons[k].position,
+									recombineEffectsForHoles[i].position
 								),
 								2
 							)
@@ -1345,8 +1371,8 @@ function updateChargeMovement() {
 	}
 }
 
-function setbandScale(v) {
-	bandScale = v;
+function setBandDiagramVScale(v) {
+	bandDiagramVScale = v;
 }
 
 /******************************
