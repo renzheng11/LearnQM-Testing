@@ -128,7 +128,7 @@ class Electron {
 		direction.normalize();
 
 		// Scale the direction vector by the ball's speed
-		direction.mult(6);
+		direction.mult(10);
 
 		// Update the position based on the direction vector
 		this.position.add(direction);

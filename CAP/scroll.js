@@ -5,31 +5,31 @@ let scenes = [];
 StartScroll = () => {
 	let controller = new ScrollMagic.Controller();
 
-	let scene1 = new ScrollMagic.Scene({
-		triggerElement: "#scene1",
-	})
-		.setClassToggle("#scene1", "fade-in")
-		.on("start", () => {
-			if (sceneCount == 0) {
-				sceneCount = 1;
-				resetScene();
-			} else {
-				sceneCount = 0;
-				resetDraw();
-			}
-		})
-		.addTo(controller);
+	// let scene1 = new ScrollMagic.Scene({
+	// 	triggerElement: "#scene1",
+	// })
+	// 	.setClassToggle("#scene1", "fade-in")
+	// 	.on("start", () => {
+	// 		if (sceneCount == 0) {
+	// 			sceneCount = 1;
+	// 			resetScene();
+	// 		} else {
+	// 			sceneCount = 0;
+	// 			resetDraw();
+	// 		}
+	// 	})
+	// 	.addTo(controller);
 
 	let scene2 = new ScrollMagic.Scene({
 		triggerElement: "#scene2",
 	})
 		.setClassToggle("#scene2", "fade-in")
 		.on("start", () => {
-			if (sceneCount == 1) {
+			if (sceneCount == 0) {
 				sceneCount = 2;
 				resetScene();
 			} else {
-				sceneCount = 1;
+				sceneCount = 0;
 				resetScene();
 			}
 		})

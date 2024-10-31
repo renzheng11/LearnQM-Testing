@@ -59,7 +59,7 @@ const battery = {
 	rightX: boxD.xRight + boxD.width / 2,
 	y1: boxD.y + boxD.height,
 	y2: boxD.y + boxD.height + 60,
-	batterySize: 40,
+	size: 40,
 };
 
 let reverse = false; // keeps track of battery direction (whether charge flows left or right)
@@ -116,11 +116,13 @@ let scannerWidth;
 let xMax; // end of depletion region, math amount
 let xPercent; // percentage of xMax compared to total region width
 let maxBox = 0; // box's pixel x position for xMax (scale labelled right below box)
-let xPos; // tracks user's pixel mouse position within box
-let currX; // converts pixel xPos to math amount
+let boxMouseX = 0; // tracks user's pixel mouse position within box
+let graphMouseX = 0; // tracks user's pixel mouse position within canvas
+
+let currX; // converts pixel boxMouseX to math amount
 
 let Q = 1; // charge amount determined by user slider
-let currQ; // calculated amount according to xPos when scanning
+let currQ; // calculated amount according to boxMouseX when scanning
 let actualQ = 1; // ???
 
 let buttonState = "A"; // tracks whether button text is "Apply" or "Reset"
@@ -363,7 +365,13 @@ function fadeFunc() {
  * Check if mouse hovering over battery to change cursor
  */
 function mouseHover() {
-	if (mouseX > 266 && mouseX < 344 && mouseY > 420 && mouseY < 456) {
+	// console.log("battery.leftx", b
+	if (
+		mouseX / sx > battery.imageX - 10 &&
+		mouseX / sx < battery.imageX + 66 &&
+		mouseY / sy > battery.y1 * sy &&
+		mouseY / sy < (battery.y1 + 40) * sy
+	) {
 		if (buttonState == "A") {
 			document.body.style.cursor = "pointer";
 		}
@@ -377,10 +385,10 @@ function mouseHover() {
  */
 function mousePressed() {
 	if (
-		mouseX > 266 &&
-		mouseX < 344 &&
-		mouseY > 420 &&
-		mouseY < 456 &&
+		mouseX / sx > battery.imageX - 10 &&
+		mouseX / sx < battery.imageX + 66 &&
+		mouseY / sy > battery.y1 * sy &&
+		mouseY / sy < (battery.y1 + 40) * sy &&
 		buttonState == "A"
 	) {
 		reverse = !reverse;
@@ -628,15 +636,16 @@ function drawElectrons(box) {
 				if (electron.passedDest.includes(4)) {
 					if (!reverse) {
 						if (electron.position.x < attractSide) {
-							electron.position.x += 4;
+							// charges get attracted to the side
+							electron.position.x += 8;
 						}
 
 						if (electron.position.x > attractSide - 2) {
 							let possibleSpeeds = [];
-							for (let i = 7; i < 10; i++) {
+							for (let i = 8; i < 12; i++) {
 								possibleSpeeds.push(i);
 							}
-							for (let i = -7; i > -10; i--) {
+							for (let i = -8; i > -12; i--) {
 								possibleSpeeds.push(i);
 							}
 							let index = floor(Math.random() * possibleSpeeds.length);
@@ -651,7 +660,8 @@ function drawElectrons(box) {
 						}
 					} else if (reverse) {
 						if (electron.position.x > attractSide) {
-							electron.position.x -= 4;
+							// charges get attracted to the side
+							electron.position.x -= 8;
 						}
 
 						if (electron.position.x < attractSide + 2) {
@@ -757,18 +767,20 @@ function scaleUnits(item, unit) {
  * @param {*} box Box to draw scanner for
  */
 function drawScanner(box) {
-	xPos = 0;
+	boxMouseX = 0;
+
 	let scale = 1;
 	scannerNM = 1;
 	scannerWidth = scannerNM * scale; // 1nm
 
 	// if mouse is in box
+
 	if (mouseX / sx < box.x + boxD.width && mouseX / sx > box.x) {
-		xPos = mouseX / sx - box.x;
+		boxMouseX = mouseX / sx - box.x;
 	}
 
 	// percentage
-	currX = xPos / boxD.width;
+	currX = boxMouseX / boxD.width;
 
 	if (box.type == "m") {
 		// following equations
@@ -813,7 +825,7 @@ function drawScanner(box) {
 		noStroke();
 
 		// only draw if electrons have been animated
-		rect(box.x, box.y, xPos + scannerWidth, box.h);
+		rect(box.x, box.y, boxMouseX + scannerWidth, box.h);
 
 		beginShape();
 		// vertex(box.x , box.y ); // bottom left
@@ -842,18 +854,14 @@ function drawScanner(box) {
 			text(`Q: ${currQ.toFixed(2)}µC`, box.x + 80, box.y - 32);
 
 			text(
-				`# uncompensated \n   photons: ${electronsRight}`,
+				`# uncompensated \n   dopants: ${electronsRight}`,
 				box.x + 172,
 				box.y - 32
 			);
 			styleText();
 			// left box Q + electrons
 			text(`Q: -${Q.toFixed(2)}µC`, boxD.xLeft + 80, box.y - 32);
-			text(
-				`# uncompensated \n   photons: ${electronsLeft}`,
-				boxD.xLeft + 172,
-				box.y - 32
-			);
+
 			// right box xMax
 			text(`xMax: ${xMax}µm`, box.x + 80, box.y - 16);
 			// drag over box prompt
@@ -866,15 +874,20 @@ function drawScanner(box) {
 			}
 		} else if (reverse) {
 			// right box Q
-			text(`Q: -${currQ.toFixed(2)}µC`, box.x + 120, box.y - 32);
+			// text(`Q: -${currQ.toFixed(2)}µC`, box.x + 120, box.y - 32);
+
+			if (boxMouseX >= 6) {
+				// num is picked (scanner looks like it's right of electrons) - may need to change later
+				// if scanner is right of electrons
+				text(`Q: -${Q.toFixed(2)}µC`, box.x + 120, box.y - 32);
+				text(`# extra electrons:  ${electronsLeft}`, box.x + 120, box.y - 18);
+			} else {
+				// if scanner out of box
+				text(`Q: 0µC`, box.x + 120, box.y - 32);
+				text(`# extra electrons: 0`, box.x + 120, box.y - 18);
+			}
 			// left box Q
 			text(`Q: ${Q.toFixed(2)}µC`, boxD.xLeft + 120, box.y - 32);
-
-			text(
-				`# extra electrons: \n ${electronsLeft}`,
-				boxD.xLeft + 180,
-				box.y - 32
-			);
 		}
 		styleText();
 		for (let i = 0; i < 5; i++) {
@@ -943,9 +956,28 @@ function drawGraph() {
 	text("120 MV/cm —", graph.center - 70, graph.y - 54);
 	text("-120 MV/cm —", graph.center - 70, graph.y + 54);
 
+	// track mouse position
+	graphMouseX = mouseX / sx;
+
 	if (sceneAnimated) {
+		stroke(...color.net);
+		noFill();
+
+		// draw line indicated where E = [x] amount is referring to
+		line(graphMouseX, graph.y - 60, graphMouseX, graph.y + 60);
+
+		noStroke();
 		fill(...color.net);
-		text(`= ${Q * 11.3} MV/cm`, graph.center + 30, graph.y - 64);
+		// draw text EF amount
+		if (graphMouseX > graph.center) {
+			text(
+				`= -${(Q * 11.3 - currQ * 11.3).toFixed(2)} MV/cm`,
+				graph.center + 30,
+				graph.y - 64
+			);
+		} else {
+			text(`= ${0} MV/cm`, graph.center + 30, graph.y - 64);
+		}
 	}
 
 	textFont("Cambria");
@@ -981,8 +1013,8 @@ function drawGraph() {
 				graph.x,
 				graph.center,
 				graph.center,
-				graph.center + 26,
-				graph.center + 26,
+				boxD.xRight,
+				boxD.xRight,
 				graph.end,
 			];
 
@@ -993,7 +1025,7 @@ function drawGraph() {
 					graph.x,
 					graph.center,
 					graph.center,
-					graph.center + 26,
+					boxD.xRight,
 					currRightBox.x + boxMax,
 					graph.end,
 				];
@@ -1004,8 +1036,8 @@ function drawGraph() {
 				graph.x,
 				graph.center,
 				graph.center,
-				graph.center + 26,
-				graph.center + 26,
+				boxD.xRight,
+				boxD.xRight,
 				graph.end,
 			];
 		}
@@ -1104,8 +1136,8 @@ function drawArrows() {
 }
 
 function draw() {
-	sx = (windowWidth / scale_x) * 0.98;
-	sy = (windowHeight / scale_y) * 0.98;
+	sx = (windowWidth / scale_x) * 0.95;
+	sy = (windowHeight / scale_y) * 0.95;
 	scale(sx);
 	if (sceneCount > 0) {
 		// canvas

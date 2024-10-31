@@ -24,7 +24,7 @@ const color = {
 	CDColor: [2, 104, 255], // charge density
 	electricFieldOpacity: 160,
 	chargeDensityOpacity: 160,
-	white: [255, 140],
+	white: [255],
 	black: [0],
 	black2: [30],
 	red: [255],
@@ -59,11 +59,11 @@ let recomCount = 0; //disappear number count
 let appliedVoltage = 0; //added voltage for p dopant
 let generationRate = 1000; //generation rate
 let generationRateInterval; //generation rate interval
+let temp = 270; //set temperature
 let recombineOn = true; //recombine on or off
 let dopingConcen = 0; // doping concentration
 let dopingConcen_new = 0; // doping concentration
 var timeElapsed = 0; //count down for timeIt functionn
-let newAcceleration = 0;
 
 // scattering
 let willScatter = false; //scatter true or false
@@ -100,7 +100,7 @@ let electron_add = 0; //added electron number // ???
 let switchGraph = false; //turn on or off the switch between charge density and electric field graph
 
 // Intervals
-let genInterval = 2000; //interval for generation
+let interval_45 = 2000; //interval for generation
 var run45; // initiation for geenration
 let run11; //initiation
 let run_outer; //initiation
@@ -270,11 +270,16 @@ function setup() {
 	context = canvas.drawingContext;
 
 	scaleWindow();
+	onRefresh();
 
-	// generate charges
+	// generate balls based on frequency
 	run45 = setInterval(function () {
 		generateCharges(1);
-	}, genInterval);
+	}, interval_45); // scene changing T
+	// generate balls straight
+	run11 = setInterval(function () {
+		generateCharges_straight(1);
+	}, 2000); // scene changing T
 
 	scatteringInterval = setInterval(function () {
 		scattering();
@@ -509,8 +514,8 @@ function drawGraph() {
 
 	///////////new box graphing
 
-	// noStroke();
-	// fill(254, 246, 182, 100);
+	noStroke();
+	fill(254, 246, 182, 100);
 
 	//////////////////////////////////////////////////// graph switch on and off change looks
 	// if (switchGraph) {
@@ -520,8 +525,6 @@ function drawGraph() {
 	// }
 
 	//choosing the E-field or charge density box around text
-	noFill();
-	noStroke();
 	if (switchGraph) {
 		// electric field is showing
 		stroke(...color.EFColor);
@@ -529,27 +532,26 @@ function drawGraph() {
 		rect(272 * sx, 186 * sy, 94 * sx, 24 * sy, 5 * sy, 5 * sy);
 
 		// charge density outline when not active
-		stroke(...color.blue);
+		stroke(...color.CDColor);
+		// noStroke();
 		noFill();
-		rect();
 		rect(158 * sx, 186 * sy, 108 * sx, 24 * sy, 5 * sy, 5 * sy);
 	} else {
 		// charge density is showing
 		stroke(...color.CDColor);
 		fill(...color.CDColor, 80);
 		rect(158 * sx, 186 * sy, 108 * sx, 24 * sy, 5 * sy, 5 * sy);
+
 		// electric field outline
-		stroke(...color.blue);
+		stroke(...color.EFColor);
+		// strokeWeight(8);
 		noFill();
-		rect();
 		rect(272 * sx, 186 * sy, 94 * sx, 24 * sy, 5 * sy, 5 * sy);
 	}
 
-	noFill();
-	noStroke();
-
 	// text
 
+	noStroke();
 	fill(...color.blue);
 
 	// strokeWeight(1);
@@ -562,7 +564,7 @@ function drawGraph() {
 
 	noFill();
 	textSize(14);
-	stroke(...color.white);
+	stroke("#fff");
 
 	context.stroke();
 
@@ -573,10 +575,9 @@ function drawGraph() {
 		//////////////////////////////////////////////////// draw charge density when switch is False
 		if (switchGraph == false) {
 			noStroke();
-			fill(...color.CDColor, color.chargeDensityOpacity);
-			// fill(254, 246, 182, 100);
+			fill(254, 246, 182, 100);
 			if (electronBand_data_v1.length > 0) {
-				//if (hole_new == 5e13 && electronBand_data_v1.length>0)
+				//if (hole_new == 50000000000000 && electronBand_data_v1.length>0)
 				//test case for v_data_1.json
 
 				minorityDensity =
@@ -656,7 +657,6 @@ function drawGraph() {
 
 	noFill();
 	fill(30);
-	// fill("red");
 	noStroke();
 	// top
 	rect(
@@ -671,7 +671,7 @@ function drawGraph() {
 		outlineX * sx,
 		capacitorDiagramY * sy,
 		(outlineWidth + xSlide) * sx,
-		(capacitorHeight - 1) * sy
+		capacitorHeight * sy
 	);
 
 	fill(...color.bg);
@@ -684,25 +684,25 @@ function drawGraph() {
 		80 * sy
 	);
 
-	stroke(...color.white);
+	stroke("white");
 	fill(30);
 	// draw metal on left side
-	rect(metalX * sx, (metalY + 1) * sy, metalWidth * sx, (metalHeight - 1) * sy);
+	rect(metalX * sx, metalY * sy, metalWidth * sx, metalHeight * sy);
 
 	// draw Insulator
 	rect(
-		(metalX + metalWidth - 1) * sx,
-		(metalY + 1) * sy,
+		(metalX + metalWidth) * sx,
+		metalY * sy,
 		metalWidth * sx,
-		(metalHeight - 1) * sy
+		metalHeight * sy
 	);
 
 	// draw metal on right side
 	rect(
 		(outlineX + outlineWidth - metalWidth + xSlide) * sx,
-		(metalY + 1) * sy,
+		metalY * sy,
 		metalWidth * sx,
-		(metalHeight - 1) * sy
+		metalHeight * sy
 	);
 
 	let batteryX = outlineX + 360;
@@ -745,7 +745,7 @@ function drawGraph() {
 		(insulatorLabel.height / 1.5) * sy
 	);
 
-	stroke(...color.white);
+	stroke("fff");
 
 	// line from left metal to battery, vertical
 	line(
@@ -786,147 +786,55 @@ function drawBandDiagram() {
 	stroke(254, 246, 182);
 	noFill();
 
-	if (scene(1)) {
-		if (hole_new == 99763115748444.14) {
-			//10^17 case
+	if (hole_new == 99763115748444.14) {
+		//10^17 case
 
-			if (appliedVoltage / 20 == -2) {
-				current_array = numberArray1_neg_2_0;
-			} else if (appliedVoltage / 20 == -1.6) {
-				current_array = numberArray1_neg_1_6;
-			} else if (appliedVoltage / 20 == -1.2) {
-				current_array = numberArray1_neg_1_2;
-			} else if (appliedVoltage / 20 == -0.8) {
-				current_array = numberArray1_neg_0_8;
-			} else if (appliedVoltage / 20 == -0.4) {
-				current_array = numberArray1_neg_0_4;
-			} else if (appliedVoltage / 20 == 0) {
-				current_array = numberArray1_0;
-			} else if (appliedVoltage / 20 == 0.4) {
-				current_array = numberArray1_pos_0_4;
-			} else if (appliedVoltage / 20 == 0.8) {
-				current_array = numberArray1_pos_0_8;
-			} else if (appliedVoltage / 20 == 1.2) {
-				current_array = numberArray1_pos_1_2;
-			} else if (appliedVoltage / 20 == 1.6) {
-				current_array = numberArray1_pos_1_6;
-			} else if (appliedVoltage / 20 == 2) {
-				current_array = numberArray1_pos_2_0;
-			}
-		} else if (hole_new == 5e13) {
-			if (appliedVoltage / 20 == -2) {
-				current_array = numberArray2_neg_2_0;
-			} else if (appliedVoltage / 20 == -1.6) {
-				current_array = numberArray2_neg_1_6;
-			} else if (appliedVoltage / 20 == -1.2) {
-				current_array = numberArray2_neg_1_2;
-			} else if (appliedVoltage / 20 == -0.8) {
-				current_array = numberArray2_neg_0_8;
-			} else if (appliedVoltage / 20 == -0.4) {
-				current_array = numberArray2_neg_0_4;
-			} else if (appliedVoltage / 20 == 0) {
-				current_array = numberArray2_0;
-			} else if (appliedVoltage / 20 == 0.4) {
-				current_array = numberArray2_pos_0_4;
-			} else if (appliedVoltage / 20 == 0.8) {
-				current_array = numberArray2_pos_0_8;
-			} else if (appliedVoltage / 20 == 1.2) {
-				current_array = numberArray2_pos_1_2;
-			} else if (appliedVoltage / 20 == 1.6) {
-				current_array = numberArray2_pos_1_6;
-			} else if (appliedVoltage / 20 == 2) {
-				current_array = numberArray2_pos_2_0;
-			}
+		if (appliedVoltage / 20 == -2) {
+			current_array = numberArray1_neg_2_0;
+		} else if (appliedVoltage / 20 == -1.6) {
+			current_array = numberArray1_neg_1_6;
+		} else if (appliedVoltage / 20 == -1.2) {
+			current_array = numberArray1_neg_1_2;
+		} else if (appliedVoltage / 20 == -0.8) {
+			current_array = numberArray1_neg_0_8;
+		} else if (appliedVoltage / 20 == -0.4) {
+			current_array = numberArray1_neg_0_4;
+		} else if (appliedVoltage / 20 == 0) {
+			current_array = numberArray1_0;
+		} else if (appliedVoltage / 20 == 0.4) {
+			current_array = numberArray1_pos_0_4;
+		} else if (appliedVoltage / 20 == 0.8) {
+			current_array = numberArray1_pos_0_8;
+		} else if (appliedVoltage / 20 == 1.2) {
+			current_array = numberArray1_pos_1_2;
+		} else if (appliedVoltage / 20 == 1.6) {
+			current_array = numberArray1_pos_1_6;
+		} else if (appliedVoltage / 20 == 2) {
+			current_array = numberArray1_pos_2_0;
 		}
-	} else if (scene(2)) {
-		if (hole_new == 99763115748444.14) {
-			//10^17 case
-
-			if (appliedVoltage / 20 == 2) {
-				current_array = -numberArray1_neg_2_0;
-			} else if (appliedVoltage / 20 == 1.6) {
-				current_array = -numberArray1_neg_1_6;
-			} else if (appliedVoltage / 20 == 1.2) {
-				current_array = -numberArray1_neg_1_2;
-			} else if (appliedVoltage / 20 == 0.8) {
-				current_array = -numberArray1_neg_0_8;
-			} else if (appliedVoltage / 20 == 0.4) {
-				current_array = -numberArray1_neg_0_4;
-			} else if (appliedVoltage / 20 == 0) {
-				current_array = numberArray1_0;
-			} else if (appliedVoltage / 20 == -0.4) {
-				current_array = -numberArray1_pos_0_4;
-			} else if (appliedVoltage / 20 == -0.8) {
-				current_array = -numberArray1_pos_0_8;
-			} else if (appliedVoltage / 20 == -1.2) {
-				current_array = -numberArray1_pos_1_2;
-			} else if (appliedVoltage / 20 == -1.6) {
-				current_array = -numberArray1_pos_1_6;
-			} else if (appliedVoltage / 20 == -2) {
-				current_array = -numberArray1_pos_2_0;
-			}
-		} else if (hole_new == 5e13) {
-			if (appliedVoltage / 20 == -2) {
-				current_array = numberArray2_neg_2_0;
-			} else if (appliedVoltage / 20 == -1.6) {
-				current_array = numberArray2_neg_1_6;
-			} else if (appliedVoltage / 20 == -1.2) {
-				current_array = numberArray2_neg_1_2;
-			} else if (appliedVoltage / 20 == -0.8) {
-				current_array = numberArray2_neg_0_8;
-			} else if (appliedVoltage / 20 == -0.4) {
-				current_array = numberArray2_neg_0_4;
-			} else if (appliedVoltage / 20 == 0) {
-				current_array = numberArray2_0;
-			} else if (appliedVoltage / 20 == 0.4) {
-				current_array = numberArray2_pos_0_4;
-			} else if (appliedVoltage / 20 == 0.8) {
-				current_array = numberArray2_pos_0_8;
-			} else if (appliedVoltage / 20 == 1.2) {
-				current_array = numberArray2_pos_1_2;
-			} else if (appliedVoltage / 20 == 1.6) {
-				current_array = numberArray2_pos_1_6;
-			} else if (appliedVoltage / 20 == 2) {
-				current_array = numberArray2_pos_2_0;
-			}
-		}
-
-		if (appliedVoltage / 20 > 0.3) {
-			// newAcceleration = newAcceleration * 10; // original
-
-			newAcceleration = newAcceleration * 5;
-		}
-
-		if (dopingConcen_new == 5e13) {
-			if (appliedVoltage / 20 == -0.4) {
-				newAcceleration = newAcceleration * 3;
-			}
-
-			if (appliedVoltage / 20 == -1.2) {
-				newAcceleration = newAcceleration * 0.8;
-			}
-
-			if (appliedVoltage / 20 < -1.4) {
-				newAcceleration = newAcceleration * 1.5;
-			}
-		}
-
-		if (dopingConcen_new > 5e13) {
-			if (appliedVoltage / 20 == -0.4) {
-				newAcceleration = newAcceleration * 2;
-			}
-
-			if (appliedVoltage / 20 == -0.8) {
-				newAcceleration = newAcceleration * 1.5;
-			}
-
-			if (appliedVoltage / 20 == -1.2) {
-				newAcceleration = newAcceleration * 0.8;
-			}
-
-			if (appliedVoltage / 20 < -1.4) {
-				newAcceleration = newAcceleration * 1.5;
-			}
+	} else if (hole_new == 50000000000000) {
+		if (appliedVoltage / 20 == -2) {
+			current_array = numberArray2_neg_2_0;
+		} else if (appliedVoltage / 20 == -1.6) {
+			current_array = numberArray2_neg_1_6;
+		} else if (appliedVoltage / 20 == -1.2) {
+			current_array = numberArray2_neg_1_2;
+		} else if (appliedVoltage / 20 == -0.8) {
+			current_array = numberArray2_neg_0_8;
+		} else if (appliedVoltage / 20 == -0.4) {
+			current_array = numberArray2_neg_0_4;
+		} else if (appliedVoltage / 20 == 0) {
+			current_array = numberArray2_0;
+		} else if (appliedVoltage / 20 == 0.4) {
+			current_array = numberArray2_pos_0_4;
+		} else if (appliedVoltage / 20 == 0.8) {
+			current_array = numberArray2_pos_0_8;
+		} else if (appliedVoltage / 20 == 1.2) {
+			current_array = numberArray2_pos_1_2;
+		} else if (appliedVoltage / 20 == 1.6) {
+			current_array = numberArray2_pos_1_6;
+		} else if (appliedVoltage / 20 == 2) {
+			current_array = numberArray2_pos_2_0;
 		}
 	}
 
@@ -957,15 +865,15 @@ function drawBandDiagram() {
 		curveVertex((250 + y) * sx, (171.25 + current_array[k] * 40 - 100) * sy);
 		electronBand_data_v1[k] = {
 			x: (250 + y) * sx,
-			y: (171.25 + current_array[k] * (40 / 1.2) - 100) * sy,
+			y: (171.25 + current_array[k] * 40 - 100) * sy,
 		};
 		electronBand_data[k] = {
 			x: (250 + y) * sx,
-			y: (171.25 + current_array[k] * (40 / 1.2) - 100) * sy,
+			y: (171.25 + current_array[k] * 40 - 100) * sy,
 		};
 		electronBand[k] = [
 			(250 + y) * sx,
-			(171.25 + current_array[k] * (40 / 1.2) - 100) * sy,
+			(171.25 + current_array[k] * 40 - 100) * sy,
 		];
 
 		//}
@@ -994,63 +902,34 @@ function drawBandDiagram() {
 		);
 		holeBand_data_v1[k] = {
 			x: (250 + y) * sx,
-			y: (171.25 + current_array[k] * (40 / 1.2) - 30 - 30) * sy,
+			y: (171.25 + current_array[k] * 40 - 30 - 30) * sy,
 		};
 		holeBand_data[k] = {
 			x: (250 + y) * sx,
-			y: (171.25 + current_array[k] * (40 / 1.2) - 30 - 30) * sy,
+			y: (171.25 + current_array[k] * 40 - 30 - 30) * sy,
 		};
 
 		holeBand[k] = [
 			(250 + y) * sx,
-			(171.25 + current_array[k] * (40 / 1.2) - 30 - 30) * sy,
+			(171.25 + current_array[k] * 40 - 30 - 30) * sy,
 		];
 	}
 	endShape();
 	noStroke();
 }
-
-function onRefresh() {
-	resetScene();
-}
-
 //reset button
-function resetScene() {
+function reset_scene1() {
 	genElectrons = [];
 	genHoles = [];
 	initElectrons = [];
 	initHoles = [];
 	fixedCharges = [];
 
-	updateDopingConcentration(130);
-	setScattering(20);
-	setVelocity(9);
-	setDistance(9);
-	setConcentration(1);
-	appliedVoltage = 0;
-
-	if (scene(1)) {
-		document.getElementById("dopingScene1").value = 130;
-		document.getElementById("appliedVoltageScene1").value = 0;
-		document.getElementById("scatteringScene1").value = 20;
-		document.getElementById("distanceScene1").value = 9;
-	} else if (scene(2)) {
-		document.getElementById("dopingScene2").value = 130;
-		document.getElementById("appliedVoltageScene2").value = 0;
-		document.getElementById("scatteringScene2").value = 20;
-		document.getElementById("distanceScene2").value = 9;
-	}
-
-	// generate charges
-	run45 = setInterval(function () {
-		generateCharges(1);
-	}, genInterval);
-
 	if (scene(1) || scene(2)) {
 		if (scene(1)) {
-			updateDopingConcentration(document.getElementById("dopingScene1").value);
+			updateDopingConcentration(document.getElementById("slider_61").value);
 		} else if (scene(2)) {
-			updateDopingConcentration(document.getElementById("dopingScene2").value);
+			updateDopingConcentration(document.getElementById("slider_611").value);
 		}
 	}
 }
@@ -1122,7 +1001,7 @@ function scattering() {
 			chargeArray[i].botz =
 				getRandomBotz[Math.floor(Math.random() * getRandomBotz.length)];
 			let closestToBand = findClosestValue(band, chargeArray[i].position.x);
-			chargeArray[i].bandOrigin.y = closestToBand;
+			chargeArray[i].origin.y = closestToBand;
 			chargeArray[i].movingVelocity = chargeArray[i].botz;
 			chargeArray[i].direction = createVector(random(-1, 1), random(-1, 1));
 			chargeArray[i].velocity = p5.Vector.mult(
@@ -1144,7 +1023,7 @@ function scattering() {
 //generating electron hole pairs based on frequency
 function generateCharges(num) {
 	clearInterval(run45);
-	genInterval = 4000 / generationRateInterval;
+	interval_45 = 4000 / generationRateInterval;
 
 	run45 = setInterval(function () {
 		generateCharges(1);
@@ -1169,22 +1048,22 @@ function generateCharges(num) {
 				);
 
 				// create new generated electron
-				let newElectron = new Charge(xPosition, yPosition, 10, chargeID, "e");
-				newElectron.bandOrigin.x = closestValueToElectronBand;
+				let newCharge = new Charge(xPosition, yPosition, 10, chargeID, "e");
+				newCharge.origin.x = closestValueToElectronBand;
 
-				newElectron.top = 1;
+				newCharge.top = 1;
 				////botz is the velocity here, and it comes from a randomly generated number list
-				newElectron.botz =
+				newCharge.botz =
 					getRandomBotz[Math.floor(Math.random() * getRandomBotz.length)];
 
-				genElectrons.push(newElectron);
+				genElectrons.push(newCharge);
 
 				// create new generated hole
 				let closestValueToHoleBand = findClosestValue(holeBand, xPosition);
 
 				let newHole = new Charge(xPosition, yPosition, 10, chargeID, "h");
 
-				newHole.bandOrigin.x = closestValueToHoleBand;
+				newHole.origin.x = closestValueToHoleBand;
 				newHole.top = 1;
 				newHole.botz =
 					getRandomBotz[Math.floor(Math.random() * getRandomBotz.length)];
@@ -1196,6 +1075,9 @@ function generateCharges(num) {
 		}
 	}
 }
+
+//straight moving balls generating for higher velocity
+function generateCharges_straight(num) {}
 
 //Reads doping concentration
 function updateDopingConcentration(a) {
@@ -1269,14 +1151,14 @@ function updateDopingConcentration(a) {
 			{ nv: 1.7, quantity: 32 },
 			{ nv: 1.8, quantity: 24 },
 			{ nv: 1.9, quantity: 18 },
-			{ nv: 2.0, quantity: 13 },
-			{ nv: 2.1, quantity: 9 * 5 },
-			{ nv: 2.2, quantity: 6 * 5 },
-			{ nv: 2.3, quantity: 4 * 5 },
-			{ nv: 3.5, quantity: 3 * 5 },
-			{ nv: 4, quantity: 2 * 5 },
-			{ nv: 5, quantity: 1 * 5 },
-			{ nv: 6, quantity: 1 * 5 },
+			{ nv: 3.0, quantity: 13 },
+			{ nv: 2.1, quantity: 9 },
+			{ nv: 2.2, quantity: 6 },
+			{ nv: 2.3, quantity: 4 },
+			{ nv: 3.5, quantity: 3 },
+			{ nv: 4, quantity: 2 },
+			{ nv: 5, quantity: 1 },
+			{ nv: 6, quantity: 1 },
 		];
 
 		for (let i = 0; i < norm_vel.length; i++) {
@@ -1354,9 +1236,15 @@ function findClosestValue(array, targetX) {
 }
 
 //change applied voltage slider
-function updateAppliedVoltage(a) {
-	// resetScene();
+function apply_V_p(a) {
 	appliedVoltage = a;
+	reset_scene1();
+}
+
+//refreshing page reset
+function onRefresh() {
+	updateDopingConcentration(130);
+	reset_scene1();
 }
 
 //recombine toggle between 0 and 1 every 3 seconds
@@ -1366,6 +1254,7 @@ function toggleRecombine() {
 	} else {
 		recombineOn = true;
 	}
+	// Now recombine will toggle between 0 and 1 every 3 seconds
 }
 
 // the function to update the electron hole movements and animations
@@ -1378,7 +1267,7 @@ function updateChargeMovement() {
 				chargeArray[i].update();
 
 				if (chargeArray[i].opacity > 255) {
-					chargeArray[i].randomWalk();
+					chargeArray[i].random_walk();
 				}
 			}
 		}
@@ -1454,6 +1343,10 @@ function updateChargeMovement() {
 			}
 		}
 	}
+}
+
+function setbandScale(v) {
+	bandScale = v;
 }
 
 /******************************
