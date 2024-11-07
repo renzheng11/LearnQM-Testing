@@ -15,24 +15,21 @@ let fade; // alpha that determines pos charges fade during beginning of scene
 let timeoutID = 0; // used to clear timeout
 const timeout = 4400; // time to wait to during transfer being drawing arrows, numbers, graphs
 
-// color variables for drawing
 let color = {
 	bg: [18, 18, 18],
 	white: [255, 255, 255],
 	grey: [175, 175, 175],
-	pos: [125, 241, 148],
-	posDim: [65, 46, 46],
-	posDim: [65, 46, 46],
-	neg: [255, 247, 174],
-	negDim: [18, 66, 104],
-	sign: [31, 145, 54],
-	signDim: [50, 31, 31],
+	// pos: [125, 241, 148],
+	pos: [200, 122, 121],
+	// neg: [255, 247, 174],
+	neg: [60, 163, 255],
+	// sign:  [65, 46, 46, 1],
+	sign: [90, 60, 60],
 	battery: [230, 226, 188],
-	net: [117, 190, 255],
+	net: [255, 241, 116],
+	scanner: [125, 241, 148],
 	neutral: [79, 79, 79],
-	scanner: [218, 107, 107],
 };
-
 // set rows & cols for positive charge grid
 const rows = 22;
 const cols = 18;
@@ -135,7 +132,7 @@ function setup() {
 	batteryPosImg = loadImage("batteryPos.png");
 	batteryNegImg = loadImage("batteryNeg.png");
 	mosImg = loadImage("mos.png");
-	vecEImg = loadImage("blue_E.png");
+	vecEImg = loadImage("EF.png");
 
 	tempBox = new Box(boxD.xLeft, boxD.y, boxD.width, boxD.height, 0);
 
@@ -355,7 +352,7 @@ function newBoxes() {
  * Fade all neutral charges during beginning of scene
  */
 function fadeFunc() {
-	let fadeLimit = 56;
+	let fadeLimit = 70;
 	if (fade > fadeLimit) {
 		fade -= 2;
 	}
@@ -821,18 +818,12 @@ function drawScanner(box) {
 
 	if (sceneCount > 7 || sceneCount == 4) {
 		// draw scanner
-		fill(...color.scanner, 100);
+		fill(...color.scanner, 72);
 		noStroke();
 
 		// only draw if electrons have been animated
 		rect(box.x, box.y, boxMouseX + scannerWidth, box.h);
 
-		beginShape();
-		// vertex(box.x , box.y ); // bottom left
-		// vertex((box.x + scannerWidth) , box.y ); // bottom right
-		// vertex((box.x + scannerWidth + boxD.depth) , (box.y + boxD.angle) ); // top right
-		// vertex((box.x + boxD.depth) , (box.y + boxD.angle) ); // top left
-		endShape(CLOSE);
 		styleText();
 		fill(...color.grey);
 
@@ -851,13 +842,25 @@ function drawScanner(box) {
 		if (!reverse) {
 			fill(...color.scanner);
 			// right box Q + electrons
+
+			// for scenes where both sides are metal
+			let surfaceDepth = 18; // pixels into right box where 1st column appears to end
+			if (sceneCount == 4) {
+				if (boxMouseX < surfaceDepth) {
+					currQ = Q * (boxMouseX / surfaceDepth);
+					electronsRight = (
+						(currQ / (1.6 * 10 ** -19)) *
+						(boxMouseX / surfaceDepth)
+					).toExponential(2);
+				} else {
+					currQ = Q;
+					electronsRight = (currQ / (1.6 * 10 ** -19)).toExponential(2);
+				}
+			}
+
 			text(`Q: ${currQ.toFixed(2)}µC`, box.x + 80, box.y - 32);
 
-			text(
-				`# uncompensated \n   dopants: ${electronsRight}`,
-				box.x + 172,
-				box.y - 32
-			);
+			text(`# absent electrons: ${electronsRight}`, box.x + 152, box.y - 32);
 			styleText();
 			// left box Q + electrons
 			text(`Q: -${Q.toFixed(2)}µC`, boxD.xLeft + 80, box.y - 32);
@@ -872,6 +875,10 @@ function drawScanner(box) {
 					box.y + boxD.height / 2
 				);
 			}
+
+			// reset for calculations for electric field
+			// currQ = Q;
+			// electronsRight = (currQ / (1.6 * 10 ** -19)).toExponential(2);
 		} else if (reverse) {
 			// right box Q
 			// text(`Q: -${currQ.toFixed(2)}µC`, box.x + 120, box.y - 32);
@@ -879,12 +886,12 @@ function drawScanner(box) {
 			if (boxMouseX >= 6) {
 				// num is picked (scanner looks like it's right of electrons) - may need to change later
 				// if scanner is right of electrons
-				text(`Q: -${Q.toFixed(2)}µC`, box.x + 120, box.y - 32);
-				text(`# extra electrons:  ${electronsLeft}`, box.x + 120, box.y - 18);
+				text(`Q: -${Q.toFixed(2)}µC`, box.x + 80, box.y - 32);
+				text(`# extra electrons:  ${electronsLeft}`, box.x + 152, box.y - 32);
 			} else {
 				// if scanner out of box
-				text(`Q: 0µC`, box.x + 120, box.y - 32);
-				text(`# extra electrons: 0`, box.x + 120, box.y - 18);
+				text(`Q: 0µC`, box.x + 80, box.y - 32);
+				text(`# extra electrons: 0`, box.x + 152, box.y - 32);
 			}
 			// left box Q
 			text(`Q: ${Q.toFixed(2)}µC`, boxD.xLeft + 120, box.y - 32);
@@ -963,18 +970,22 @@ function drawGraph() {
 		stroke(...color.net);
 		noFill();
 
-		// draw line indicated where E = [x] amount is referring to
+		// draw line indicating where E = [x] amount is referring to
 		line(graphMouseX, graph.y - 60, graphMouseX, graph.y + 60);
 
+		console.log(sceneCount);
+		console.log(graphMouseX);
 		noStroke();
 		fill(...color.net);
 		// draw text EF amount
-		if (graphMouseX > graph.center) {
-			text(
-				`= -${(Q * 11.3 - currQ * 11.3).toFixed(2)} MV/cm`,
-				graph.center + 30,
-				graph.y - 64
-			);
+		if (graphMouseX > boxD.xRight && (reverse || sceneCount == 4)) {
+			text(`= ${0} MV/cm`, graph.center + 30, graph.y - 64);
+		} else if (graphMouseX > graph.center) {
+			let displayQ = -(Q * 11.3 - currQ * 11.3).toFixed(2);
+			if (reverse) {
+				displayQ = -displayQ;
+			}
+			text(`= ${displayQ} MV/cm`, graph.center + 30, graph.y - 64);
 		} else {
 			text(`= ${0} MV/cm`, graph.center + 30, graph.y - 64);
 		}
@@ -1031,7 +1042,7 @@ function drawGraph() {
 				];
 			}
 		} else if (reverse) {
-			netHeights = [0, 0, -eFieldHeight, -eFieldHeight, 0, 0, 5];
+			netHeights = [0, 0, eFieldHeight, eFieldHeight, 0, 0, 5];
 			netXPoints = [
 				graph.x,
 				graph.center,

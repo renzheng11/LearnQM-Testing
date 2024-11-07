@@ -358,40 +358,81 @@ class Charge {
 		}
 
 		//////////////////Exeagerate the electric field when the applied voltage is negateive to better visualize accumlation of holes
-		if (appliedVoltage / 20 < -0.3) {
-			// newAcceleration = newAcceleration * 10;  // original
-			newAcceleration = newAcceleration * 5;
-		}
 
-		if (dopingConcen_new == 5e13) {
-			if (appliedVoltage / 20 == 0.4) {
-				newAcceleration = newAcceleration * 3;
+		if (scene(1)) {
+			if (appliedVoltage / 20 < -0.3) {
+				// newAcceleration = newAcceleration * 10;  // original
+				newAcceleration = newAcceleration * 5;
 			}
 
-			if (appliedVoltage / 20 == 1.2) {
-				newAcceleration = newAcceleration * 0.8;
+			if (dopingConcen_new == 5e13) {
+				if (appliedVoltage / 20 == 0.4) {
+					newAcceleration = newAcceleration * 3;
+				}
+
+				if (appliedVoltage / 20 == 1.2) {
+					newAcceleration = newAcceleration * 0.8;
+				}
+
+				if (appliedVoltage / 20 > 1.4) {
+					newAcceleration = newAcceleration * 1.5;
+				}
 			}
 
-			if (appliedVoltage / 20 > 1.4) {
-				newAcceleration = newAcceleration * 1.5;
-			}
-		}
+			if (dopingConcen_new > 5e13) {
+				if (appliedVoltage / 20 == 0.4) {
+					newAcceleration = newAcceleration * 2;
+				}
 
-		if (dopingConcen_new > 5e13) {
-			if (appliedVoltage / 20 == 0.4) {
-				newAcceleration = newAcceleration * 2;
+				if (appliedVoltage / 20 == 0.8) {
+					newAcceleration = newAcceleration * 1.5;
+				}
+
+				if (appliedVoltage / 20 == 1.2) {
+					newAcceleration = newAcceleration * 0.8;
+				}
+
+				if (appliedVoltage / 20 > 1.4) {
+					newAcceleration = newAcceleration * 1.5;
+				}
+			}
+		} else if (scene(2)) {
+			if (appliedVoltage / 20 > 0.3) {
+				// newAcceleration = newAcceleration * 10; // original
+
+				newAcceleration = newAcceleration * 5;
 			}
 
-			if (appliedVoltage / 20 == 0.8) {
-				newAcceleration = newAcceleration * 1.5;
+			if (dopingConcen_new == 5e13) {
+				if (appliedVoltage / 20 == -0.4) {
+					newAcceleration = newAcceleration * 3;
+				}
+
+				if (appliedVoltage / 20 == -1.2) {
+					newAcceleration = newAcceleration * 0.8;
+				}
+
+				if (appliedVoltage / 20 < -1.4) {
+					newAcceleration = newAcceleration * 1.5;
+				}
 			}
 
-			if (appliedVoltage / 20 == 1.2) {
-				newAcceleration = newAcceleration * 0.8;
-			}
+			if (dopingConcen_new > 5e13) {
+				if (appliedVoltage / 20 == -0.4) {
+					newAcceleration = newAcceleration * 2;
+				}
 
-			if (appliedVoltage / 20 > 1.4) {
-				newAcceleration = newAcceleration * 1.5;
+				if (appliedVoltage / 20 == -0.8) {
+					newAcceleration = newAcceleration * 1.5;
+				}
+
+				if (appliedVoltage / 20 == -1.2) {
+					newAcceleration = newAcceleration * 0.8;
+				}
+
+				if (appliedVoltage / 20 < -1.4) {
+					newAcceleration = newAcceleration * 1.5;
+				}
 			}
 		}
 

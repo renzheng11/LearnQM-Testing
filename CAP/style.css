@@ -1,8 +1,4 @@
-@font-face {
-	font-family: "Agency FB";
-	src: local("./Agency_FB.ttf");
-	/* change to url with ../ */
-}
+@import url("https://fonts.googleapis.com/css2?family=Bai+Jamjuree:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400;1,500;1,600;1,700&display=swap");
 
 #body_parent {
 	background-color: #121212;
@@ -14,12 +10,12 @@
 }
 
 .title h1 {
-	font-family: Agency FB;
+	font-family: "Bai Jamjuree";
 	font-style: normal;
 	font-weight: bold;
 	letter-spacing: 2px;
 	font-size: 48px;
-	line-height: 96px;
+	line-height: 72px;
 	/* identical to box height */
 	text-align: center;
 
@@ -28,7 +24,7 @@
 
 .title p {
 	margin-top: 30px;
-	font-family: Bai Jamjuree;
+	font-family: "Bai Jamjuree";
 	font-style: normal;
 	font-weight: normal;
 	font-size: 20px;
@@ -73,11 +69,11 @@
 .row10 h1,
 .row11 h1,
 .row12 h1 {
-	font-family: Agency FB;
+	font-family: "Bai Jamjuree";
 	font-style: normal;
 	font-weight: normal;
 	font-size: 36px;
-	line-height: 72px;
+	line-height: 54px;
 	color: #fff7ae;
 }
 

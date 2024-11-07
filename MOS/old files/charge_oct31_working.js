@@ -29,11 +29,9 @@ class Charge {
 		this.active = true;
 		this.box = 0;
 		this.vehicleCreated = false; // add a flag variable
-		this.origin = createVector(0, 0);
+		this.bandOrigin = createVector(0, 0);
 		this.near_index = 100;
 		this.top = 0;
-		this.straight = 0;
-		this.push = 0;
 		this.factor = 1;
 
 		this.transitionTime = 100; // for example, transition over 60 frames
@@ -48,11 +46,11 @@ class Charge {
 	display() {
 		if (this.showing) {
 			if (this.chargeType == "e") {
-				//electron chargeType
+				//electron
 				fill(...color.yellow, this.opacity);
 				stroke(...color.yellow, this.opacity);
 			} else {
-				//hole chargeType
+				//hole
 				noFill();
 				stroke(...color.green, this.opacity); //green
 				strokeWeight(1);
@@ -63,54 +61,93 @@ class Charge {
 			if (this.chargeType == "e") {
 				// draw electrons on band diagram
 
-				//this.origin.x and this.origin.y is the baseline based on the curves calculated in the sketch.js with each scattering
-				if (this.origin.x == 0 && this.origin.y == 0) {
+				//this.bandOrigin.x and this.bandOrigin.y is the baseline based on the curves calculated in the sketch.js with each scattering
+				if (this.bandOrigin.x == 0 && this.bandOrigin.y == 0) {
 				} else {
-					if (this.straight == 0) {
-						//  added pairs electron
-						fill(...color.yellow, 160);
-						noStroke();
-						ellipse(
-							this.position.x,
-							this.origin.y - ((this.botz * 8.8 * 2 * 0.1) / 3) * sy,
-							5
-						);
-						this.bandPosition.y =
-							this.origin.x - ((this.botz * 8.8 * 2 * 0.1) / 3) * sy;
-						this.bandPosition.x = this.position.x;
+					//  added pairs electron
+					fill(...color.yellow, 160);
+					noStroke();
+					// don't draw until it has botz calculated and has snapped to band
+					if (this.bandPosition.y > 10) {
+						ellipse(this.position.x, this.bandPosition.y, 5);
 					}
-				}
-			} else if (sceneCount != 3) {
-				// draw holes on band diagram
-
-				let k = 0;
-				let s = 0;
-				if (sceneCount == 2 || sceneCount == 3) {
-					k = -30;
-					//constant for the scenes dimensions
-				}
-
-				if (this.straight == 0) {
-					//added pairs senario
-					noFill();
-					stroke(...color.green, 160); //green
-					strokeWeight(1);
-					ellipse(
-						this.position.x,
-						this.origin.y +
-							((this.botz * 8.8 * 2 * 0.1) / 3) * bandDiagramVScale * sy,
-						5
-					);
 					this.bandPosition.y =
-						this.origin.y + ((this.botz * 8.8 * 2 * 0.1) / 3) * sy;
-					this.bandPosition.x = this.position.x;
+						this.bandOrigin.y - ((this.botz * 8.8 * 2 * 0.1) / 3) * sy; // subtracting bc electron is above band
 				}
+			} else {
+				// draw holes on band diagram
+				//added pairs senario
+				noFill();
+				stroke(...color.green, 160); //green
+				strokeWeight(1);
+
+				// don't draw until it has botz calculated and has snapped to band
+				if (this.bandPosition.y > 100) {
+					ellipse(this.position.x, this.bandPosition.y, 5);
+				}
+				this.bandPosition.y =
+					this.bandOrigin.y + ((this.botz * 8.8 * 2 * 0.1) / 3) * sy; // adding bc hole is below band
 			}
 		}
 	}
 
-	////*** update the electron or hole's locations (bounce back or come back to scene) */
-	random_walk() {
+	checkBoundaries() {
+		// Charges bounce off boundaries
+		const buffer = 5;
+		// top
+		if (this.position.y < yMin * sy) {
+			this.position.y += buffer;
+			this.velocity.y = -this.velocity.y;
+		}
+
+		// bottom
+		if (this.position.y > yMax * sy) {
+			this.position.y -= buffer;
+			this.velocity.y = -this.velocity.y;
+		}
+
+		// left
+		if (this.position.x < xMin * sx) {
+			this.position.x += buffer;
+			this.velocity.x = Math.abs(this.velocity.x);
+		}
+
+		// // prevent from sneaking out left
+		// if (this.position.x < xMin * sx) {
+		// 	this.position.x = 600;
+		// }
+
+		// right
+		if (this.position.x > (xMax - buffer) * sx) {
+			if (this.id == "h" && !this.vehicleCreated) {
+				// if hole goes out of capacitor on the right, put back another hole from the right side
+				const buffer = 14;
+				var vehicle = new Charge(
+					(xMax - buffer) * sx,
+					random(yMin + buffer, yMax - buffer) * sy,
+					10,
+					"h",
+					1
+				);
+				vehicle.direction = createVector(-1, random(-1, 1));
+				vehicle.movingVelocity = this.movingVelocity;
+				vehicle.velocity = createVector(-10, 0);
+				vehicle.botz = this.botz;
+				initHoles.push(vehicle);
+				this.vehicleCreated = true;
+
+				this.direction.x = 10;
+				this.showing = false;
+				this.velocity = createVector(0, 0);
+			} else if (this.id == "e") {
+				this.position.x -= buffer;
+				this.velocity.x = -this.velocity.x;
+			}
+		}
+	}
+
+	////*** update the electron or hole's locations (bounce back or come back to capacitor) */
+	randomWalk() {
 		this.accelerate(); // accelerate() will update this.velocity
 
 		this.position.add(this.velocity);
@@ -118,13 +155,13 @@ class Charge {
 		////////////////////// avoid going into the bandgap (added by Azad)
 
 		if (this.chargeType == "e") {
-			//             //electron
+			// electron
 			let zz = findClosestValue(electronBand, this.position.x);
 			if (this.bandPosition.y > zz) {
 				this.velocity.x = -this.velocity.x;
 				this.position.add(this.velocity.x);
 			}
-		} else {
+		} else if (this.chargeType == "h") {
 			//hole
 			let zz = findClosestValue(holeBand, this.position.x);
 			if (this.bandPosition.y < zz) {
@@ -133,123 +170,35 @@ class Charge {
 			}
 		}
 
-		///////////////////////////////// electron or hole bounce off boundaries
-		//if ((this.position.x > 940*sx) && (opening == 0)) {this.direction.x = -1;}
-		if (this.position.y < yMin * sy) {
-			this.velocity.y = -this.velocity.y;
-			// this.position.y = 410 * sy;
+		this.checkBoundaries();
+
+		if (this.chargeType == "e") {
+			//electron
+			///////find the near_index: find where the electron appear (on which line they should bounce back when hit the band diagram)
+			let smallestDifference = Math.abs(
+				electronBand_data[0].y - this.bandPosition.y
+			);
+			for (let i = 0; i < electronBand_data.length; i++) {
+				let difference = Math.abs(electronBand_data[i].y - this.bandPosition.y);
+
+				if (difference < smallestDifference) {
+					smallestDifference = difference;
+					this.near_index = i;
+				}
+			}
 		}
-		if (this.position.y > yMax * sy) {
-			this.velocity.y = -this.velocity.y;
-			// this.position.y = 765 * sy;
-		}
-		if (this.position.x < 260 * sx) {
-			this.velocity.x = Math.abs(this.velocity.x);
-			// this.position.x = 263 * sx;
-		}
-
-		const r = floor(random(10));
-		const r2 = floor(random(10));
-
-		if (sceneCount == 2) {
-			if (this.push == 0) {
-				/////////////////// if hole goes out of screne on the right, put back another hole from the right side
-				if (this.position.x > 940 * sx && opening == 1 && this.straight == 0) {
-					//put back holes here
-					if (this.id == "h" && !this.vehicleCreated) {
-						var vehicle = new Charge(
-							940 * sx,
-							random(400, 760) * sy,
-							10,
-							"h",
-							1
-						);
-						vehicle.direction = createVector(-1, random(-1, 1));
-						vehicle.movingVelocity = this.movingVelocity;
-						vehicle.velocity = createVector(-10, 0);
-						vehicle.botz = this.botz;
-						vehicle.straight = 0;
-						initialHoles.push(vehicle);
-						this.vehicleCreated = true;
-					}
-
-					this.direction.x = 10;
-					this.showing = false;
-					this.velocity = createVector(0, 0);
+		if (this.chargeType == "h") {
+			//hole
+			///////find the near_index: find where the hole appear  (on which line they should bounce back when hit the band diagram)
+			let smallestDifference = Math.abs(
+				holeBand_data[0].y - this.bandPosition.y
+			);
+			for (let i = 0; i < holeBand_data.length; i++) {
+				let difference = Math.abs(holeBand_data[i].y - this.bandPosition.y);
+				if (difference < smallestDifference) {
+					smallestDifference = difference;
+					this.near_index = i;
 				}
-
-				if (this.position.x > 940 * sx && opening == 1 && this.straight == 1) {
-					this.direction.x = 10;
-					this.showing = false;
-				}
-
-				if (sceneCount == 2) {
-					if (this.chargeType == "e") {
-						//electron
-						///////find the near_index: find where the electron appear (on which line they should bounce back when hit the band diagram)
-						let smallestDifference = Math.abs(
-							electronBand_data[0].y - this.bandPosition.y
-						);
-						for (let i = 0; i < electronBand_data.length; i++) {
-							let difference = Math.abs(
-								electronBand_data[i].y - this.bandPosition.y
-							);
-
-							if (difference < smallestDifference) {
-								smallestDifference = difference;
-								this.near_index = i;
-							}
-						}
-					}
-					if (this.chargeType == "h") {
-						//hole
-						///////find the near_index: find where the hole appear  (on which line they should bounce back when hit the band diagram)
-						let smallestDifference = Math.abs(
-							holeBand_data[0].y - this.bandPosition.y
-						);
-						for (let i = 0; i < holeBand_data.length; i++) {
-							let difference = Math.abs(
-								holeBand_data[i].y - this.bandPosition.y
-							);
-							if (difference < smallestDifference) {
-								smallestDifference = difference;
-								this.near_index = i;
-							}
-						}
-					}
-				}
-			}
-		} else {
-			//////// other scenes effect other than scene 2 (bounce of boundaries etc)
-
-			if (willScatter == false) {
-				//if false no scatter
-			} else if (this.straight == 1) {
-				if (this.chargeType == "e") {
-					this.direction = createVector(-3, 0);
-				} else {
-					this.direction = createVector(3, 0);
-				}
-			} else {
-				this.direction = createVector(random(-1, 1), random(-1, 1));
-			}
-
-			if (this.position.x < (90 + 70) * sx) {
-				this.direction.x = 1;
-			}
-
-			if (this.position.x > 940 * sx && opening == 1) {
-				this.direction.x = 10;
-			}
-
-			if (this.position.x > 940 * sx && opening == 0) {
-				this.direction.x = -1;
-			}
-			if (this.position.y < (20 + 385) * sy) {
-				this.direction.y = 1;
-			}
-			if (this.position.y > 770 * sy) {
-				this.direction.y = -1;
 			}
 		}
 	}
@@ -258,16 +207,15 @@ class Charge {
 		// Check if the top is 1 and origin is {x: 0, y: 0}
 		if (this.top == 1 && appliedVoltage <= 0) {
 			// if (this.chargeType == "e"){    //electron
-			//      console.log(this.position.x)}
 
 			if (this.chargeType == "e") {
 				// The conditions are met for a vehicle instance
-				this.origin.x = 0;
-				this.origin.y = 0;
+				this.bandOrigin.x = 0;
+				this.bandOrigin.y = 0;
 			} else if (this.chargeType == "h") {
 				//electron
-				this.origin.x = 0;
-				this.origin.y = 0;
+				this.bandOrigin.x = 0;
+				this.bandOrigin.y = 0;
 			}
 		}
 	}
@@ -278,10 +226,6 @@ class Charge {
 
 	deactivate() {
 		this.active = false;
-	}
-
-	disappear() {
-		this.opacity -= 20;
 	}
 
 	stop() {
@@ -332,6 +276,7 @@ class Charge {
 		this.velocity.limit(this.maxspeed);
 		this.position.add(this.velocity);
 		this.acceleration = createVector(0, 0);
+		this.checkBoundaries();
 	}
 
 	findClosestValue(array, targetX) {
@@ -390,7 +335,7 @@ class Charge {
 
 	accelerate() {
 		///////// temp variable for calculating acceleration
-		let bbb = 0;
+		// let newAcceleration = 0;
 
 		////////////////////////////////////////// Calculate electric Field at this position/////////////////
 		let Lowestdif = 1000;
@@ -403,22 +348,95 @@ class Charge {
 			if (dif < Lowestdif) {
 				//       // Update the lowest dif and and the corresponding electric field
 				Lowestdif = dif;
-				bbb = E_field_temp_data[i].y / 100000 / 3; // Assuming 'b' is represented as second element in sub-array
-				//       console.log("bbb",E_field_temp_data[25].y);
+				newAcceleration = E_field_temp_data[i].y / 100000 / 3; // Assuming 'b' is represented as second element in sub-array
 			}
 		}
 		//////////////////////////////////////////////// If electron, accelration in the opposite direction of the field.
 		if (this.chargeType == "e") {
 			//             //electron
-			bbb = -bbb;
+			newAcceleration = -newAcceleration;
 		}
 
 		//////////////////Exeagerate the electric field when the applied voltage is negateive to better visualize accumlation of holes
 		if (appliedVoltage / 20 < -0.3) {
-			bbb = bbb * 10;
+			// newAcceleration = newAcceleration * 10;  // original
+			newAcceleration = newAcceleration * 5;
 		}
-		this.acceleration = createVector(-bbb, 0);
+
+		if (dopingConcen_new == 5e13) {
+			if (appliedVoltage / 20 == 0.4) {
+				newAcceleration = newAcceleration * 3;
+			}
+
+			if (appliedVoltage / 20 == 1.2) {
+				newAcceleration = newAcceleration * 0.8;
+			}
+
+			if (appliedVoltage / 20 > 1.4) {
+				newAcceleration = newAcceleration * 1.5;
+			}
+		}
+
+		if (dopingConcen_new > 5e13) {
+			if (appliedVoltage / 20 == 0.4) {
+				newAcceleration = newAcceleration * 2;
+			}
+
+			if (appliedVoltage / 20 == 0.8) {
+				newAcceleration = newAcceleration * 1.5;
+			}
+
+			if (appliedVoltage / 20 == 1.2) {
+				newAcceleration = newAcceleration * 0.8;
+			}
+
+			if (appliedVoltage / 20 > 1.4) {
+				newAcceleration = newAcceleration * 1.5;
+			}
+		}
+
+		this.acceleration = createVector(-newAcceleration, 0);
 		this.velocity = p5.Vector.add(this.acceleration, this.velocity);
+		this.checkBoundaries();
+
+		// if (this.position.y < yMin * sy) {
+		// 	this.velocity.y = -this.velocity.y;
+		// }
+
+		// // bottom
+		// if (this.position.y > yMax * sy) {
+		// 	this.velocity.y = -this.velocity.y;
+		// }
+
+		// // left
+		// if (this.position.x < xMin * sx) {
+		// 	this.velocity.x = Math.abs(this.velocity.x);
+		// }
+
+		// right
+		// if hole goes out of capacitor on the right, put back another hole from the right side
+		// if (this.position.x > xMax * sx) {
+		// 	if (this.id == "h" && !this.vehicleCreated) {
+		// 		const buffer = 14;
+		// 		var vehicle = new Charge(
+		// 			(xMax - buffer) * sx,
+		// 			random(yMin + buffer, yMax - buffer) * sy,
+		// 			10,
+		// 			"h",
+		// 			1
+		// 		);
+		// 		vehicle.direction = createVector(-1, random(-1, 1));
+		// 		vehicle.movingVelocity = this.movingVelocity;
+		// 		vehicle.velocity = createVector(-10, 0);
+		// 		vehicle.botz = this.botz;
+		// 		initHoles.push(vehicle);
+		// 		this.vehicleCreated = true;
+		// 	}
+
+		// 	this.direction.x = 10;
+		// 	this.showing = false;
+		// 	this.velocity = createVector(0, 0);
+		// }
 	}
 
 	tube_walk() {
@@ -451,7 +469,7 @@ class Effect {
 		this.showing = true;
 		this.generationOpacity = 135; //appear opacity
 		this.beta = 0;
-		this.recombinationOpacity = 255;
+		this.recombineOpacity = 255;
 		this.d = 1;
 		this.effectDiameter = 50;
 		this.id = id;
@@ -472,7 +490,7 @@ class Effect {
 				fill(...color.yellow, this.generationOpacity);
 				//fill(...color.green, this.generationOpacity);
 
-				ellipse(this.position.x, this.position.y, this.generationDiameter);
+				ellipse(this.position.x, this.position.y, this.d);
 			} else if (this.chargeType == "h") {
 				stroke(...color.green, this.generationOpacity);
 				strokeWeight(2);
@@ -481,15 +499,15 @@ class Effect {
 			} else if (this.chargeType == "gen") {
 				// 2
 				strokeWeight(1);
-				fill(...color.yellow, this.recombinationOpacity);
-				stroke(...color.yellow, this.recombinationOpacity);
+				fill(...color.yellow, this.recombineOpacity);
+				stroke(...color.yellow, this.recombineOpacity);
 				ellipse(this.position.x, this.position.y, 10);
 			} else if (this.chargeType == "recom") {
 				// 3
 				//hollow
 				strokeWeight(1);
 				noFill();
-				stroke(...color.green, this.recombinationOpacity);
+				stroke(...color.green, this.recombineOpacity);
 				ellipse(this.position.x, this.position.y, 10);
 			} else if (this.chargeType == "fixpos") {
 				// 4
@@ -525,7 +543,7 @@ class Effect {
 	update() {
 		if (this.chargeType == "e") {
 			this.generationOpacity -= 15;
-			this.generationDiameter += 5;
+			this.d += 5;
 		} else if (this.chargeType == "h") {
 			this.generationOpacity -= 15;
 			this.effectDiameter -= 3;
@@ -545,7 +563,7 @@ class Effect {
 	}
 
 	update_circle() {
-		this.recombinationOpacity -= 20;
+		this.recombineOpacity -= 20;
 	}
 
 	seek(target) {
