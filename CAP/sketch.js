@@ -13,17 +13,19 @@ let sy;
 let fade; // alpha that determines pos charges fade during beginning of scene
 
 let timeoutID = 0; // used to clear timeout
-const timeout = 4400; // time to wait to during transfer being drawing arrows, numbers, graphs
+const timeout = 3100; // time to wait to during transfer being drawing arrows, numbers, graphs
 
 let color = {
 	bg: [18, 18, 18],
 	white: [255, 255, 255],
 	grey: [175, 175, 175],
-	// pos: [125, 241, 148],
-	pos: [200, 122, 121],
-	// neg: [255, 247, 174],
-	neg: [60, 163, 255],
+	// pos: [125, 241, 148], old
+	// neg: [255, 247, 174], old
+	pos: [200, 122, 121], // red
+	neg: [60, 163, 255], // blue
 	// sign:  [65, 46, 46, 1],
+	// pos: [125, 241, 148], // green
+	// neg: [254, 246, 182], // yellow
 	sign: [90, 60, 60],
 	battery: [230, 226, 188],
 	net: [255, 241, 116],
@@ -155,12 +157,15 @@ function updateDopantAmount(value) {
 
 // update number of electrons transferred to other box
 function updateNumTransfer(value) {
-	// ??? value =
-
-	numTransfer = Math.round(value / 555); // ???
-	if (numTransfer < 0) {
-		numTransfer = 1;
+	if (value < 0) {
+		reverse = true;
+	} else {
+		reverse = false;
 	}
+	numTransfer = Math.round(value / 555); // ???
+	// if (numTransfer < 0) {
+	// 	numTransfer = 1;
+	// }
 	Q = value / 1000;
 }
 
@@ -212,7 +217,7 @@ function resetScene() {
 	const chargeSliders = document.querySelectorAll(".chargeSlider");
 	chargeSliders.forEach((slider) => {
 		slider.value = 8000;
-		slider.min = 1000;
+		slider.min = -10000;
 		slider.max = 10000;
 		slider.disabled = false;
 	});
@@ -275,7 +280,7 @@ function animateElectrons() {
 		if (!reverse) {
 			if (sceneAnimated == false) {
 				let i = 0;
-				for (let i = 0; i < numTransfer; i++) {
+				for (let i = 0; i < Math.abs(numTransfer); i++) {
 					let e = currRightBox.electrons[currRightBox.electrons.length - 1];
 
 					if (e.avail) {
@@ -290,7 +295,7 @@ function animateElectrons() {
 			// ready to reset
 			if (sceneAnimated == false) {
 				let i = 0;
-				for (let i = 0; i < numTransfer; i++) {
+				for (let i = 0; i < Math.abs(numTransfer); i++) {
 					let e = currLeftBox.electrons[currLeftBox.electrons.length - 1];
 
 					if (e.avail) {
@@ -314,6 +319,8 @@ function animateElectrons() {
 				sceneAnimated = true;
 				// set bounce when electrons hit positively attracted region
 				reverse ? (moveBound = -30) : (moveBound = 30);
+				// push electrons away from depletion region
+
 				// if semiconductor scene
 				if (currRightBox.type == "s" && !reverse) {
 					// set bounce to boxMax calculated from xMax
@@ -361,36 +368,35 @@ function fadeFunc() {
 /**
  * Check if mouse hovering over battery to change cursor
  */
-function mouseHover() {
-	// console.log("battery.leftx", b
-	if (
-		mouseX / sx > battery.imageX - 10 &&
-		mouseX / sx < battery.imageX + 66 &&
-		mouseY / sy > battery.y1 * sy &&
-		mouseY / sy < (battery.y1 + 40) * sy
-	) {
-		if (buttonState == "A") {
-			document.body.style.cursor = "pointer";
-		}
-	} else {
-		document.body.style.cursor = "default";
-	}
-}
+// function mouseHover() {
+// 	if (
+// 		mouseX / sx > battery.imageX - 10 &&
+// 		mouseX / sx < battery.imageX + 66 &&
+// 		mouseY / sy > battery.y1 * sy &&
+// 		mouseY / sy < (battery.y1 + 40) * sy
+// 	) {
+// 		if (buttonState == "A") {
+// 			document.body.style.cursor = "pointer";
+// 		}
+// 	} else {
+// 		document.body.style.cursor = "default";
+// 	}
+// }
 
 /**
  * Check if mouse pressed on the battery to reverse the battery direction
  */
-function mousePressed() {
-	if (
-		mouseX / sx > battery.imageX - 10 &&
-		mouseX / sx < battery.imageX + 66 &&
-		mouseY / sy > battery.y1 * sy &&
-		mouseY / sy < (battery.y1 + 40) * sy &&
-		buttonState == "A"
-	) {
-		reverse = !reverse;
-	}
-}
+// function mousePressed() {
+// 	if (
+// 		mouseX / sx > battery.imageX - 10 &&
+// 		mouseX / sx < battery.imageX + 66 &&
+// 		mouseY / sy > battery.y1 * sy &&
+// 		mouseY / sy < (battery.y1 + 40) * sy &&
+// 		buttonState == "A"
+// 	) {
+// 		reverse = !reverse;
+// 	}
+// }
 
 // ------------------------------- Drawing functions ------------------------------- //
 /**
@@ -651,7 +657,6 @@ function drawElectrons(box) {
 							electron.updateAnimate(false);
 							if (electron.pushed == false) {
 								electron.updatePushed(true);
-								sceneAnimated = true;
 								electronsTransferred += 1;
 							}
 						}
@@ -675,7 +680,6 @@ function drawElectrons(box) {
 							electron.updateAnimate(false);
 							if (electron.pushed == false) {
 								electron.updatePushed(true);
-								sceneAnimated = true;
 								timesAnimated += 1;
 								electronsTransferred += 1;
 							}
@@ -685,6 +689,15 @@ function drawElectrons(box) {
 			} else {
 				// not animated - moving around in box
 				electron.update();
+
+				// push away free electrons in semiconductor away from depletion region (highlighted positive charges)
+				if (
+					electron.boxX > 200 &&
+					electron.position.x > boxD.xRight &&
+					electron.position.x < boxD.xRight + moveBound
+				) {
+					electron.position.x += 4;
+				}
 			}
 		}
 		if (electron.show) {
@@ -749,7 +762,7 @@ function scaleUnits(item, unit) {
 		item = item / 1000;
 		item = item.toFixed(2) + `µ${unit}`;
 	} else if (item < 1 && unit == "m") {
-		item = "<1nm";
+		item = "<.1nm";
 	}
 	// < 100nm
 	else if (item < 1000) {
@@ -802,7 +815,7 @@ function drawScanner(box) {
 		currQ = Number(Q);
 	}
 
-	// light up lit dopants
+	// light up attracted uncompensated dopants in semiconductors
 	if (!reverse) {
 		for (let i = 0; i <= box.dopantIndices.length - 1; i++) {
 			let charge = box.chargeMap[box.dopantIndices[i]];
@@ -830,7 +843,7 @@ function drawScanner(box) {
 		styleText();
 		xMax = xMax.toFixed(2);
 		if (xMax < 0.001) {
-			xMax = "<1";
+			xMax = "<.001";
 		}
 
 		// let electronsLeft = (actualQ / (1.6 * 10 ** -19)).toExponential(2);
@@ -839,13 +852,17 @@ function drawScanner(box) {
 
 		fill(...color.net);
 
+		// pixels into right box where 1st column appears to end
 		if (!reverse) {
 			fill(...color.scanner);
 			// right box Q + electrons
 
 			// for scenes where both sides are metal
-			let surfaceDepth = 18; // pixels into right box where 1st column appears to end
-			if (sceneCount == 4) {
+			let surfaceDepth = 18;
+			// for scanner scenes
+			// when scanning, linearly increase Q, absent electrons / extra electrons when scanning over surface (which is really small distance but represented as larger - about size of first column)
+			console.log(sceneCount);
+			if (sceneCount == 4 || sceneCount == 8 || sceneCount == 9) {
 				if (boxMouseX < surfaceDepth) {
 					currQ = Q * (boxMouseX / surfaceDepth);
 					electronsRight = (
@@ -880,31 +897,61 @@ function drawScanner(box) {
 			// currQ = Q;
 			// electronsRight = (currQ / (1.6 * 10 ** -19)).toExponential(2);
 		} else if (reverse) {
+			let surfaceDepth = 8;
+			if (sceneCount == 4 || sceneCount == 8 || sceneCount == 9) {
+				if (boxMouseX < surfaceDepth) {
+					currQ = Q * (boxMouseX / surfaceDepth);
+					electronsLeft = (
+						(Q / (1.6 * 10 ** -19)) *
+						(boxMouseX / surfaceDepth)
+					).toExponential(2);
+					console.log(electronsLeft);
+				} else {
+					currQ = Q;
+					electronsLeft = (Q / (1.6 * 10 ** -19)).toExponential(2);
+					console.log(electronsLeft);
+				}
+			}
 			// right box Q
 			// text(`Q: -${currQ.toFixed(2)}µC`, box.x + 120, box.y - 32);
 
-			if (boxMouseX >= 6) {
-				// num is picked (scanner looks like it's right of electrons) - may need to change later
-				// if scanner is right of electrons
-				text(`Q: -${Q.toFixed(2)}µC`, box.x + 80, box.y - 32);
-				text(`# extra electrons:  ${electronsLeft}`, box.x + 152, box.y - 32);
-			} else {
-				// if scanner out of box
-				text(`Q: 0µC`, box.x + 80, box.y - 32);
-				text(`# extra electrons: 0`, box.x + 152, box.y - 32);
-			}
+			text(`Q: -${currQ.toFixed(2)}µC`, box.x + 80, box.y - 32);
+			text(`# extra electrons:  ${electronsLeft}`, box.x + 152, box.y - 32);
+
+			// if (boxMouseX >= 6) {
+			// 	// num is picked (scanner looks like it's right of electrons) - may need to change later
+			// 	// if scanner is right of electrons
+			// 	text(`Q: -${Q.toFixed(2)}µC`, box.x + 80, box.y - 32);
+			// 	text(`# extra electrons:  ${electronsLeft}`, box.x + 152, box.y - 32);
+			// } else {
+			// 	// if scanner out of box
+			// 	text(`Q: 0µC`, box.x + 80, box.y - 32);
+			// 	text(`# extra electrons: 0`, box.x + 152, box.y - 32);
+			// }
 			// left box Q
 			text(`Q: ${Q.toFixed(2)}µC`, boxD.xLeft + 120, box.y - 32);
 		}
 		styleText();
 		for (let i = 0; i < 5; i++) {
 			let distance = boxD.width / 5;
-			text(`${i * 200}µm`, box.x + i * distance - 12, box.y + boxD.height + 24);
+			if (i != 1) {
+				// skip 200 temporarily
+				text(
+					`${i * 200}µm`,
+					box.x + i * distance - 12,
+					box.y + boxD.height + 24
+				);
+			}
 			text("|", box.x + i * distance - 1.4, box.y + boxD.height + 9);
 		}
 		text("1cm x 1cm 1cm", box.x + 4, box.y + boxD.height - 4);
 		text("|", box.x + boxD.width - 1.4, box.y + boxD.height + 10);
 		text("1mm", box.x + boxD.width, box.y + boxD.height + 24);
+
+		// on left surface of box that charges are transferred to
+		fill(...color.scanner);
+		text("|", box.x + 20, box.y + boxD.height + 10);
+		text("<.001µm", box.x + 20, box.y + boxD.height + 24);
 	}
 }
 
@@ -973,15 +1020,13 @@ function drawGraph() {
 		// draw line indicating where E = [x] amount is referring to
 		line(graphMouseX, graph.y - 60, graphMouseX, graph.y + 60);
 
-		console.log(sceneCount);
-		console.log(graphMouseX);
 		noStroke();
 		fill(...color.net);
-		// draw text EF amount
+		// draw EF amount text
 		if (graphMouseX > boxD.xRight && (reverse || sceneCount == 4)) {
 			text(`= ${0} MV/cm`, graph.center + 30, graph.y - 64);
 		} else if (graphMouseX > graph.center) {
-			let displayQ = -(Q * 11.3 - currQ * 11.3).toFixed(2);
+			let displayQ = -(Q * 11.3).toFixed(2);
 			if (reverse) {
 				displayQ = -displayQ;
 			}
@@ -1157,7 +1202,7 @@ function draw() {
 
 		// ongoing functions
 		fadeFunc();
-		mouseHover();
+		// mouseHover();
 
 		// boxes & charges
 		drawBox(currLeftBox);
@@ -1179,13 +1224,13 @@ function draw() {
 
 		drawBattery();
 		styleText();
-		if (buttonState == "A") {
-			text(
-				"Click battery to reverse polarity",
-				battery.leftX + 80,
-				battery.y2 + 40
-			);
-		}
+		// if (buttonState == "A") {
+		// 	text(
+		// 		"Click battery to reverse polarity",
+		// 		battery.leftX + 80,
+		// 		battery.y2 + 40
+		// 	);
+		// }
 
 		// graph
 		if (sceneCount > 2 && sceneCount != 5) {

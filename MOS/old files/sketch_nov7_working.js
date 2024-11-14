@@ -29,10 +29,9 @@ const color = {
 	black2: [30],
 	red: [255],
 	red2: [255, 40, 0],
-	positive: [125, 241, 148],
-	negative: [254, 246, 182],
-	// positive: [255, 122, 121],
-	// negative: [60, 163, 255],
+	green: [125, 241, 148],
+	greenBright: [0, 255, 0],
+	yellow: [254, 246, 182],
 };
 
 /******************************
@@ -65,7 +64,6 @@ let dopingConcen = 0; // doping concentration
 let dopingConcen_new = 0; // doping concentration
 var timeElapsed = 0; //count down for timeIt functionn
 let newAcceleration = 0;
-let AccelerationFactor = 1; // used to exagerate E-field for acceleration based on the voltage and doping
 
 // scattering
 let willScatter = false; //scatter true or false
@@ -80,20 +78,19 @@ let scatteringCount = 0; //scattering count
 let bandScale = 1; //change the verticle distribution scale of band diagram
 let getRandomBotz = []; //velocity of random distribution
 let boltzDistribution = []; //New random velocity distribution added by Azad
-let electronBand = []; //graph negative line
+let electronBand = []; //graph yellow line
 let holeBand = []; //graph green line
 
-let electronBand_data = new Array(100).fill(0); //store negative line data
+let electronBand_data = new Array(100).fill(0); //store yellow line data
 let holeBand_data = []; //store green line data
 let holeBand_data_indice = []; //store green line data
 
 let holeBand_v1 = []; //for json data v_data_1.json store green line data
-let electronBand_v1 = []; //for json data v_data_1.json store negative line data
+let electronBand_v1 = []; //for json data v_data_1.json store yellow line data
 let holeBand_data_v1 = []; //for json data v_data_1.json store green line data
-let electronBand_data_v1 = []; //for json data v_data_1.json store negative line data
+let electronBand_data_v1 = []; //for json data v_data_1.json store yellow line data
 
 let bandLength = 134;
-let FermiVoltage = 0; //used to plot Ef
 
 // electron hole
 var current_Electron_c = 0; //electron count // ???
@@ -265,8 +262,8 @@ function fetchBandDiagramData() {
 /*******************************************************
  * Section: preload variables or functions
  *******************************************************/
+fetchBandDiagramData();
 function setup() {
-	fetchBandDiagramData();
 	let canvas = createCanvas((2 * windowWidth) / 3, windowHeight);
 	canvas.parent("visualization");
 	frameRate(10);
@@ -298,7 +295,6 @@ function setup() {
  ***************************************************/
 function draw() {
 	background(18, 18, 18);
-
 	scaleWindow();
 
 	checkSelect();
@@ -410,6 +406,7 @@ function drawGraph() {
 		outlineHeight * sy
 	);
 	//two
+	// rect (x, y, w, h)
 	rect(
 		outlineX * sx,
 		chargeDensityDiagramY * sy,
@@ -417,6 +414,7 @@ function drawGraph() {
 		outlineHeight * sy
 	);
 	// three
+	// rect (x, y, w, h)
 	rect(
 		outlineX * sx,
 		capacitorDiagramY * sy,
@@ -424,14 +422,30 @@ function drawGraph() {
 		capacitorHeight * sy
 	);
 
+	////////////////////////////////////////////DRAW THE horizon on the second graph
 	noFill();
 	//coordinates
+	//up
 	stroke(...color.blue, 180);
+	////horizoN
+	// ////////////new
 	// x axis line
 	line(210 * sx, 290 * sy, 890 * sx, 290 * sy);
 	// y axis line
 	let xStart = 250;
 	line(xStart * sx, 224 * sy, 250 * sx, 355 * sy);
+
+	//////////////////////////////////////////////////// tickers draw on x axis
+	// positive x
+	// for (let i = 0; i < NumXAxisTicks; i++) {
+	// 	let x = 550 * sx + ((400 / 8) * sx * i * 2 + (400 / 8) * 2 * sx);
+	// 	let y = 290 * sy;
+	// 	line(x, y, x, y - 5 * sy); // Draw the line
+	// 	noStroke();
+	// 	fill(102, 194, 255, 180);
+	// 	textSize(10 * sx);
+	// 	text("1 \u00B5m", 340 * sx, 313 * sy);
+	// }
 
 	let numXTicks = 7;
 
@@ -440,7 +454,8 @@ function drawGraph() {
 		stroke(...color.blue, 180);
 		let x = (xStart + 100 * i) * sx;
 		let y = 290 * sy;
-		line(x, y, x, y - 5 * sy); // Draw the line
+		// line(x, y, x, y - 5 * sy); // Draw the line
+		line(x, y + 5, x, y - 5); // Draw the line
 
 		// tick label
 		if (i < numXTicks - 1) {
@@ -448,7 +463,7 @@ function drawGraph() {
 			fill(102, 194, 255, 180);
 			textSize(10 * sx);
 
-			text(`${50 * (i + 1)} nm`, (80 + (xStart + 101 * i)) * sx, 313 * sy);
+			text(`${50 * (i + 1)} nm`, (90 + (xStart + 98 * i)) * sx, 313 * sy);
 		}
 	}
 	stroke(...color.blue, 180);
@@ -459,90 +474,73 @@ function drawGraph() {
 		for (let i = 0; i < 4; i++) {
 			stroke(...color.blue, 180);
 			let x = 250 * sx;
-			let y = (385 / 2 + 98) * sy + 12.5 * sy + 12.5 * sy * i;
+			let y = (385 / 2 + 96.25) * sy + 12.5 * sy + 12.5 * sy * i;
 			line(x, y, x + 5 * sx, y); // Draw the line
 
 			noStroke();
 			fill(102, 194, 255, 180);
 			textSize(10 * sx);
-			// only show units at end points
-			if (i == 3) {
-				text(`${-10 * (i + 1)} mC/cm^3`, x + 10, y - 4, x + 5 * sx, y);
-			} else {
-				text(`${-10 * (i + 1)}`, x + 10, y - 4, x + 5 * sx, y);
-			}
+			text(`${-10 * (i + 1)} mC/cm^3`, x + 10, y - 4, x + 5 * sx, y);
 		}
 		//positive charge density y axis ticks
 		for (let i = 0; i < 4; i++) {
 			stroke(...color.blue, 180);
 			let x = 250 * sx;
-			let y = (385 / 2 + 98) * sy - 12.5 * sy - 12.5 * sy * i;
+			let y = (385 / 2 + 96.25) * sy - 12.5 * sy - 12.5 * sy * i;
 			line(x, y, x + 5 * sx, y); // Draw the line
 
 			noStroke();
 			fill(102, 194, 255, 180);
 			textSize(10 * sx);
-			// only show units at end points
-			if (i == 3) {
-				text(`${10 * (i + 1)} mC/cm^3`, x + 10, y - 4, x + 5 * sx, y);
-			} else {
-				text(`${10 * (i + 1)}`, x + 10, y - 4, x + 5 * sx, y);
-			}
+			text(`${10 * (i + 1)} mC/cm^3`, x + 10, y - 4, x + 5 * sx, y);
 		}
 	} else {
 		// negative electric field y axis ticks
 		for (let i = 0; i < 4; i++) {
 			stroke(...color.blue, 180);
 			let x = 250 * sx;
+
+			// length of each tick - AZAD
 			let y =
-				(385 / 2 + 98) * sy +
+				(385 / 2 + 96.25) * sy +
 				(40 / 1530) * 500 * sy +
 				(40 / 1530) * 500 * sy * i;
 			line(x, y, x + 5 * sx, y); // Draw the line
 			noStroke();
 			fill(...color.blue, 180);
 			textSize(10 * sx);
-			// only show units at end points
-			if (i == 3) {
-				text(
-					`${(0.1 * (i + 1)).toFixed(1)} MV/cm`,
-					x + 10,
-					y - 4,
-					x + 5 * sx,
-					y
-				);
-			} else {
-				text(`${(0.1 * (i + 1)).toFixed(1)}`, x + 10, y - 4, x + 5 * sx, y);
-			}
+			text(`${(0.1 * (i + 1)).toFixed(1)} MV/cm`, x + 10, y - 4, x + 5 * sx, y);
+			// only use for extreme points
 		}
 		// positive electric field y axis ticks
 		for (let i = 0; i < 4; i++) {
 			stroke(...color.blue, 180);
 			let x = 250 * sx;
 			let y =
-				(385 / 2 + 98) * sy -
+				(385 / 2 + 96.25) * sy -
 				(40 / 1530) * 500 * sy -
 				(40 / 1530) * 500 * sy * i;
 			line(x, y, x + 5 * sx, y); // Draw the line
 			noStroke();
 			fill(...color.blue, 180);
 			textSize(10 * sx);
-			// only show units at end points
-			if (i == 3) {
-				text(
-					`${(0.1 * (i + 1)).toFixed(1)} MV/cm`,
-					x + 10,
-					y - 4,
-					x + 5 * sx,
-					y
-				);
-			} else {
-				text(`${(0.1 * (i + 1)).toFixed(1)}`, x + 10, y - 4, x + 5 * sx, y);
-			}
+			text(`${(0.1 * (i + 1)).toFixed(1)} MV/cm`, x + 10, y - 4, x + 5 * sx, y);
 		}
 	}
 
 	//////////////////////////////////////////////////// x axis labeling
+
+	///////////new box graphing
+
+	// noStroke();
+	// fill(254, 246, 182, 100);
+
+	//////////////////////////////////////////////////// graph switch on and off change looks
+	// if (switchGraph) {
+	// 	fill("white");
+	// } else {
+	// 	fill(102, 194, 255, 100);
+	// }
 
 	// Buttons to swtich between E-field / charge density
 	noFill();
@@ -666,16 +664,14 @@ function drawGraph() {
 					///charge density graph
 					beginShape();
 
-					vertex(250 * sx, (385 / 2 + 98) * sy);
+					vertex(250 * sx, (385 / 2 + 96.25) * sy);
 
 					// Add all points as curve vertices
 					for (let i = 0; i < charge_density_temp_data.length; i++) {
 						let x = charge_density_temp_data[i].x;
 						let y =
-							((charge_density_temp_data[i].y / Math.pow(10, 14)) *
-								(12.5 * sy)) /
-								10 +
-							(385 / 2 + 98) * sy;
+							charge_density_temp_data[i].y / Math.pow(10, 14) +
+							(385 / 2 + 96.25) * sy;
 						//let y = 20 + (10+385/2+96.25) * sy;
 						vertex(x, y);
 					}
@@ -696,28 +692,21 @@ function drawGraph() {
 					///charge density graph
 					beginShape();
 
-					vertex(250 * sx, (385 / 2 + 98) * sy);
+					vertex(250 * sx, (385 / 2 + 96.25) * sy);
 
 					// Add all points as curve vertices
 					for (let i = 0; i < E_field_temp_data.length; i++) {
 						let x = E_field_temp_data[i].x;
 						let y =
-							10 *
-								(E_field_temp_data[i].y / Math.pow(10, 6)) *
-								(40 / 1530) *
-								500 *
-								sy +
-							(385 / 2 + 98) * sy;
-						// let y =
-						// 	(E_field_temp_data[i].y / Math.pow(10, 4)) * 2 +
-						// 	(385 / 2 + 96.25) * sy;
+							(E_field_temp_data[i].y / Math.pow(10, 4)) * 2 +
+							(385 / 2 + 96.25) * sy;
 
 						vertex(x, y);
 					}
 					vertex(
 						E_field_temp_data[bandLength - 2].x,
-						E_field_temp_data[bandLength - 2].y / Math.pow(10, 6) +
-							(385 / 2 + 98) * sy
+						E_field_temp_data[bandLength - 2].y / Math.pow(10, 5) +
+							(385 / 2 + 96.25) * sy
 					);
 
 					endShape();
@@ -777,23 +766,13 @@ function drawGraph() {
 	let batteryY = capacitorDiagramY + 376;
 
 	// battery image
-	if (appliedVoltage >= 0) {
-		image(
-			batteryPosImg,
-			(batteryX + xSlide / 2) * sx,
-			batteryY * sy,
-			(batteryPosImg.width / 1.5) * sx,
-			(batteryPosImg.height / 1.5) * sy
-		);
-	} else {
-		image(
-			batteryNegImg,
-			(batteryX + xSlide / 2) * sx,
-			batteryY * sy,
-			(batteryNegImg.width / 1.5) * sx,
-			(batteryNegImg.height / 1.5) * sy
-		);
-	}
+	image(
+		batteryPosImg,
+		(batteryX + xSlide / 2) * sx,
+		batteryY * sy,
+		(batteryPosImg.width / 1.5) * sx,
+		(batteryPosImg.height / 1.5) * sy
+	);
 
 	// left metal label
 	image(
@@ -882,8 +861,11 @@ function drawGraph() {
 
 function drawBandDiagram() {
 	///////////////////////////////////////////////////////////////////draw new band diagram using json data
+
 	stroke(254, 246, 182);
 	noFill();
+
+	console.log("appliedVoltage", appliedVoltage);
 
 	if (scene(1)) {
 		if (hole_new == 99763115748444.14) {
@@ -900,6 +882,7 @@ function drawBandDiagram() {
 			} else if (appliedVoltage / 20 == -0.4) {
 				current_array = numberArray1_neg_0_4;
 			} else if (appliedVoltage / 20 == 0) {
+				console.log("scene 1, first density, v=0");
 				current_array = numberArray1_0;
 			} else if (appliedVoltage / 20 == 0.4) {
 				current_array = numberArray1_pos_0_4;
@@ -978,6 +961,7 @@ function drawBandDiagram() {
 			} else if (appliedVoltage / 20 == 0.4) {
 				current_array_temp = numberArray2_neg_0_4;
 			} else if (appliedVoltage / 20 == 0) {
+				console.log("numberArray2_0", numberArray2_0);
 				current_array_temp = numberArray2_0;
 			} else if (appliedVoltage / 20 == -0.4) {
 				current_array_temp = numberArray2_pos_0_4;
@@ -995,6 +979,9 @@ function drawBandDiagram() {
 			for (let i = 0; i < bandLength - 1; i++) {
 				current_array[i] = current_array_temp[i] * -1;
 			}
+			//console.log("current_array=",current_array);
+			// console.log("current_array_temp=", current_array_temp);
+			// console.log("appliedVoltage / 20", appliedVoltage / 20);
 		}
 	}
 
@@ -1018,23 +1005,11 @@ function drawBandDiagram() {
 		}
 	}
 
-	// draw labels
-
-	//draw negative curve
-
+	//draw yellow curve
 	beginShape();
 
-	textFont("Courier New");
-	noStroke();
-	fill(...color.negative);
-	text("E_c", 920 * sx, 75 * sy);
-
-	noFill();
-	stroke(...color.negative);
-	strokeWeight(1.5);
-	// draw electron curve (E_c)
-
 	for (var k = 0; k < bandLength; k++) {
+		//yellow curve
 		let x1 = 17;
 		let x2 = 349;
 		let y1 = 0;
@@ -1042,8 +1017,6 @@ function drawBandDiagram() {
 		let a = (y2 - y1) / (x2 - x1);
 		let b = y1 - a * x1;
 		let y = a * x_values_1[k] + b;
-
-		// vertex drawn from current_array
 		curveVertex((250 + y) * sx, (171.25 + current_array[k] * 40 - 100) * sy);
 		electronBand_data_v1[k] = {
 			x: (250 + y) * sx,
@@ -1062,79 +1035,13 @@ function drawBandDiagram() {
 	}
 	endShape();
 	noStroke();
-	drawingContext.setLineDash([6]);
+	stroke(125, 241, 148);
 
-	noStroke();
-	fill("#FF5839");
-	text("E_i", 920 * sx, 90 * sy);
-
-	noFill();
-
-	//Draw E_i
-	strokeWeight(1);
-	stroke("#FF5839"); // red
+	//draw green curve
 	beginShape();
 
 	for (var k = 0; k < bandLength; k++) {
-		//negative curve
-		let x1 = 17;
-		let x2 = 349;
-		let y1 = 0;
-		let y2 = 679;
-		let a = (y2 - y1) / (x2 - x1);
-		let b = y1 - a * x1;
-		let y = a * x_values_1[k] + b;
-		curveVertex((250 + y) * sx, (171.25 + current_array[k] * 40 - 80) * sy);
-	}
-	endShape();
-
-	noStroke();
-	fill("#AE8BFF");
-	text("E_f", 920 * sx, 104 * sy);
-
-	noFill();
-	strokeWeight(1);
-	//Draw E_f
-	stroke("#AE8BFF"); // purple
-	beginShape();
-
-	for (var k = 0; k < bandLength; k++) {
-		//negative curve
-		let x1 = 17;
-		let x2 = 349;
-		let y1 = 0;
-		let y2 = 679;
-		let a = (y2 - y1) / (x2 - x1);
-		let b = y1 - a * x1;
-		let y = a * x_values_1[k] + b;
-		if (scene(1)) {
-			FermiVoltage = -0.026 * Math.log(hole_new / Math.pow(10, 8));
-		}
-		if (scene(2)) {
-			FermiVoltage = 0.026 * Math.log(hole_new / Math.pow(10, 8));
-		}
-
-		curveVertex(
-			(250 + y) * sx,
-			(171.25 + FermiVoltage - 80 - (FermiVoltage / 1.19) * 40) * sy
-		);
-	}
-	endShape();
-
-	noStroke();
-	fill(...color.positive);
-	text("E_v", 920 * sx, 118 * sy);
-
-	drawingContext.setLineDash([0]);
-
-	//draw hole curve
-	noFill();
-	strokeWeight(1.5);
-	stroke(...color.positive);
-	beginShape();
-
-	for (var k = 0; k < bandLength; k++) {
-		//hole curve
+		//green curve
 
 		let x1 = 17;
 		let x2 = 349;
@@ -1164,9 +1071,6 @@ function drawBandDiagram() {
 	}
 	endShape();
 	noStroke();
-	strokeWeight(1);
-
-	textFont("Sans-serif");
 }
 
 function onRefresh() {
@@ -1175,7 +1079,6 @@ function onRefresh() {
 
 //reset button
 function resetScene() {
-	fetchBandDiagramData();
 	genElectrons = [];
 	genHoles = [];
 	initElectrons = [];
@@ -1516,96 +1419,6 @@ function findClosestValue(array, targetX) {
 function updateAppliedVoltage(a) {
 	// resetScene();
 	appliedVoltage = a;
-
-	AccelerationFactor = 1;
-	if (scene(1)) {
-		if (appliedVoltage / 20 < -0.3) {
-			// newAcceleration = newAcceleration * 10;  // original
-			AccelerationFactor = 5;
-		}
-
-		if (dopingConcen_new == 5e13) {
-			recomDistance = 15;
-			if (appliedVoltage / 20 == 0.4) {
-				AccelerationFactor = 2;
-			}
-
-			if (appliedVoltage / 20 == 0 / 8) {
-				AccelerationFactor = 1.5;
-			}
-
-			if (appliedVoltage / 20 == 1.2) {
-				AccelerationFactor = 0.8;
-				recomDistance = 21;
-			}
-
-			if (appliedVoltage / 20 > 1.4) {
-				AccelerationFactor = 1.5;
-				recomDistance = 27;
-			}
-		}
-
-		if (dopingConcen_new > 5e13) {
-			recomDistance = 12;
-			if (appliedVoltage / 20 == 0.4) {
-				AccelerationFactor = 2;
-			}
-
-			if (appliedVoltage / 20 == 0.8) {
-				AccelerationFactor = 1.5;
-			}
-
-			if (appliedVoltage / 20 == 1.2) {
-				AccelerationFactor = 0.8;
-			}
-
-			if (appliedVoltage / 20 > 1.4) {
-				AccelerationFactor = 1.5;
-			}
-		}
-	} else if (scene(2)) {
-		if (appliedVoltage / 20 > 0.3) {
-			// newAcceleration = newAcceleration * 10; // original
-
-			AccelerationFactor = 5;
-		}
-
-		if (dopingConcen_new == 5e13) {
-			recomDistance = 12;
-			if (appliedVoltage / 20 == -0.4) {
-				AccelerationFactor = 2;
-			}
-
-			if (appliedVoltage / 20 == -1.2) {
-				AccelerationFactor = 0.8;
-				recomDistance = 21;
-			}
-
-			if (appliedVoltage / 20 < -1.4) {
-				AccelerationFactor = 1.5;
-				recomDistance = 27;
-			}
-		}
-
-		if (dopingConcen_new > 5e13) {
-			recomDistance = 12;
-			if (appliedVoltage / 20 == -0.4) {
-				AccelerationFactor = 2;
-			}
-
-			if (appliedVoltage / 20 == -0.8) {
-				AccelerationFactor = 1.1;
-			}
-
-			if (appliedVoltage / 20 == -1.2) {
-				AccelerationFactor = 0.8;
-			}
-
-			if (appliedVoltage / 20 < -1.4) {
-				AccelerationFactor = 1.5;
-			}
-		}
-	}
 }
 
 //recombine toggle between 0 and 1 every 3 seconds

@@ -42,24 +42,22 @@ class Charge {
 		}, 8000);
 	}
 
-	// display the electron / hole on band diagram
+	/////****** display the electron or hole looks & also the upper part on the graph
 	display() {
 		if (this.showing) {
 			if (this.chargeType == "e") {
 				//electron
-				fill(...color.negative, this.opacity);
-				stroke(...color.negative, this.opacity);
+				fill(...color.yellow, this.opacity);
+				stroke(...color.yellow, this.opacity);
 			} else {
 				//hole
 				noFill();
-				stroke(...color.positive, this.opacity); //positive
+				stroke(...color.green, this.opacity); //green
 				strokeWeight(1);
 			}
 
-			// draw charges in capacitor
 			ellipse(this.position.x, this.position.y, this.diameter);
 
-			let buffer = 16;
 			if (this.chargeType == "e") {
 				// draw electrons on band diagram
 
@@ -67,10 +65,10 @@ class Charge {
 				if (this.bandOrigin.x == 0 && this.bandOrigin.y == 0) {
 				} else {
 					//  added pairs electron
-					fill(...color.negative, 160);
+					fill(...color.yellow, 160);
 					noStroke();
 					// don't draw until it has botz calculated and has snapped to band
-					if (this.bandPosition.y > 10 && this.position.x < xMax + buffer) {
+					if (this.bandPosition.y > 10) {
 						ellipse(this.position.x, this.bandPosition.y, 5);
 					}
 					this.bandPosition.y =
@@ -80,19 +78,16 @@ class Charge {
 				// draw holes on band diagram
 				//added pairs senario
 				noFill();
-				stroke(...color.positive, 160); //positive
+				stroke(...color.green, 160); //green
 				strokeWeight(1);
 
 				// don't draw until it has botz calculated and has snapped to band
-
-				if (this.bandPosition.y > 100 && this.position.x < xMax + buffer) {
+				if (this.bandPosition.y > 100) {
 					ellipse(this.position.x, this.bandPosition.y, 5);
 				}
 				this.bandPosition.y =
 					this.bandOrigin.y + ((this.botz * 8.8 * 2 * 0.1) / 3) * sy; // adding bc hole is below band
 			}
-
-			stroke("white");
 		}
 	}
 
@@ -116,6 +111,11 @@ class Charge {
 			this.position.x += buffer;
 			this.velocity.x = Math.abs(this.velocity.x);
 		}
+
+		// // prevent from sneaking out left
+		// if (this.position.x < xMin * sx) {
+		// 	this.position.x = 600;
+		// }
 
 		// right
 		if (this.position.x > (xMax - buffer) * sx) {
@@ -359,84 +359,82 @@ class Charge {
 
 		//////////////////Exeagerate the electric field when the applied voltage is negateive to better visualize accumlation of holes
 
-		newAcceleration = AccelerationFactor * newAcceleration;
+		if (scene(1)) {
+			if (appliedVoltage / 20 < -0.3) {
+				// newAcceleration = newAcceleration * 10;  // original
+				newAcceleration = newAcceleration * 5;
+			}
 
-		// if (scene(1)) {
-		// 	if (appliedVoltage / 20 < -0.3) {
-		// 		// newAcceleration = newAcceleration * 10;  // original
-		// 		newAcceleration = newAcceleration * 5;
-		// 	}
+			if (dopingConcen_new == 5e13) {
+				if (appliedVoltage / 20 == 0.4) {
+					newAcceleration = newAcceleration * 3;
+				}
 
-		// 	if (dopingConcen_new == 5e13) {
-		// 		if (appliedVoltage / 20 == 0.4) {
-		// 			newAcceleration = newAcceleration * 2;
-		// 		}
+				if (appliedVoltage / 20 == 1.2) {
+					newAcceleration = newAcceleration * 0.8;
+				}
 
-		// 		if (appliedVoltage / 20 == 1.2) {
-		// 			newAcceleration = newAcceleration * 0.8;
-		// 		}
+				if (appliedVoltage / 20 > 1.4) {
+					newAcceleration = newAcceleration * 1.5;
+				}
+			}
 
-		// 		if (appliedVoltage / 20 > 1.4) {
-		// 			newAcceleration = newAcceleration * 1.5;
-		// 		}
-		// 	}
+			if (dopingConcen_new > 5e13) {
+				if (appliedVoltage / 20 == 0.4) {
+					newAcceleration = newAcceleration * 2;
+				}
 
-		// 	if (dopingConcen_new > 5e13) {
-		// 		if (appliedVoltage / 20 == 0.4) {
-		// 			newAcceleration = newAcceleration * 2;
-		// 		}
+				if (appliedVoltage / 20 == 0.8) {
+					newAcceleration = newAcceleration * 1.5;
+				}
 
-		// 		if (appliedVoltage / 20 == 0.8) {
-		// 			newAcceleration = newAcceleration * 1.1;
-		// 		}
+				if (appliedVoltage / 20 == 1.2) {
+					newAcceleration = newAcceleration * 0.8;
+				}
 
-		// 		if (appliedVoltage / 20 == 1.2) {
-		// 			newAcceleration = newAcceleration * 0.8;
-		// 		}
+				if (appliedVoltage / 20 > 1.4) {
+					newAcceleration = newAcceleration * 1.5;
+				}
+			}
+		} else if (scene(2)) {
+			if (appliedVoltage / 20 > 0.3) {
+				// newAcceleration = newAcceleration * 10; // original
 
-		// 		if (appliedVoltage / 20 > 1.4) {
-		// 			newAcceleration = newAcceleration * 1.5;
-		// 		}
-		// 	}
-		// } else if (scene(2)) {
-		// 	if (appliedVoltage / 20 > 0.3) {
-		// 		// newAcceleration = newAcceleration * 10; // original
+				newAcceleration = newAcceleration * 5;
+			}
 
-		// 		newAcceleration = newAcceleration * 5;
-		// 	}
+			if (dopingConcen_new == 5e13) {
+				if (appliedVoltage / 20 == -0.4) {
+					newAcceleration = newAcceleration * 3;
+				}
 
-		// 	if (dopingConcen_new == 5e13) {
-		// 		if (appliedVoltage / 20 == -0.4) {
-		// 			newAcceleration = newAcceleration * 3;
-		// 		}
+				if (appliedVoltage / 20 == -1.2) {
+					newAcceleration = newAcceleration * 0.8;
+				}
 
-		// 		if (appliedVoltage / 20 == -1.2) {
-		// 			newAcceleration = newAcceleration * 0.8;
-		// 		}
+				if (appliedVoltage / 20 < -1.4) {
+					newAcceleration = newAcceleration * 1.5;
+				}
+			}
 
-		// 		if (appliedVoltage / 20 < -1.4) {
-		// 			newAcceleration = newAcceleration * 1.5;
-		// 		}
-		// 	}
+			if (dopingConcen_new > 5e13) {
+				if (appliedVoltage / 20 == -0.4) {
+					newAcceleration = newAcceleration * 2;
+				}
 
-		// 	if (dopingConcen_new > 5e13) {
-		// 		if (appliedVoltage / 20 == -0.4) {
-		// 			newAcceleration = newAcceleration * 2;
-		// 		}
+				if (appliedVoltage / 20 == -0.8) {
+					newAcceleration = newAcceleration * 1.5;
+				}
 
-		// 		if (appliedVoltage / 20 == -0.8) {
-		// 			newAcceleration = newAcceleration * 1.5;
-		// 		}
+				if (appliedVoltage / 20 == -1.2) {
+					newAcceleration = newAcceleration * 0.8;
+				}
 
-		// 		if (appliedVoltage / 20 == -1.2) {
-		// 			newAcceleration = newAcceleration * 0.8;
-		// 		}
-
-		// 		if (appliedVoltage / 20 < -1.4) {
-		// 			newAcceleration = newAcceleration * 1.5;
-		// 		}
-		// 	}
-		// }
+				if (appliedVoltage / 20 < -1.4) {
+					newAcceleration = newAcceleration * 1.5;
+				}
+			}
+		}
 
 		this.acceleration = createVector(-newAcceleration, 0);
 		this.velocity = p5.Vector.add(this.acceleration, this.velocity);
@@ -530,27 +528,27 @@ class Effect {
 		if (this.showing) {
 			if (this.chargeType == "e") {
 				noStroke();
-				fill(...color.negative, this.generationOpacity);
-				//fill(...color.positive, this.generationOpacity);
+				fill(...color.yellow, this.generationOpacity);
+				//fill(...color.green, this.generationOpacity);
 
 				ellipse(this.position.x, this.position.y, this.d);
 			} else if (this.chargeType == "h") {
-				stroke(...color.positive, this.generationOpacity);
+				stroke(...color.green, this.generationOpacity);
 				strokeWeight(2);
 				noFill();
 				ellipse(this.position.x, this.position.y, this.effectDiameter);
 			} else if (this.chargeType == "gen") {
 				// 2
 				strokeWeight(1);
-				fill(...color.negative, this.recombineOpacity);
-				stroke(...color.negative, this.recombineOpacity);
+				fill(...color.yellow, this.recombineOpacity);
+				stroke(...color.yellow, this.recombineOpacity);
 				ellipse(this.position.x, this.position.y, 10);
 			} else if (this.chargeType == "recom") {
 				// 3
 				//hollow
 				strokeWeight(1);
 				noFill();
-				stroke(...color.positive, this.recombineOpacity);
+				stroke(...color.green, this.recombineOpacity);
 				ellipse(this.position.x, this.position.y, 10);
 			} else if (this.chargeType == "fixpos") {
 				// 4

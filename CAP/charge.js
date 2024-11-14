@@ -1,7 +1,7 @@
 class Electron {
 	constructor(x, y, radius, boxX, boxY, boxW, boxH, lit, avail) {
 		this.position = createVector(x, y);
-		this.velocity = p5.Vector.random2D().mult(3.5); // Initial random velocity
+		this.velocity = p5.Vector.random2D().mult(4); // Initial random velocity
 		this.radius = radius;
 		this.boxX = boxX;
 		this.boxY = boxY;
@@ -73,16 +73,17 @@ class Electron {
 		let top = this.boxY + buffer;
 		let bottom = this.boxY + this.boxH - buffer;
 
-		if (!reverse) {
-		} else {
-		}
-
 		// handle repulsion space
-
 		// right box && default polarity
 		if (this.boxX > 200 && !reverse) {
+			// console.log(left + moveBound);
+			// if (this.position > left && this.position.x < left + moveBound) {
+			// 	// console.log("><");
+			// 	this.position.x += 20;
+			// }
 			// going left -> hit repulsion edge -> bounce right
 			if (this.position.x < left + moveBound && this.velocity.x < 0) {
+				// console.log("bounc off left");
 				this.velocity.x *= -1;
 			}
 		} else {
