@@ -80,6 +80,7 @@ let batteryPosImg;
 let batteryNegImg;
 let mosImg;
 let vecEImg;
+let scaleImg;
 
 // variables for moving electrons
 let dest1; // where battery line connects to box where charge flows from
@@ -106,7 +107,7 @@ let brightChargesMetal = []; // indexes for which positive charges to light up
 let electronsTransferred = 0; // number of electrons transferred
 let defaultDopants = 30; // default number of dopants when scene starts
 
-let moveBound = 0; // set bounce boundary for depletion zone (where electrons are repulsed from lit up positive charges)
+let bounceBoundary = 0; // set bounce boundary for depletion zone (where electrons are repulsed from lit up positive charges)
 
 // scanner / variables related to xMax and charge (Q)
 let scannerNM;
@@ -135,6 +136,7 @@ function setup() {
 	batteryNegImg = loadImage("batteryNeg.png");
 	mosImg = loadImage("mos.png");
 	vecEImg = loadImage("EF.png");
+	scaleImg = loadImage("scale.png");
 
 	tempBox = new Box(boxD.xLeft, boxD.y, boxD.width, boxD.height, 0);
 
@@ -142,6 +144,10 @@ function setup() {
 	newBoxes();
 
 	// reset all variables
+	resetScene();
+}
+
+function onRefresh() {
 	resetScene();
 }
 
@@ -186,7 +192,7 @@ function resetScene() {
 	sceneAnimated = false;
 	timesAnimated = 0;
 	electronsTransferred = 0;
-	moveBound = 0;
+	bounceBoundary = 0;
 
 	// re-initialize current boxes
 	boxD.depth = 80;
@@ -314,17 +320,19 @@ function animateElectrons() {
 				: currLeftBox.numElectrons < totalElectrons;
 
 			if (condition) {
+				console.log("animatedelectrons condition");
 				// amount has transfered
 				showEF = true;
 				sceneAnimated = true;
-				// set bounce when electrons hit positively attracted region
-				reverse ? (moveBound = -30) : (moveBound = 30);
+				drawScanner(currRightBox);
+
 				// push electrons away from depletion region
+				reverse ? (bounceBoundary = -30) : (bounceBoundary = 30);
 
 				// if semiconductor scene
 				if (currRightBox.type == "s" && !reverse) {
 					// set bounce to boxMax calculated from xMax
-					reverse ? (moveBound = -boxMax) : (moveBound = boxMax);
+					reverse ? (bounceBoundary = -boxMax) : (bounceBoundary = boxMax);
 				}
 			}
 		}, timeout);
@@ -694,7 +702,7 @@ function drawElectrons(box) {
 				if (
 					electron.boxX > 200 &&
 					electron.position.x > boxD.xRight &&
-					electron.position.x < boxD.xRight + moveBound
+					electron.position.x < boxD.xRight + bounceBoundary
 				) {
 					electron.position.x += 4;
 				}
@@ -805,7 +813,9 @@ function drawScanner(box) {
 	xPercent = xMax / 1000; // divide by max µm
 
 	// convert x max to pixel
+	// console.log("setting boxmax in scanner");
 	boxMax = boxD.width * xPercent;
+	// console.log("boxmax", boxMax);
 
 	// calculate currQ
 	currQ = (Q * currX) / xPercent;
@@ -842,15 +852,31 @@ function drawScanner(box) {
 
 		styleText();
 		xMax = xMax.toFixed(2);
-		if (xMax < 0.001) {
-			xMax = "<.001";
-		}
+		// if (xMax < 0.001) {
+		// 	xMax = "<.001";
+		// }
 
 		// let electronsLeft = (actualQ / (1.6 * 10 ** -19)).toExponential(2);
 		let electronsLeft = (Q / (1.6 * 10 ** -19)).toExponential(2);
 		let electronsRight = (currQ / (1.6 * 10 ** -19)).toExponential(2);
 
 		fill(...color.net);
+
+		if (sceneCount == 4) {
+			// scene: two metals, with scanner
+			// draw the scale break icon
+			image(
+				scaleImg,
+				boxD.xRight + 26,
+				boxD.y + boxD.height - 12,
+				scaleImg.width / 2,
+				scaleImg.height / 2
+			);
+
+			image(scaleImg, 500, 460, scaleImg.width / 2, scaleImg.height / 2);
+			fill(...color.white);
+			text("= change in x scale", 520, 476);
+		}
 
 		// pixels into right box where 1st column appears to end
 		if (!reverse) {
@@ -861,8 +887,7 @@ function drawScanner(box) {
 			let surfaceDepth = 18;
 			// for scanner scenes
 			// when scanning, linearly increase Q, absent electrons / extra electrons when scanning over surface (which is really small distance but represented as larger - about size of first column)
-			console.log(sceneCount);
-			if (sceneCount == 4 || sceneCount == 8 || sceneCount == 9) {
+			if (sceneCount == 4) {
 				if (boxMouseX < surfaceDepth) {
 					currQ = Q * (boxMouseX / surfaceDepth);
 					electronsRight = (
@@ -883,7 +908,10 @@ function drawScanner(box) {
 			text(`Q: -${Q.toFixed(2)}µC`, boxD.xLeft + 80, box.y - 32);
 
 			// right box xMax
-			text(`xMax: ${xMax}µm`, box.x + 80, box.y - 16);
+			if (xMax > 0.1) {
+				// > 0.1: don't show xmax for metals, very small xmax
+				text(`xMax: ${xMax}µm`, box.x + 80, box.y - 16);
+			}
 			// drag over box prompt
 			if (currX == 0) {
 				text(
@@ -905,17 +933,15 @@ function drawScanner(box) {
 						(Q / (1.6 * 10 ** -19)) *
 						(boxMouseX / surfaceDepth)
 					).toExponential(2);
-					console.log(electronsLeft);
 				} else {
 					currQ = Q;
 					electronsLeft = (Q / (1.6 * 10 ** -19)).toExponential(2);
-					console.log(electronsLeft);
 				}
 			}
 			// right box Q
 			// text(`Q: -${currQ.toFixed(2)}µC`, box.x + 120, box.y - 32);
 
-			text(`Q: -${currQ.toFixed(2)}µC`, box.x + 80, box.y - 32);
+			text(`Q: ${currQ.toFixed(2)}µC`, box.x + 80, box.y - 32);
 			text(`# extra electrons:  ${electronsLeft}`, box.x + 152, box.y - 32);
 
 			// if (boxMouseX >= 6) {
@@ -934,8 +960,10 @@ function drawScanner(box) {
 		styleText();
 		for (let i = 0; i < 5; i++) {
 			let distance = boxD.width / 5;
-			if (i != 1) {
-				// skip 200 temporarily
+			if (i == 0) {
+				// don't show unit for 0
+				text(`${0}`, box.x + i * distance - 12, box.y + boxD.height + 24);
+			} else {
 				text(
 					`${i * 200}µm`,
 					box.x + i * distance - 12,
@@ -944,14 +972,26 @@ function drawScanner(box) {
 			}
 			text("|", box.x + i * distance - 1.4, box.y + boxD.height + 9);
 		}
-		text("1cm x 1cm 1cm", box.x + 4, box.y + boxD.height - 4);
+		text("1mm x 1mm 1mm", box.x + 170, box.y + boxD.height - 8);
 		text("|", box.x + boxD.width - 1.4, box.y + boxD.height + 10);
 		text("1mm", box.x + boxD.width, box.y + boxD.height + 24);
 
 		// on left surface of box that charges are transferred to
 		fill(...color.scanner);
-		text("|", box.x + 20, box.y + boxD.height + 10);
-		text("<.001µm", box.x + 20, box.y + boxD.height + 24);
+		// nm tick
+		if (sceneCount == 4) {
+			// text("|", box.x + 20, box.y + boxD.height + 10);
+			stroke(...color.scanner);
+			strokeWeight(2);
+			line(
+				box.x + 20,
+				box.y + boxD.height - 10,
+				box.x + 20,
+				box.y + boxD.height + 10
+			);
+			noStroke();
+			text("<.001µm", box.x + 20, box.y + boxD.height - 18);
+		}
 	}
 }
 
@@ -1026,7 +1066,7 @@ function drawGraph() {
 		if (graphMouseX > boxD.xRight && (reverse || sceneCount == 4)) {
 			text(`= ${0} MV/cm`, graph.center + 30, graph.y - 64);
 		} else if (graphMouseX > graph.center) {
-			let displayQ = -(Q * 11.3).toFixed(2);
+			let displayQ = -(Q * 11.3 - currQ * 11.3).toFixed(2);
 			if (reverse) {
 				displayQ = -displayQ;
 			}

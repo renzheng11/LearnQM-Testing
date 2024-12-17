@@ -14,7 +14,7 @@
 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PN Junctions</title>
+  <title>PN Junctions - Asymmetrical</title>
 
   <link href="./style.css" rel="stylesheet" />
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet" />
@@ -38,19 +38,19 @@
   <a href="../index.html"><img id="back-icon" src="../images/arrow-left.svg" /></a>
   <div class="container">
     <div class="row title-row">
-      <h1 class="col-lg-12">P-N JUNCTIONS</h1>
+      <h1 class="col-lg-12">P-N JUNCTIONS - ASYMMETRICAL</h1>
       <div class="col-lg-1"></div>
-      <p class="col-lg-10">A P-N junction is one of the most important semiconductor devices with applications ranging from rectifiers to solar cells. It is also an important part of more complex devices such as transistors. In this chapter you get to play with an ideal abrupt P-N Junction.</p>
+      <p class="col-lg-10">In the previous chapter, we saw how a symmetrical PN junction works. Let’s see what happens if the doping concentrations in the P and N regions are not the same. </p>
       <div class="col-lg-1"></div>
     </div>
     <div class="row sub-atomic-particle-row" id="scene_0">
     </div>
     <div class="row sub-atomic-particle-row" id="scene_1">
       <div class="col-lg-4">
-        <h1>P-N Junction</h1>
+        <h1>Asymmetrical P-N Junction</h1>
       
         <p>
-       Imagine we magically connect P-type and N-type pieces of Si together. Let's see what happens.
+          Imagine we magically connect P-type and N-type pieces of Si together. The doping concentration of the p-side is 5E13 per cm^3. You can choose the doping concentration of the N side. 
         </p>
         <p>Doping Concentration (per cm<sup>3</sup>):  <output type="text" id = "updateDopingConcentration" val = "Math.round(updateDopingConcentration(this.value))"> </p>
         <input style="width: 100%;" type="range" min="130" max="133" value="130" step = "3" id = "slider_6"
@@ -65,9 +65,7 @@
         </div>
         <button class="button" onclick="resetScene()">Reset</button>
          <p>
-       After reaching equilibrium, do you see any electrons going from the N-side to the Pside? What do they have in common?
-
-       What happens if an electron-hole pair is generated in the middle (depletion region)?
+          After reaching equilibrium, compare the values of the charge density and electric field in the depletion regions on each side? What about the width of the depletion region on each side? Or, the total charge on each side? Can you qualitatively explain what you observe?
         </p>
       </div>
     </div>

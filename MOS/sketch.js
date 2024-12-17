@@ -76,6 +76,8 @@ let scatteringCount = 0; //scattering count
 
 // graphing
 
+let graphTextSize = 12;
+
 // band diagram
 let bandScale = 1; //change the verticle distribution scale of band diagram
 let getRandomBotz = []; //velocity of random distribution
@@ -161,7 +163,7 @@ let numberArray1_pos_1_4;
 let numberArray1_pos_1_6;
 let numberArray1_pos_1_8;
 let numberArray1_pos_2_0;
-let x_values_1;
+let xPositionData;
 
 let numberArray2_neg_2_0;
 let numberArray2_neg_1_8;
@@ -193,6 +195,10 @@ let E_field_temp_data = []; //electric field temp data
 let x_counter; //used to read electric field at a given point in Accelerate function
 let tesx; //used to read electric field at a given point in Accelerate function
 
+let timeSinceLastInteraction = 0;
+
+fetchBandDiagramData(); // DO NOT REMOVE, included in multiple places to prevent load failures
+
 function fetchBandDiagramData() {
 	fetch("v_data_1.json")
 		.then((response) => response.json())
@@ -221,7 +227,7 @@ function fetchBandDiagramData() {
 			numberArray1_pos_1_6 = jsonData[18]["18"].map(Number); //
 			numberArray1_pos_1_8 = jsonData[19]["19"].map(Number); //
 			numberArray1_pos_2_0 = jsonData[20]["20"].map(Number); //
-			x_values_1 = jsonData[21]["21"].map(Number); //
+			xPositionData = jsonData[21]["21"].map(Number); //
 
 			// Output the array to verify
 		})
@@ -297,6 +303,9 @@ function setup() {
  * Section: draw on canvas for different sceneCount
  ***************************************************/
 function draw() {
+	timeSinceLastInteraction += 0.1; // approx += 1 every second (depends on framerate)
+	checkTimeout();
+
 	background(18, 18, 18);
 
 	scaleWindow();
@@ -308,6 +317,14 @@ function draw() {
 		updateChargeMovement();
 		checkRecombines();
 		drawBandDiagram();
+	}
+}
+
+// check and reset scene if it has been running with no user interaction for amount of time
+function checkTimeout() {
+	if (timeSinceLastInteraction > 240) {
+		// (approx 4 minutes)
+		resetScene();
 	}
 }
 
@@ -389,6 +406,7 @@ function checkRecombines() {
 
 // switch graph
 function mouseClicked() {
+	timeSinceLastInteraction = 0; // reset for checkTimeout function
 	let xCondition = 270 * sx - mouseX; // left border of right button
 	let yCondition = abs(205 * sy - mouseY); // top border of right button
 	if (xCondition < 100 * sx && xCondition < 0 && yCondition < 16 * sy) {
@@ -446,9 +464,9 @@ function drawGraph() {
 		if (i < numXTicks - 1) {
 			noStroke();
 			fill(102, 194, 255, 180);
-			textSize(10 * sx);
+			textSize(graphTextSize * sx);
 
-			text(`${50 * (i + 1)} nm`, (80 + (xStart + 101 * i)) * sx, 313 * sy);
+			text(`${50 * (i + 1)} nm`, (80 + (xStart + 101 * i)) * sx, 308 * sy);
 		}
 	}
 	stroke(...color.blue, 180);
@@ -464,10 +482,12 @@ function drawGraph() {
 
 			noStroke();
 			fill(102, 194, 255, 180);
-			textSize(10 * sx);
+			textSize(graphTextSize * sx);
 			// only show units at end points
 			if (i == 3) {
-				text(`${-10 * (i + 1)} mC/cm^3`, x + 10, y - 4, x + 5 * sx, y);
+				text(`${-10 * (i + 1)} mC/cm`, x + 10, y - 4, x + 5 * sx, y);
+				textSize(graphTextSize - 2);
+				text(`3`, x + 68 * sx, y - 5, x + 5 * sx, y); // cubed superscript
 			} else {
 				text(`${-10 * (i + 1)}`, x + 10, y - 4, x + 5 * sx, y);
 			}
@@ -481,10 +501,12 @@ function drawGraph() {
 
 			noStroke();
 			fill(102, 194, 255, 180);
-			textSize(10 * sx);
+			textSize(graphTextSize * sx);
 			// only show units at end points
 			if (i == 3) {
-				text(`${10 * (i + 1)} mC/cm^3`, x + 10, y - 4, x + 5 * sx, y);
+				text(`${10 * (i + 1)} mC/cm`, x + 10, y - 4, x + 5 * sx, y);
+				textSize(graphTextSize - 2);
+				text(`3`, x + 64 * sx, y - 5, x + 5 * sx, y);
 			} else {
 				text(`${10 * (i + 1)}`, x + 10, y - 4, x + 5 * sx, y);
 			}
@@ -501,7 +523,7 @@ function drawGraph() {
 			line(x, y, x + 5 * sx, y); // Draw the line
 			noStroke();
 			fill(...color.blue, 180);
-			textSize(10 * sx);
+			textSize(graphTextSize * sx);
 			// only show units at end points
 			if (i == 3) {
 				text(
@@ -526,7 +548,7 @@ function drawGraph() {
 			line(x, y, x + 5 * sx, y); // Draw the line
 			noStroke();
 			fill(...color.blue, 180);
-			textSize(10 * sx);
+			textSize(graphTextSize * sx);
 			// only show units at end points
 			if (i == 3) {
 				text(
@@ -630,6 +652,7 @@ function drawGraph() {
 				//if (hole_new == 5e13 && electronBand_data_v1.length>0)
 				//test case for v_data_1.json
 
+				// calculate charge density data
 				minorityDensity =
 					Math.pow(10, 20) / Math.pow(dopingConcen_new * Math.pow(10, 3), 2);
 				for (let i = 0; i < bandLength; i++) {
@@ -698,6 +721,7 @@ function drawGraph() {
 
 					vertex(250 * sx, (385 / 2 + 98) * sy);
 
+					// draw electric field graph
 					// Add all points as curve vertices
 					for (let i = 0; i < E_field_temp_data.length; i++) {
 						let x = E_field_temp_data[i].x;
@@ -998,13 +1022,14 @@ function drawBandDiagram() {
 		}
 	}
 
+	// calculate electric field
 	if (electronBand_data_v1.length > 0) {
 		//test case for v_data_1.json
 
 		for (let i = 0; i < bandLength - 1; i++) {
 			let y1 =
 				((current_array[i + 1] - current_array[i]) /
-					(x_values_1[i + 1] - x_values_1[i])) *
+					(xPositionData[i + 1] - xPositionData[i])) *
 				Math.pow(10, 7);
 			E_field_temp_data[i] = { x: electronBand_data_v1[i].x, y: y1 };
 		}
@@ -1012,22 +1037,64 @@ function drawBandDiagram() {
 		for (let i = 0; i < bandLength - 1; i++) {
 			let y1 =
 				((current_array[i + 1] - current_array[i]) /
-					(x_values_1[i + 1] - x_values_1[i])) *
+					(xPositionData[i + 1] - xPositionData[i])) *
 				Math.pow(10, 7);
 			E_field_temp_data[i] = { x: electronBand_data_v1[i].x, y: y1 };
 		}
 	}
 
-	// draw labels
-
 	//draw negative curve
 
 	beginShape();
 
+	let subscriptAddY = 2;
+	let subscriptAddX = 8;
+	let eTextSize = 14;
+	let subscriptTextSize = 12;
+
+	// draw band diagram labels
 	textFont("Courier New");
+
 	noStroke();
-	fill(...color.negative);
-	text("E_c", 920 * sx, 75 * sy);
+
+	// Ec label
+	fill(...color.negative); // negative color
+	textSize(eTextSize * sx);
+	text("E", 920 * sx, 75 * sy);
+	textSize(subscriptTextSize * sx);
+	text("c", (920 + subscriptAddX) * sx, (75 + subscriptAddY) * sy); // subscript
+
+	// Ei label
+	fill("#AE8BFF"); // purple
+	textSize(eTextSize * sx);
+	textSize(subscriptTextSize * sx);
+
+	let yPos_Ei = sceneCount == 1 ? 90 : 104;
+
+	text("E", 920 * sx, yPos_Ei * sy);
+	text("i", (920 + subscriptAddX) * sx, (yPos_Ei + subscriptAddY) * sy);
+
+	// Ef label
+
+	let yPos_Ef = sceneCount == 1 ? 104 : 90;
+	fill("#FF5839"); // red
+	textSize(eTextSize * sx);
+	text("E", 920 * sx, yPos_Ef * sy);
+	textSize(subscriptTextSize * sx);
+	text("f", (920 + subscriptAddX) * sx, (yPos_Ef + subscriptAddY) * sy);
+
+	// Ev label
+	fill(...color.positive); // positive color
+	textSize(eTextSize * sx);
+	text("E", 920 * sx, 118 * sy);
+	textSize(subscriptTextSize * sx);
+	text("v", (920 + subscriptAddX) * sx, (118 + subscriptAddY) * sy);
+
+	textSize(12 * sx);
+
+	noFill();
+	strokeWeight(1);
+	//Draw E_f
 
 	noFill();
 	stroke(...color.negative);
@@ -1041,7 +1108,7 @@ function drawBandDiagram() {
 		let y2 = 679;
 		let a = (y2 - y1) / (x2 - x1);
 		let b = y1 - a * x1;
-		let y = a * x_values_1[k] + b;
+		let y = a * xPositionData[k] + b;
 
 		// vertex drawn from current_array
 		curveVertex((250 + y) * sx, (171.25 + current_array[k] * 40 - 100) * sy);
@@ -1062,39 +1129,15 @@ function drawBandDiagram() {
 	}
 	endShape();
 	noStroke();
+
 	drawingContext.setLineDash([6]);
-
 	noStroke();
-	fill("#FF5839");
-	text("E_i", 920 * sx, 90 * sy);
 
 	noFill();
 
-	//Draw E_i
+	// draw Ei curve
 	strokeWeight(1);
-	stroke("#FF5839"); // red
-	beginShape();
 
-	for (var k = 0; k < bandLength; k++) {
-		//negative curve
-		let x1 = 17;
-		let x2 = 349;
-		let y1 = 0;
-		let y2 = 679;
-		let a = (y2 - y1) / (x2 - x1);
-		let b = y1 - a * x1;
-		let y = a * x_values_1[k] + b;
-		curveVertex((250 + y) * sx, (171.25 + current_array[k] * 40 - 80) * sy);
-	}
-	endShape();
-
-	noStroke();
-	fill("#AE8BFF");
-	text("E_f", 920 * sx, 104 * sy);
-
-	noFill();
-	strokeWeight(1);
-	//Draw E_f
 	stroke("#AE8BFF"); // purple
 	beginShape();
 
@@ -1106,7 +1149,24 @@ function drawBandDiagram() {
 		let y2 = 679;
 		let a = (y2 - y1) / (x2 - x1);
 		let b = y1 - a * x1;
-		let y = a * x_values_1[k] + b;
+		let y = a * xPositionData[k] + b;
+		curveVertex((250 + y) * sx, (171.25 + current_array[k] * 40 - 80) * sy);
+	}
+	endShape();
+
+	// draw Ef curve
+	stroke("#FF5839"); // red
+	drawingContext.setLineDash([0]);
+	beginShape();
+	for (var k = 0; k < bandLength; k++) {
+		//negative curve
+		let x1 = 17;
+		let x2 = 349;
+		let y1 = 0;
+		let y2 = 679;
+		let a = (y2 - y1) / (x2 - x1);
+		let b = y1 - a * x1;
+		let y = a * xPositionData[k] + b;
 		if (scene(1)) {
 			FermiVoltage = -0.026 * Math.log(hole_new / Math.pow(10, 8));
 		}
@@ -1120,10 +1180,6 @@ function drawBandDiagram() {
 		);
 	}
 	endShape();
-
-	noStroke();
-	fill(...color.positive);
-	text("E_v", 920 * sx, 118 * sy);
 
 	drawingContext.setLineDash([0]);
 
@@ -1142,23 +1198,23 @@ function drawBandDiagram() {
 		let y2 = 679;
 		let a = (y2 - y1) / (x2 - x1);
 		let b = y1 - a * x1;
-		let y = a * x_values_1[k] + b;
+		let x = a * xPositionData[k] + b;
 
 		curveVertex(
-			(250 + y) * sx,
+			(250 + x) * sx,
 			(-30 + 171.25 + current_array[k] * 40 - 30) * sy
 		);
 		holeBand_data_v1[k] = {
-			x: (250 + y) * sx,
+			x: (250 + x) * sx,
 			y: (171.25 + current_array[k] * (40 / 1.2) - 30 - 30) * sy,
 		};
 		holeBand_data[k] = {
-			x: (250 + y) * sx,
+			x: (250 + x) * sx,
 			y: (171.25 + current_array[k] * (40 / 1.2) - 30 - 30) * sy,
 		};
 
 		holeBand[k] = [
-			(250 + y) * sx,
+			(250 + x) * sx,
 			(171.25 + current_array[k] * (40 / 1.2) - 30 - 30) * sy,
 		];
 	}
@@ -1175,6 +1231,7 @@ function onRefresh() {
 
 //reset button
 function resetScene() {
+	console.log("resetscene: fetchBanddiagramdata");
 	fetchBandDiagramData();
 	genElectrons = [];
 	genHoles = [];
@@ -1196,13 +1253,9 @@ function resetScene() {
 	if (scene(1)) {
 		document.getElementById("dopingScene1").value = 130;
 		document.getElementById("appliedVoltageScene1").value = 0;
-		document.getElementById("scatteringScene1").value = 20;
-		document.getElementById("distanceScene1").value = 9;
 	} else if (scene(2)) {
 		document.getElementById("dopingScene2").value = 130;
 		document.getElementById("appliedVoltageScene2").value = 0;
-		document.getElementById("scatteringScene2").value = 20;
-		document.getElementById("distanceScene2").value = 9;
 	}
 
 	if (scene(1) || scene(2)) {
@@ -1358,6 +1411,8 @@ function generateCharges(num) {
 
 //Reads doping concentration
 function updateDopingConcentration(a) {
+	timeSinceLastInteraction = 0; // reset for checkTimeout function
+
 	//// Azad: Doping concentration * 0.001
 	hole_new = Math.pow(10, ((10 / 10) * (a - 124) + 124) / 10) * 5;
 
@@ -1514,7 +1569,7 @@ function findClosestValue(array, targetX) {
 
 //change applied voltage slider
 function updateAppliedVoltage(a) {
-	// resetScene();
+	timeSinceLastInteraction = 0; // reset for checkTimeout function
 	appliedVoltage = a;
 
 	AccelerationFactor = 1;
