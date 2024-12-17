@@ -341,13 +341,6 @@ function fetchBandDiagramData() {
 }
 
 // Functions  ===================================================================
-function keyPressed() {
-	if (switchGraph) {
-		switchGraph = false; // show electric field graph
-	} else {
-		switchGraph = true;
-	}
-}
 // Switch from Charge Density graph to Electric Field graph
 function mouseClicked() {
 	timeSinceLastInteraction = 0; // reset for checkTimeout function
