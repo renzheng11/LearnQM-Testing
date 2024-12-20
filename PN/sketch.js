@@ -79,6 +79,7 @@ let appliedVoltageFactor = 1; //factor for applied voltage
 
 let temp = 270; //set temperature
 var electronCount = 0;
+let e_count_limit = 0; //is used after each recombination event to decide if new pair of electron and hole must be injected from the ends
 
 let count_n = 0; // ???
 let scatteringVelocity;
@@ -107,7 +108,7 @@ let holeConcentrationData = []; // previously new_holeConcentrationPlotset_count
 
 let chargeDensityLeftData = []; // previously new_array_rou_e_set
 let chargeDensityRightData = []; // previously new_array_rou_h_set
-let chargeDensityData =[];
+let chargeDensityData = [];
 
 let switchGraph = false; //turn on or off the switch between charge density and electric field graph
 
@@ -217,7 +218,7 @@ let ChargeDensity1E14_pos_0_4;
 let ChargeDensity1E14_pos_0_5;
 
 let currentArray = []; //is used to draw the banddiagram
-let currentArrayScene2 = []; //is used to caclulate currentArray in Scene 1. 
+let currentArrayScene2 = []; //is used to caclulate currentArray in Scene 1.
 
 let chargeArray = []; //array used to store charge density for positive voltages from fetched files
 let currentArray_temp = []; //used to calculaate currentArray in Scene 2
@@ -304,9 +305,9 @@ function fetchBandDiagramData() {
 
 			// Output the array to verify
 			// clg(dataArray1E14_pos_2_0);
-		})
+		});
 
-		fetch("ChargeDensity5E13.json")
+	fetch("ChargeDensity5E13.json")
 		.then((response) => response.json())
 		.then((jsonData) => {
 			// Assuming jsonData is an array and we're interested in specific object properties
@@ -318,10 +319,9 @@ function fetchBandDiagramData() {
 			ChargeDensity5E13_pos_0_3 = jsonData["+0.3"].map(Number);
 			ChargeDensity5E13_pos_0_4 = jsonData["+0.4"].map(Number);
 			ChargeDensity5E13_pos_0_5 = jsonData["+0.5"].map(Number);
+		});
 
-		})
-
-		fetch("ChargeDensity1E14.json")
+	fetch("ChargeDensity1E14.json")
 		.then((response) => response.json())
 		.then((jsonData) => {
 			// Assuming jsonData is an array and we're interested in specific object properties
@@ -333,9 +333,7 @@ function fetchBandDiagramData() {
 			ChargeDensity1E14_pos_0_3 = jsonData["+0.3"].map(Number);
 			ChargeDensity1E14_pos_0_4 = jsonData["+0.4"].map(Number);
 			ChargeDensity1E14_pos_0_5 = jsonData["+0.5"].map(Number);
-
 		})
-
 
 		.catch((error) => console.error("Error loading the JSON data:", error));
 }
@@ -736,9 +734,9 @@ function drawGraph() {
 	);
 	// graph y axis
 	line(
-		(150 + 800 /2) * sx,
+		(150 + 800 / 2) * sx,
 		(10 + 385 / 2 + 30) * sy,
-		(150 + 800 /2) * sx,
+		(150 + 800 / 2) * sx,
 		(10 + 385 / 2 + 770 / 4 - 30) * sy
 	);
 
@@ -776,7 +774,7 @@ function drawGraph() {
 		fill(...color.blue);
 		textSize(10 * sx);
 		text("20 μC/cm\u00B3", 560 * sx, 252 * sy);
-		text("-20 μC/cm\u00B3", 560 * sx, 351 * sy);
+		text("–20 μC/cm\u00B3", 560 * sx, 351 * sy);
 	} else {
 		// Charge Density
 		// graph -y axis ticks
@@ -802,15 +800,21 @@ function drawGraph() {
 		noStroke();
 		fill(...color.blue);
 		textSize(10 * sx);
-		text("2000 V/cm", 560 * sx, 249 * sy);
-		text("-2000 V/cm", 560 * sx, 353 * sy);
+
+		if (appliedVoltage / 40 > 0.35 && scene(2)) {
+			text("800 V/cm", 560 * sx, 249 * sy);
+			text("–800 V/cm", 560 * sx, 353 * sy);
+		} else {
+			text("4000 V/cm", 560 * sx, 249 * sy);
+			text("–4000 V/cm", 560 * sx, 353 * sy);
+		}
 	}
 
 	noStroke();
 	fill(...color.blue);
 	textSize(10 * sx);
 	text("5 \u00B5m", 790 * sx, 313 * sy);
-	text("-5 \u00B5m", 290 * sx, 313 * sy);
+	text("–5 \u00B5m", 290 * sx, 313 * sy);
 
 	if (switchGraph) {
 		// electric field is showing
@@ -1119,7 +1123,7 @@ function drawElectricFieldData() {
 		// 			sy
 		// 	);
 		//}
-		 if (scene(2)||scene(1)) {
+		if (scene(2) || scene(1)) {
 			// triangle(
 			// 	(550 - (400 / 8) * voltageDepletionWidth) * sx,
 			// 	(10 + 385 / 2 + 96.25) * sy,
@@ -1143,40 +1147,44 @@ function drawElectricFieldData() {
 
 			//fill(218, 112, 214, 100);
 			//if (electronBand_data_v1.length > 0) {
-				//if (appliedVoltage > 0 || appliedVoltage < 0) {
-					///charge density graph
-					beginShape();
+			//if (appliedVoltage > 0 || appliedVoltage < 0) {
+			///charge density graph
+			beginShape();
 
-					vertex(150 * sx, (10 + 385 / 2 + 96.25) * sy);
-					
+			vertex(150 * sx, (10 + 385 / 2 + 96.25) * sy);
 
-					// Add all points as curve vertices
-					for (let i = 0; i < E_field_temp_data.length; i++) {
-						let x = E_field_temp_data[i].x;
-						let y =
-							10 *
-								(E_field_temp_data[i].y / Math.pow(10, 4)) *
-								(40 / 1530) *
-								500 *
-								sy +
-								(10 + 385 / 2 + 96.25) * sy;
-						// let y =
-						// 	(E_field_temp_data[i].y / Math.pow(10, 4)) * 2 +
-						// 	(385 / 2 + 96.25) * sy;
-						
-						vertex(x, y);
-					}
-					// vertex(
-					// 	E_field_temp_data[bandLength - 2].x,
-					// 	E_field_temp_data[bandLength - 2].y / Math.pow(10, 6) +
-					// 		(385 / 2 + 98) * sy
-					// );
-					vertex(940 * sx, (10 + 385 / 2 + 96.25) * sy);
-					endShape();
-				//}
+			let y_scale = 1;
+			// change the scale for E when the applied voltage is positive and large
+			if (appliedVoltage / 40 > 0.35 && scene(2)) {
+				y_scale = 5;
+			}
+
+			// Add all points as curve vertices
+			for (let i = 0; i < E_field_temp_data.length; i++) {
+				let x = E_field_temp_data[i].x;
+				let y =
+					10 *
+						(E_field_temp_data[i].y / Math.pow(10, 4)) *
+						y_scale *
+						(40 / 1530) *
+						500 *
+						sy +
+					(10 + 385 / 2 + 96.25) * sy;
+				// let y =
+				// 	(E_field_temp_data[i].y / Math.pow(10, 4)) * 2 +
+				// 	(385 / 2 + 96.25) * sy;
+
+				vertex(x, y);
+			}
+			// vertex(
+			// 	E_field_temp_data[bandLength - 2].x,
+			// 	E_field_temp_data[bandLength - 2].y / Math.pow(10, 6) +
+			// 		(385 / 2 + 98) * sy
+			// );
+			vertex(950 * sx, (10 + 385 / 2 + 96.25) * sy);
+			endShape();
 			//}
-
-
+			//}
 		}
 	}
 }
@@ -1192,42 +1200,39 @@ function drawChargeDensityData() {
 	// 		10 + 0.7 * Math.pow(10, -13) * addedDopants - appliedVoltage / 2;
 	// }
 
-	
-	if (scene(2)||scene(1)){
-	// draw graph data
-	if (switchGraph == false) {
-		
-		beginShape();
+	if (scene(2) || scene(1)) {
+		// draw graph data
+		if (switchGraph == false) {
+			beginShape();
 
-					vertex(150 * sx, (10 + 385 / 2 + 96.25) * sy);
+			vertex(150 * sx, (10 + 385 / 2 + 96.25) * sy);
 
-					// Add all points as curve vertices
-					for (let i = 0; i < E_field_temp_data.length; i++) {
-						let x = E_field_temp_data[i].x;
-						let y =
-							10 *
-							(chargeDensityData[i].y / Math.pow(10, 12)) *
-								(40 / 1530) *
-								100 *
-								sy +
-								(10 + 385 / 2 + 96.25) * sy;
-						
+			// Add all points as curve vertices
+			for (let i = 0; i < E_field_temp_data.length; i++) {
+				let x = E_field_temp_data[i].x;
+				let y =
+					10 *
+						(chargeDensityData[i].y / Math.pow(10, 12)) *
+						(40 / 1530) *
+						100 *
+						sy +
+					(10 + 385 / 2 + 96.25) * sy;
 
-						// let y =
-						// 	(E_field_temp_data[i].y / Math.pow(10, 4)) * 2 +
-						// 	(385 / 2 + 96.25) * sy;
+				// let y =
+				// 	(E_field_temp_data[i].y / Math.pow(10, 4)) * 2 +
+				// 	(385 / 2 + 96.25) * sy;
 
-						vertex(x, y);
-					}
-					vertex(950 * sx, (10 + 385 / 2 + 96.25) * sy);
-					// vertex(
-					// 	E_field_temp_data[bandLength - 2].x,
-					// 	E_field_temp_data[bandLength - 2].y / Math.pow(10, 6) +
-					// 		(385 / 2 + 98) * sy
-					// );
+				vertex(x, y);
+			}
+			vertex(950 * sx, (10 + 385 / 2 + 96.25) * sy);
+			// vertex(
+			// 	E_field_temp_data[bandLength - 2].x,
+			// 	E_field_temp_data[bandLength - 2].y / Math.pow(10, 6) +
+			// 		(385 / 2 + 98) * sy
+			// );
 
-					endShape();
-	 }
+			endShape();
+		}
 	}
 }
 
@@ -1341,16 +1346,15 @@ function setCurrentDataArray() {
 		}
 	}
 
-// 	for (var k = 0; k < bandLength; k++) {
-// 		 currentArrayScene2[k] = currentArray[k];
-// }
+	// 	for (var k = 0; k < bandLength; k++) {
+	// 		 currentArrayScene2[k] = currentArray[k];
+	// }
 	//console.log('addedDopants=', addedDopants);
 	//console.log('currentArray=',currentArray);
 	//console.log('dataArray1E14_0',dataArray1E14_0);
-	
+
 	//currentArrayScene2 = currentArray;
 }
-
 
 function handleBands() {
 	setCurrentDataArray(); // according to slider applied voltage
@@ -1448,26 +1452,24 @@ function drawBands() {
 	strokeWeight(1.5);
 
 	if (scene(1)) {
-		if(voltageDepletionWidth < initialDepletionWidth) {
-			if (addedDopants == 5e13){
-			for (var k = 0; k < bandLength; k++) {
-				let y11 = ((dataArray5E13_0[k]));
-				currentArray[k] = y11 * (voltageDepletionWidth/initialDepletionWidth) ;
+		if (voltageDepletionWidth < initialDepletionWidth) {
+			if (addedDopants == 5e13) {
+				for (var k = 0; k < bandLength; k++) {
+					let y11 = dataArray5E13_0[k];
+					currentArray[k] =
+						y11 * (voltageDepletionWidth / initialDepletionWidth);
 				}
 			}
-			if (addedDopants == 1e14){
+			if (addedDopants == 1e14) {
 				for (var k = 0; k < bandLength; k++) {
-					let y11 = ((dataArray1E14_0[k]));
-					currentArray[k] = y11 * (voltageDepletionWidth/initialDepletionWidth) ;
-					}
+					let y11 = dataArray1E14_0[k];
+					currentArray[k] =
+						y11 * (voltageDepletionWidth / initialDepletionWidth);
 				}
-	
+			}
+		}
 	}
 
-
-	}
-	
-	
 	//console.log('dataArray5E13_0', dataArray5E13_0)
 	beginShape();
 	for (var k = 0; k < bandLength; k++) {
@@ -1484,17 +1486,14 @@ function drawBands() {
 		fill("red");
 		noFill();
 		curveVertex(xPos * sx, (171.25 + currentArray[k] * 40 - 100) * sy); // electron band + extra line bug
-		electronBand[k] = [
-			(xPos) * sx,
-			(171.25 + currentArray[k] * (40) - 100) * sy,
-		];
+		electronBand[k] = [xPos * sx, (171.25 + currentArray[k] * 40 - 100) * sy];
 		let b =
 			((currentArray[k + 1] - currentArray[k]) /
-				(dataArray1E14_xPos[k+1] - dataArray1E14_xPos[k])) *
+				(dataArray1E14_xPos[k + 1] - dataArray1E14_xPos[k])) *
 			Math.pow(10, 4);
 		E_field_temp_data[k] = { x: xPos * sx, y: b };
-		
 	}
+	E_field_temp_data[bandLength - 1].y = E_field_temp_data[bandLength - 2].y;
 
 	// for (let k = 0; k < bandLength; k++) {
 	// 	let y1 =
@@ -1503,7 +1502,7 @@ function drawBands() {
 	// 		Math.pow(10, 4);
 	// 	E_field_temp_data[k] = { x: electronBand[k].x, y: y1 };
 	// }
-	
+
 	endShape();
 	noStroke();
 
@@ -1539,65 +1538,62 @@ function drawBands() {
 		curveVertex((0 + y) * sx, (-30 + 171.25 + currentArray[k] * 40 - 30) * sy);
 		holeBand[k] = [
 			(0 + y) * sx,
-			(171.25 + currentArray[k] * (40) - 30 - 30) * sy,
+			(171.25 + currentArray[k] * 40 - 30 - 30) * sy,
 		];
 	}
 
-	for (let i = 0; i < bandLength/2; i++) {
+	for (let i = 0; i < bandLength / 2; i++) {
 		// let minorityDensity =
 		// Math.pow(10, 20) / Math.pow(addedDopants, 2);
-			let y1 =
-				-1.6 *
-				Math.pow(10, -2) *
-				addedDopants *
-				(-1 +
-					Math.exp(-currentArray[i] / 0.026));
-					
-					//console.log('currentArray[i]',currentArray[i]);
-					//console.log('addedDopants',addedDopants);
-					chargeDensityData[i] = {
-				x: E_field_temp_data[i].x,
-				y: y1,
-			};
-
-	}
-	//console.log('E_field_temp_data',E_field_temp_data);		
-		
-	//console.log('currentArray',currentArray);			
-	for (let i = 120; i < bandLength; i++) {		
-	let y2 = currentArray[bandLength-1]
 		let y1 =
-		1.6 *
-		Math.pow(10, -2) *
-		addedDopants *
-		(-1 +
-			Math.exp((- y2 + currentArray[i]) / 0.026));
+			-1.6 *
+			Math.pow(10, -2) *
+			addedDopants *
+			(-1 + Math.exp(-currentArray[i] / 0.026));
 
-			//  let y1 =
-			// 	1.6 *
-			// 	Math.pow(10, -2) *
-			// 	addedDopants *
-			// 	(1 - Math.exp(-currentArray[i] / 0.026));
-				
-					chargeDensityData[i] = {
-						x: E_field_temp_data[i].x,
-						y: y1,
-					};	
-					
-			// 		chargeDensitytData[i] = {
-			// 	x: E_field_temp_data[i].x,
-			// 	y: y1,
-			// };
-		}
+		//console.log('currentArray[i]',currentArray[i]);
+		//console.log('addedDopants',addedDopants);
+		chargeDensityData[i] = {
+			x: E_field_temp_data[i].x,
+			y: y1,
+		};
+	}
+	//console.log('E_field_temp_data',E_field_temp_data);
+
+	//console.log('currentArray',currentArray);
+	for (let i = 120; i < bandLength; i++) {
+		let y2 = currentArray[bandLength - 1];
+		let y1 =
+			1.6 *
+			Math.pow(10, -2) *
+			addedDopants *
+			(-1 + Math.exp((-y2 + currentArray[i]) / 0.026));
+
+		//  let y1 =
+		// 	1.6 *
+		// 	Math.pow(10, -2) *
+		// 	addedDopants *
+		// 	(1 - Math.exp(-currentArray[i] / 0.026));
+
+		chargeDensityData[i] = {
+			x: E_field_temp_data[i].x,
+			y: y1,
+		};
+
+		// 		chargeDensitytData[i] = {
+		// 	x: E_field_temp_data[i].x,
+		// 	y: y1,
+		// };
+	}
 	//console.log('chargeDensityData', chargeDensityData);
 	let voltageRounded = Math.round((appliedVoltage / 40) * 10) / 10;
-	if (voltageRounded > 0){
-		for (let i = 0; i < bandLength; i++) {	
+	if (voltageRounded > 0) {
+		for (let i = 0; i < bandLength; i++) {
 			chargeDensityData[i] = {
 				x: E_field_temp_data[i].x,
-				y: -chargeArray[i] *100000000000000000,
-			};	
-	}
+				y: -chargeArray[i] * 100000000000000000,
+			};
+		}
 	}
 
 	//console.log('voltageRounded', voltageRounded);
@@ -1982,6 +1978,9 @@ function zap(array1, array2, num) {
 		}
 	}
 
+	// console.log('Electrons', initialElectrons.length + generatedElectrons.length );
+	// console.log('Holes', generatedHoles.length + initialHoles.length);
+
 	for (let i = 0; i < array1.length; i++) {
 		for (let k = 0; k < array2.length; k++) {
 			// check if electron and hole are close and they are showing, not same ID
@@ -2047,23 +2046,35 @@ function zap(array1, array2, num) {
 
 				recombineCount++;
 
-				let b = array1[i].position.y;
+				if (
+					initialElectrons.length + generatedElectrons.length <
+					e_count_limit * 1.1
+				) {
+					let b = array1[i].position.y;
 
-				var newCharge = new Charge(170 * sx, b, 10, "h", 1);
-				newCharge.botz = array2[k].botz;
-				array2.push(newCharge);
+					var newCharge = new Charge(150 * sx, b, 10, "h", 1);
+					newCharge.botz = array2[k].botz;
+					newCharge.direction = createVector(1, random(-1, 1));
+					newCharge.movingVelocity = this.movingVelocity;
+					newCharge.velocity = createVector(10, 0);
+					array2.push(newCharge);
 
-				chargeID += 1;
+					chargeID += 1;
 
-				var newCharge2 = new Charge(930 * sx, b, 10, "e", 0);
-				newCharge2.botz = array1[i].botz;
-				array1.push(newCharge2);
+					var newCharge2 = new Charge(950 * sx, b, 10, "e", 0);
+					newCharge2.botz = array1[i].botz;
+					newCharge2.direction = createVector(-1, random(-1, 1));
+					newCharge2.movingVelocity = this.movingVelocity;
+					newCharge2.velocity = createVector(-10, 0);
 
-				// array1.push(new Charge((930)*sx, b, 10, "e", 0));
-				chargeID += 1;
+					array1.push(newCharge2);
 
-				array1.splice(i, 1);
-				array2.splice(k, 1);
+					// array1.push(new Charge((930)*sx, b, 10, "e", 0));
+					chargeID += 1;
+
+					array1.splice(i, 1);
+					array2.splice(k, 1);
+				}
 
 				break;
 			}
@@ -2073,7 +2084,7 @@ function zap(array1, array2, num) {
 
 function draw() {
 	timeSinceLastInteraction += 0.1; // approx += 1 every second (depends on framerate)
-	checkTimeout();
+	// checkTimeout();
 	background(...color.bg);
 	scaleWindow();
 
@@ -2366,7 +2377,6 @@ function updateDopingConcentration(a) {
 	if (a == 133) {
 		addedDopants = Math.pow(10, 14);
 	}
-	
 
 	voltageDepletionWidth = 0;
 	//handleBands();
@@ -2437,12 +2447,11 @@ function updateDopingConcentration(a) {
 					) *
 					Math.pow(10, 3);
 			}
-
-			
 		}
 
 		let electronCount =
 			Math.pow(100, (Math.log10(Math.round(addedDopants / 5)) - 8) / 2) / 1000;
+		e_count_limit = electronCount;
 
 		////////////////Note from Azad: This is the code from Christina to generate boltzmann distribution of velocities
 
@@ -2591,7 +2600,7 @@ function updateAppliedVoltage(a) {
 		) *
 		Math.pow(10, 3);
 
-		updateChargeOrigins();
+	updateChargeOrigins();
 
 	//for (var i = 0; i < 100; i++) {
 	//(800)/100*i

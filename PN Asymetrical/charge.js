@@ -174,29 +174,6 @@ class Charge {
 				//middle part
 
 				if (this.origin.x == 0) {
-					// // console.log("this.origin.x=",this.origin.x);
-					// // console.log("this.origin.y=",this.origin.y);
-					// fill(254, 246, 182, 100);
-					// stroke(254, 246, 182, 100);
-					// //yellow
-					// ellipse(
-					// 	this.position.x,
-					// 	(-electronBand[99] -
-					// 		17.4 +
-					// 		72 +
-					// 		17.4 -
-					// 		this.botz * 8.8 * 0.2 * changeV) *
-					// 		sy,
-					// 	5
-					// );
-					// this.position2.y =
-					// 	(-electronBand[99] -
-					// 		17.4 +
-					// 		72 +
-					// 		17.4 -
-					// 		this.botz * 8.8 * 0.2 * changeV) *
-					// 	sy;
-					// this.position2.x = this.position.x;
 				} else {
 					if (this.straight == 0) {
 						fill(254, 246, 182, 100);
@@ -238,18 +215,7 @@ class Charge {
 				}
 
 				if (this.origin.x == 0 && this.origin.y == 0) {
-					// noFill();
-					// stroke(125, 241, 148, 100); //green
-					// strokeWeight(1);
-					// //dense area
-					// //new
-					// ellipse(
-					// 	this.position.x,
-					// 	(s + 111 + this.botz * 8.8 * 0.2 * changeV) * sy,
-					// 	5
-					// );
-					// this.position2.y = (s + 111 + this.botz * 8.8 * 0.2 * changeV) * sy;
-					// this.position2.x = this.position.x;
+					
 				} else {
 					if (this.straight == 0) {
 						noFill();
@@ -317,25 +283,7 @@ class Charge {
 	}
 
 	random_walk() {
-		// this.movingVelocity = (this.botz * 5 * parseInt(scattering_velocity)) / 5;
-
-		// if (this.botz == 4 || this.botz == 5) {
-		// 	this.movingVelocity =
-		// 		(4 * this.botz * 5 * parseInt(scattering_velocity)) / 5;
-		// 	this.direction.y = this.direction.y * 0.1;
-		// }
-
-		// if (isNaN(this.movingVelocity)) {
-		// 	this.movingVelocity = 0;
-		// }
-
-		// try {
-		// 	let uPOS = p5.Vector.mult(this.direction, this.movingVelocity);
-		// 	this.position.add(uPOS);
-		// } catch (error) {
-		// 	//
-		// 	this.position.add(createVector(0, 0));
-		// }
+		
 
 		this.accelerate(); // accelerate() will update this.velocity
 
@@ -423,16 +371,23 @@ class Charge {
 				}
 			}
 
-			if (this.position.x > 940 * sx && opening == 1 && this.straight == 1) {
-				this.direction.x = 10;
-				this.show = 0;
-			}
+			// if (this.position.x > 940 * sx && opening == 1 && this.straight == 1) {
+			// 	this.direction.x = 10;
+			// 	this.show = 0;
+			// }
 
-			if (this.position.x < 145 * sx) {
-				this.position.x = 50 * sx;
-			}
+			// if (this.position.x < 145 * sx) {
+			// 	this.position.x = 50 * sx;
+			// }
 
 			if (this.position.x < 150 * sx && opening == 1 && this.straight == 0) {
+				//////
+				this.direction = createVector(1, random(-1, 1));
+				this.velocity = createVector(10, 0);
+				this.position.y = random(400, 760) * sy;
+
+
+				///////
 				this.direction.x = -10;
 				this.show = 0;
 				if (this.id == "h" && !this.chargeCreated) {
@@ -452,299 +407,52 @@ class Charge {
 				}
 			}
 
-			// if (this.position.x < 150 * sx && opening == 1 && this.straight == 1) {
-			// 	this.direction.x = -10;
-			// 	this.show = 0;
-			// }
-
-			// if (this.position.x > 940 * sx && opening == 0) {
-			// 	this.direction.x = -1;
-			// }
-			// if (this.position.y < 405 * sy) {
-			// 	this.direction.y = 1;
-			// }
+			
 
 			if (this.position.y < 405 * sy) {
 				this.velocity.y = -this.velocity.y;
 				this.position.y = 410 * sy;
 			}
-			// if (this.position.y > 770 * sy) {
-			// 	this.direction.y = -1;
-			// }
+			
 
 			if (this.position.y > 770 * sy) {
 				this.velocity.y = -this.velocity.y;
 				this.position.y = 765 * sy;
 			}
 
-			//if (scene(2) || scene(3)) {
-			// if (this.color == 0) {
-			// 	//electron
-			// 	let smallestDifference = Math.abs(
-			// 		electronLineData[0].y - this.position2.y
-			// 	);
-
-			// 	for (let i = 0; i < electronLineData.length; i++) {
-			// 		let difference = Math.abs(electronLineData[i].y - this.position2.y);
-
-			// 		if (difference < smallestDifference) {
-			// 			smallestDifference = difference;
-			// 			this.near_index = i;
-			// 		}
-			// 	}
-			// }
-			// if (this.color == 1) {
-			// 	//hole
-			// 	let smallestDifference = Math.abs(
-			// 		holeLineData[0].y - this.position2.y
-			// 	);
-
-			// 	for (let i = 0; i < holeLineData.length; i++) {
-			// 		let difference = Math.abs(holeLineData[i].y - this.position2.y);
-
-			// 		if (difference < smallestDifference) {
-			// 			smallestDifference = difference;
-			// 			this.near_index = i;
-			// 		}
-			// 	}
-			// }
-
-			// Utility functions
-			// function lerp(start, end, t) {
-			// 	return start * (1 - t) + end * t;
-			// }
-
-			//wrong
-			// try {
-			// 	if (this.near_index < 60) {
-			// 		if (
-			// 			this.color == 1 &&
-			// 			this.position2.x >=
-			// 				holeLineData[this.near_index].x - E_gap_factor - 10
-			// 		) {
-			// 			// {this.direction.x = -2; }
-
-			// 			if (this.elapsedTime < this.transitionTime) {
-			// 				// Increment elapsed time
-			// 				this.elapsedTime++;
-
-			// 				// Calculate delta
-			// 				let delta = this.elapsedTime / this.transitionTime;
-
-			// 				// Update direction.x with lerp
-			// 				this.direction.x = lerp(0, -2, delta);
-			// 			} else {
-			// 				// After the transition, make sure direction.x stays at -2
-			// 				this.direction.x = -2;
-			// 			}
-			// 		}
-			// 	}
-			// } catch (error) {}
-
-			// try {
-			// 	if (
-			// 		this.color == 0 &&
-			// 		this.position2.x <=
-			// 			electronLineData[this.near_index].x + E_gap_factor + 10
-			// 	) {
-			// 		this.direction.x = 2;
-			// 	}
-			// } catch (error) {
-			// 	//
-			// }
-			//}
-			//else if (scene(1)) {
-			// if (this.color == 0) {
-			// 	let smallestDifference = Math.abs(
-			// 		electronLineData[0].y - this.position2.y
-			// 	);
-
-			// 	for (let i = 99; i >= 0; i--) {
-			// 		let difference = Math.abs(electronLineData[i].y - this.position2.y);
-
-			// 		if (difference < smallestDifference) {
-			// 			smallestDifference = difference;
-			// 			this.near_index = i;
-			// 		}
-			// 	}
-			// }
-			// if (this.color == 1) {
-			// 	let smallestDifference = Math.abs(
-			// 		holeLineData[0].y - this.position2.y
-			// 	);
-
-			// 	for (let i = 99; i >= 0; i--) {
-			// 		let difference = Math.abs(holeLineData[i].y - this.position2.y);
-
-			// 		if (difference < smallestDifference) {
-			// 			smallestDifference = difference;
-			// 			this.near_index = i;
-			// 		}
-			// 	}
-			// }
-
-			// function lerp(start, end, t) {
-			// 	return start * (1 - t) + end * t;
-			// }
-
-			// try {
-			// 	if (
-			// 		this.color == 1 &&
-			// 		this.position2.x >=
-			// 			holeLineData[this.near_index].x - E_gap_factor - 10
-			// 	) {
-			// 		this.direction.x = -2;
-			// 	} else if (this.color == 1 && this.straight == 1) {
-			// 		this.direction.x = 3;
-			// 	}
-			// } catch (error) {
-			// 	//
-			// }
-
-			// try {
-			// 	// if (this.near_index<50)  {
-
-			// 	if (
-			// 		this.color == 0 &&
-			// 		this.position2.x <=
-			// 			electronLineData[this.near_index].x + E_gap_factor + 10
-			// 	) {
-			// 		this.direction.x = 2;
-			// 	} else if (this.color == 0 && this.straight == 1) {
-			// 		this.direction.x = -3;
-			// 	}
-
-			// 	// }
-
-			// 	//electron
-			// } catch (error) {
-			// 	//
-			// }
-			//}
+	
 		}
-		//else {
-		// if (willScatter == false) {
-		// 	//if false no scatter
-		// } else if (this.straight == 1) {
-		// 	if (this.color == 0) {
-		// 		this.direction = createVector(-3, 0);
-		// 	} else {
-		// 		this.direction = createVector(3, 0);
-		// 	}
-		// } else {
-		// 	this.direction = createVector(random(-1, 1), random(-1, 1));
-		// }
-		// //  } else if (floor(this.position.x) % r == 0 && floor(this.position.y) % r2 ==0) {this.direction = createVector(random(-1,1), random(-1,1));}
-
-		// if (this.position.x < (90 + 70) * sx) {
-		// 	this.direction.x = 1;
-		// }
-
-		// if (this.position.x > 940 * sx && opening == 1) {
-		// 	this.direction.x = 10;
-		// }
-
-		// if (this.position.x < 150 * sx && opening == 1) {
-		// 	this.direction.x = -10;
-		// }
-
-		// if (this.position.x > 940 * sx && opening == 0) {
-		// 	this.direction.x = -1;
-		// }
-		// if (this.position.y < (20 + 385) * sy) {
-		// 	this.direction.y = 1;
-		// }
-		// if (this.position.y > 770 * sy) {
-		// 	this.direction.y = -1;
-		// }
-		//}
-
-		// }
+		
 	}
 
 	accelerate() {
-		let a = (voltageDepletionWidth * bandDiagramHeight) / 20;
-		let x_depletion_start = (550 - (400 / 8) * voltageDepletionWidthP) * sx;
+		// let a = (voltageDepletionWidth * bandDiagramHeight) / 20;
+		
+		// let x_depletion_start = (550 - (400 / 8) * voltageDepletionWidthP) * sx;
 		let x_depletion_middle = 550 * sx;
-		let x_depletion_end = (550 + (400 / 8) * voltageDepletionWidth) * sx;
-		let x_depletion_width = x_depletion_end - x_depletion_start;
-		//console.log("a",a)
-		if (
-			this.position.x > x_depletion_start &&
-			this.position.x < x_depletion_middle
-		) {
-			if (this.color == 0) {
-				this.acceleration =
-					(a * (this.position.x - x_depletion_start)) /
-					(0.5 * x_depletion_width);
-			} else if (this.color == 1) {
-				this.acceleration =
-					(-a * (this.position.x - x_depletion_start)) /
-					(0.5 * x_depletion_width);
-			} else {
-			}
-		} else if (
-			this.position.x > x_depletion_middle &&
-			this.position.x < x_depletion_end
-		) {
-			if (this.color == 0) {
-				this.acceleration =
-					(a * (x_depletion_end - this.position.x)) / (0.5 * x_depletion_width);
-			} else if (this.color == 1) {
-				this.acceleration =
-					(-a * (x_depletion_end - this.position.x)) /
-					(0.5 * x_depletion_width);
-			} else {
-			}
-		} else {
-			this.acceleration = 0;
+		// let x_depletion_end = (550 + (400 / 8) * voltageDepletionWidth) * sx;
+		// let x_depletion_width = x_depletion_end - x_depletion_start;
+		let aaa = findClosestY(E_field_temp_data, this.position.x); 
+		
+		let bbb = findClosestY(E_field_temp_data, 500 * sx); 
+		
+		aaa = aaa /1800;
+		if (appliedVoltage / 40 > 0.2 ){ 
+			aaa = aaa * 0.1 / (appliedVoltage / 40) //Make electric field even weaker when the applied voltage is larger than 0.2V.
+		 }
+
+
+		//console.log("bbb",bbb);
+		//console.log("a",a);
+		//console.log("this.postion.x", this.position.x);
+
+		if (this.color == 0) {
+			this.acceleration = aaa;
+		}
+		if (this.color == 1) {
+			this.acceleration = - aaa;
 		}
 
-		// else if (
-		// 	this.position.x > 550 * sx &&
-		// 	this.position.x < (550 + (400 / 8) * voltageDepletionWidth) * sx
-		// ) {
-		// 	// if (sceneCount==1.5) {
-
-		// 	// } else {
-		// 	e_field_c = (initialDepletionWidth / bandDiagramHeight) * 50;
-		// 	// }
-
-		// 	if (this.color == 0) {
-		// 		let a =
-		// 			(e_field_c /
-		// 				(550 * sx - (550 - (400 / 8) * voltageDepletionWidth) * sx)) *
-		// 				(this.position.x - 550 * sx) -
-		// 			((550 - (400 / 8) * voltageDepletionWidth) * sx * e_field_c) /
-		// 				(550 * sx - (550 - (400 / 8) * voltageDepletionWidth) * sx);
-
-		// 		this.acceleration = (-a / 140) * factor_new;
-
-		// 		this.velocity = p5.Vector.add(
-		// 			createVector(this.acceleration, 0),
-		// 			this.velocity
-		// 		);
-		// 		this.position.add(this.velocity);
-		// 	} else if (this.color == 1) {
-		// 		let a =
-		// 			(e_field_c /
-		// 				(550 * sx - (550 - (400 / 8) * voltageDepletionWidth) * sx)) *
-		// 				(this.position.x - 550 * sx) -
-		// 			((550 - (400 / 8) * voltageDepletionWidth) * sx * e_field_c) /
-		// 				(550 * sx - (550 - (400 / 8) * voltageDepletionWidth) * sx);
-
-		// 		this.acceleration = (a / 140) * factor_new;
-
-		// 		this.velocity = p5.Vector.add(
-		// 			createVector(this.acceleration, 0),
-		// 			this.velocity
-		// 		);
-		// 	} else {
-		// 	}
-		// } else {
-		// 	this.velocity = createVector(0, 0);
-		// 	this.acceleartion = createVector(0, 0);
-		// }
 	}
 
 	tube_walk() {

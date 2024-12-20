@@ -81,6 +81,8 @@ let appliedVoltageFactor = 1; //factor for applied voltage
 
 let temp = 270; //set temperature
 var electronCount = 0;
+let e_count_limit = 0; //is used after each recombination event to decide if new pair of electron and hole must be injected from the ends
+let h_count_limit = 0;
 
 let count_n = 0; // ???
 let scatteringVelocity;
@@ -341,6 +343,13 @@ function fetchBandDiagramData() {
 }
 
 // Functions  ===================================================================
+function keyPressed() {
+	if (switchGraph) {
+		switchGraph = false; // show electric field graph
+	} else {
+		switchGraph = true;
+	}
+}
 // Switch from Charge Density graph to Electric Field graph
 function mouseClicked() {
 	timeSinceLastInteraction = 0; // reset for checkTimeout function
@@ -715,44 +724,6 @@ function drawScene3GraphLines() {
 		(10 + 385 / 2 + 96.25 - 60 - 5) * sy
 	);
 }
-
-function drawDopingConcenLabels() {
-	noStroke();
-	fill(...color.bg, 180);
-	rect(151 * sx, 396 * sy, 214, 24); // x, y, w, h
-
-	textSize(12 * sx);
-	fill("white"); // Black color for text
-
-	// left side
-
-	// text with full number
-	// text(`Doping Concentration = ${dopingConcentration}`, 156 * sx, 410 * sy);
-
-	// text with exponential form
-	text(
-		`Doping Concentration = ${addedDopantsP.toExponential(1)}/cm`,
-		158 * sx,
-		410 * sy
-	);
-	textSize(10 * sx);
-	text(`3`, 351 * sx, 407 * sy);
-
-	// right side
-	// text with exponential form
-	textSize(12 * sx);
-	fill(...color.bg, 180);
-	rect(730 * sx, 396 * sy, 212, 24); // x, y, w, h
-	fill("white"); // Black color for text
-	text(
-		`Doping Concentration = ${addedDopants.toExponential(1)}/cm`,
-		738 * sx,
-		410 * sy
-	);
-	textSize(10 * sx);
-	text(`3`, 931 * sx, 407 * sy);
-}
-
 function drawGraph() {
 	noFill();
 	stroke(...color.blue, 180);
@@ -807,7 +778,7 @@ function drawGraph() {
 		fill(...color.blue);
 		textSize(10 * sx);
 		text("20 μC/cm\u00B3", 560 * sx, 252 * sy);
-		text("-20 μC/cm\u00B3", 560 * sx, 351 * sy);
+		text("–20 μC/cm\u00B3", 560 * sx, 351 * sy);
 	} else {
 		// Charge Density
 		// graph -y axis ticks
@@ -833,15 +804,22 @@ function drawGraph() {
 		noStroke();
 		fill(...color.blue);
 		textSize(10 * sx);
-		text("2000 V/cm", 560 * sx, 249 * sy);
-		text("-2000 V/cm", 560 * sx, 353 * sy);
+
+		//console.log ('appliedVoltage', appliedVoltage/40);
+		if (appliedVoltage / 40 > 0.35 && scene(2)) {
+			text("800 V/cm", 560 * sx, 249 * sy);
+			text("–800 V/cm", 560 * sx, 353 * sy);
+		} else {
+			text("4000 V/cm", 560 * sx, 249 * sy);
+			text("–4000 V/cm", 560 * sx, 353 * sy);
+		}
 	}
 
 	noStroke();
 	fill(...color.blue);
 	textSize(10 * sx);
 	text("5 \u00B5m", 790 * sx, 313 * sy);
-	text("-5 \u00B5m", 290 * sx, 313 * sy);
+	text("–5 \u00B5m", 290 * sx, 313 * sy);
 
 	if (switchGraph) {
 		// electric field is showing
@@ -886,8 +864,6 @@ function drawGraph() {
 	if (voltageDepletionWidth >= initialDepletionWidth && appliedVoltage == 0) {
 		text("Equilibrium", 760 * sx, 223 * sy);
 	}
-
-	drawDopingConcenLabels();
 }
 
 function setVoltageDepletionWidth() {
@@ -917,8 +893,6 @@ function setVoltageDepletionWidth() {
 			1 / 2
 		) *
 		Math.pow(10, 3);
-
-	console.log("voltageDepletionWidth=", voltageDepletionWidth);
 
 	// voltageDepletionWidth =
 	// 	5800 *
@@ -974,7 +948,6 @@ function drawDepletionRegion() {
 	context.closePath();
 	context.stroke();
 	context.setLineDash([]);
-	console.log("voltageDepletionWidthP", voltageDepletionWidthP);
 }
 
 // scene 3
@@ -1223,16 +1196,24 @@ function drawElectricFieldData() {
 
 			vertex(150 * sx, (10 + 385 / 2 + 96.25) * sy);
 
-			// Add all points as curve vertices
+			let y_scale = 1;
+			// change the scale for E when the applied voltage is positive and large
+			if (appliedVoltage / 40 > 0.35 && scene(2)) {
+				y_scale = 5;
+			}
+
+			//console.log(E_field_temp_data);
 			for (let i = 0; i < E_field_temp_data.length; i++) {
 				let x = E_field_temp_data[i].x;
 				let y =
 					10 *
 						(E_field_temp_data[i].y / Math.pow(10, 4)) *
+						y_scale *
 						(40 / 1530) *
 						500 *
 						sy +
 					(10 + 385 / 2 + 96.25) * sy;
+
 				// let y =
 				// 	(E_field_temp_data[i].y / Math.pow(10, 4)) * 2 +
 				// 	(385 / 2 + 96.25) * sy;
@@ -1244,7 +1225,7 @@ function drawElectricFieldData() {
 			// 	E_field_temp_data[bandLength - 2].y / Math.pow(10, 6) +
 			// 		(385 / 2 + 98) * sy
 			// );
-			vertex(940 * sx, (10 + 385 / 2 + 96.25) * sy);
+			vertex(950 * sx, (10 + 385 / 2 + 96.25) * sy);
 			endShape();
 			//}
 			//}
@@ -1556,6 +1537,7 @@ function drawBands() {
 			Math.pow(10, 4);
 		E_field_temp_data[k] = { x: xPos * sx, y: b };
 	}
+	E_field_temp_data[bandLength - 1].y = E_field_temp_data[bandLength - 2].y;
 
 	// for (let k = 0; k < bandLength; k++) {
 	// 	let y1 =
@@ -2033,6 +2015,15 @@ function drawConcentrationData() {
 
 function zap(array1, array2, num) {
 	//zap new electron e & new hole h
+
+	// console.log('initialElectrons', initialElectrons.length);
+	// console.log('generatedElectrons', generatedElectrons.length);
+	// console.log('initialHoles', initialHoles.length);
+	// console.log('generatedHoles', generatedHoles.length);
+
+	//console.log('Electrons', initialElectrons.length + generatedElectrons.length );
+	//console.log('Holes', generatedHoles.length + initialHoles.length);
+
 	let Recombin_Prob = 0.5;
 	if (scene(3)) {
 		if (appliedVoltage / 10 < -0.2) {
@@ -2105,21 +2096,36 @@ function zap(array1, array2, num) {
 
 				recombineCount++;
 
+				//console.log('e_count_limi', e_count_limit);
+
 				let b = array1[i].position.y;
 
-				var newCharge = new Charge(170 * sx, b, 10, "h", 1);
-				newCharge.botz = array2[k].botz;
-				array2.push(newCharge);
+				if (initialHoles.length + generatedHoles.length < h_count_limit * 1.1) {
+					var newCharge = new Charge(170 * sx, b, 10, "h", 1);
+					newCharge.botz = array2[k].botz;
+					//newCharge.chargeCreated = true;
+					newCharge.direction = createVector(1, random(-1, 1));
+					newCharge.movingVelocity = this.movingVelocity;
+					newCharge.velocity = createVector(10, 0);
+					array2.push(newCharge);
+					chargeID += 1;
+				}
 
-				chargeID += 1;
+				if (
+					initialElectrons.length + generatedElectrons.length <
+					e_count_limit * 1.1
+				) {
+					var newCharge2 = new Charge(930 * sx, b, 10, "e", 0);
+					newCharge2.botz = array1[i].botz;
+					newCharge2.direction = createVector(-1, random(-1, 1));
+					newCharge2.movingVelocity = this.movingVelocity;
+					newCharge2.velocity = createVector(-10, 0);
+					//newCharge2.chargeCreated = true;
+					array1.push(newCharge2);
 
-				var newCharge2 = new Charge(930 * sx, b, 10, "e", 0);
-				newCharge2.botz = array1[i].botz;
-				array1.push(newCharge2);
-
-				// array1.push(new Charge((930)*sx, b, 10, "e", 0));
-				chargeID += 1;
-
+					// array1.push(new Charge((930)*sx, b, 10, "e", 0));
+					chargeID += 1;
+				}
 				array1.splice(i, 1);
 				array2.splice(k, 1);
 
@@ -2131,7 +2137,7 @@ function zap(array1, array2, num) {
 
 function draw() {
 	timeSinceLastInteraction += 0.1; // approx += 1 every second (depends on framerate)
-	checkTimeout();
+	// checkTimeout();
 	background(...color.bg);
 	scaleWindow();
 
@@ -2161,6 +2167,8 @@ function draw() {
 		setVoltageDepletionWidth();
 	}
 	if (scene(3)) {
+		setCurrentDataArray();
+		updateEField();
 		drawScene3GraphLines();
 		drawConcentrationData();
 		countConcentration();
@@ -2509,6 +2517,7 @@ function updateDopingConcentration(a) {
 
 		let electronCount =
 			Math.pow(100, (Math.log10(Math.round(addedDopants / 5)) - 8) / 2) / 1000;
+		e_count_limit = electronCount;
 
 		////////////////Note from Azad: This is the code from Christina to generate boltzmann distribution of velocities
 
@@ -2587,6 +2596,7 @@ function updateDopingConcentration(a) {
 
 		//currentHoleCount = Math.round(dopingConcentration);
 		h_count = Math.pow(100, (Math.log10(addedDopantsP / 5) - 8) / 2) / 1000;
+		h_count_limit = h_count;
 
 		for (let i = 0; i < h_count; i++) {
 			let a = random(170 * sx, 550 * sx);
@@ -2617,6 +2627,27 @@ function findClosestValue(array, targetX) {
 			// Update closest diff and closestBValue
 			closestDiff = diff;
 			closestBValue = array[i][1]; // Assuming 'b' is represented as second element in sub-array
+		}
+	}
+
+	// Return the 'b' value of the element with the x value closest to targetX
+	return closestBValue;
+}
+
+function findClosestY(array, targetX) {
+	// Initialize closest diff with a very large value
+	let closestDiff = 1000;
+	// Initialize closestBValue as undefined
+	let closestBValue;
+
+	for (let i = 0; i < array.length; i++) {
+		// Calculate absolute difference between targetX and current x value
+		let diff = Math.abs(targetX - array[i].x);
+		// If this difference is less than closest diff found so far
+		if (diff < closestDiff) {
+			// Update closest diff and closestBValue
+			closestDiff = diff;
+			closestBValue = array[i].y; // Assuming 'b' is represented as second element in sub-array
 		}
 	}
 
@@ -2669,7 +2700,6 @@ function updateAppliedVoltage(a) {
 		) *
 		Math.pow(10, 3);
 
-	console.log("voltageDepletionWidth", voltageDepletionWidth);
 	// voltageDepletionWidth =
 	// 	5800 *
 	// 	Math.pow(
@@ -2876,5 +2906,32 @@ function checkMouseHoverForNewStraightLine() {
 			text(value.toExponential(1), x + 15, y); // Display the value next to the ellipse
 			break; // Stop checking other points
 		}
+	}
+}
+
+function updateEField() {
+	for (var k = 0; k < bandLength; k++) {
+		// parameters for drawing band diagram
+		let x1 = 0;
+		let x2 = 16;
+		let y1 = 150;
+		let y2 = 950;
+		let a = (y2 - y1) / (x2 - x1);
+		//let b = y1 - a * x1;
+		let xPos = a * dataArray1E14_xPos[k] + y1;
+
+		// vertex drawn from currentArray
+		// fill("red");
+		// noFill();
+		// curveVertex(xPos * sx, (171.25 + currentArray[k] * 40 - 100) * sy); // electron band + extra line bug
+		// electronBand[k] = [
+		// 	(xPos) * sx,
+		// 	(171.25 + currentArray[k] * (40) - 100) * sy,
+		// ];
+		let b =
+			((currentArray[k + 1] - currentArray[k]) /
+				(dataArray1E14_xPos[k + 1] - dataArray1E14_xPos[k])) *
+			Math.pow(10, 4);
+		E_field_temp_data[k] = { x: xPos * sx, y: b };
 	}
 }

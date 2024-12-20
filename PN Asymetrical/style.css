@@ -485,3 +485,10 @@ input:checked + .slider:before {
 .cursor-noselect {
 	cursor: not-allowed;
 }
+
+.browser-spec {
+	padding: 16px;
+	border-left: 5px solid #fef6b6;
+	background: #323332;
+	border-radius: 8px;
+}
