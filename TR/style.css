@@ -4,6 +4,10 @@
 	/* change to url with ../ */
 }
 
+@import url("https://fonts.cdnfonts.com/css/agency-fb");
+
+@import url("https://fonts.googleapis.com/css2?family=Bai+Jamjuree:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400;1,500;1,600;1,700&display=swap");
+
 #body_parent {
 	background-color: #121212;
 	padding-bottom: 50px;
@@ -14,7 +18,7 @@
 }
 
 .title h1 {
-	font-family: Agency FB;
+	font-family: "Bai Jamjuree";
 	font-style: normal;
 	font-weight: bold;
 	letter-spacing: 2px;
@@ -28,7 +32,7 @@
 
 .title p {
 	margin-top: 30px;
-	font-family: Bai Jamjuree;
+	font-family: "Bai Jamjuree";
 	font-style: normal;
 	font-weight: normal;
 	font-size: 20px;
@@ -73,7 +77,7 @@
 .row10 h1,
 .row11 h1,
 .row12 h1 {
-	font-family: Agency FB;
+	font-family: "Bai Jamjuree";
 	font-style: normal;
 	font-weight: normal;
 	font-size: 36px;
@@ -288,4 +292,11 @@ datalist {
 
 input {
 	width: 50%;
+}
+
+.browser-spec {
+	padding: 16px;
+	border-left: 5px solid #fef6b6;
+	background: #323332;
+	border-radius: 8px;
 }

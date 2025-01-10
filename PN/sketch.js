@@ -3,7 +3,6 @@ Authors: Christina Wu, Ren Zheng,  Azad Naeemi
 Contacts: renzheng112@gmail.com
 ------------------------------------------ */
 
-// Variables ===================================================================
 // tools
 function qs(selector) {
 	return document.querySelector(selector);
@@ -12,6 +11,8 @@ function qs(selector) {
 function scene(num) {
 	return sceneCount == num;
 }
+
+// Variables ===================================================================
 
 // P5 canvas
 let context;
@@ -59,7 +60,6 @@ let boltzDistribution = []; //New random velocity distribution added by Azad
 
 let generationEffects = []; // circle that appears around a generated pair
 let recombineEffects = []; // circle that appears around a recombined pair
-let recombineEffects_dot = [];
 let recombinedElectrons = []; // electron that appears briefly at recombination location
 let recombinedHoles = []; // hole that appears briefly at recombination location
 let recombinePositions = []; //middle position store
@@ -582,13 +582,6 @@ function updateCharges() {
 		if (typeof recombineEffects[i] != "undefined") {
 			recombineEffects[i].display();
 			recombineEffects[i].update();
-		}
-	}
-
-	// IDK for dot is for
-	for (let i = 0; i < recombineEffects_dot.length; i++) {
-		if (typeof recombineEffects[i] != "undefined") {
-			recombineEffects_dot[i].display();
 		}
 	}
 

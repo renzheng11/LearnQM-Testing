@@ -4,17 +4,32 @@ let scenes = [];
 
 StartScroll = () => {
 	let controller = new ScrollMagic.Controller();
+	let scene_0 = new ScrollMagic.Scene({
+		triggerElement: "#scene0",
+	})
+		.setClassToggle("#scene0", "fade-in")
+
+		.on("start", () => {
+			if (sceneCount == 0) {
+				sceneCount = 0.5;
+				opening = 0;
+			} else {
+				sceneCount = 0;
+				resetScene();
+			}
+		})
+		.addTo(controller);
 
 	let scene1 = new ScrollMagic.Scene({
 		triggerElement: "#scene1",
 	})
 		.setClassToggle("#scene1", "fade-in")
 		.on("start", () => {
-			if (sceneCount == 0) {
+			if (sceneCount == 0.5) {
 				sceneCount = 1;
 				resetScene();
 			} else {
-				sceneCount = 0;
+				sceneCount = 0.5;
 			}
 		})
 		.addTo(controller);
