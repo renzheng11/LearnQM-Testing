@@ -2158,6 +2158,7 @@ function draw() {
 		drawElectricFieldData();
 		setInitialDepletionWidth();
 		drawDepletionRegion();
+		drawDopingConcenLabels();
 	}
 	if (scene(1) || scene(2)) {
 		drawGraph();
@@ -2934,4 +2935,36 @@ function updateEField() {
 			Math.pow(10, 4);
 		E_field_temp_data[k] = { x: xPos * sx, y: b };
 	}
+}
+
+function drawDopingConcenLabels() {
+	noStroke();
+	fill(...color.bg, 180);
+	rect(151 * sx, 396 * sy, 214, 24); // x, y, w, h
+	textSize(12 * sx);
+	fill("white"); // Black color for text
+	// left side
+	// text with full number
+	// text(`Doping Concentration = ${dopingConcentration}`, 156 * sx, 410 * sy);
+	// text with exponential form
+	text(
+		`Doping Concentration = ${addedDopantsP.toExponential(1)}/cm`,
+		158 * sx,
+		410 * sy
+	);
+	textSize(10 * sx);
+	text(`3`, 351 * sx, 407 * sy);
+	// right side
+	// text with exponential form
+	textSize(12 * sx);
+	fill(...color.bg, 180);
+	rect(730 * sx, 396 * sy, 212, 24); // x, y, w, h
+	fill("white"); // Black color for text
+	text(
+		`Doping Concentration = ${addedDopants.toExponential(1)}/cm`,
+		738 * sx,
+		410 * sy
+	);
+	textSize(10 * sx);
+	text(`3`, 931 * sx, 407 * sy);
 }

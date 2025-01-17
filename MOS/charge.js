@@ -1,14 +1,13 @@
 class Charge {
 	//the class to change electron hole pairs movements
-	constructor(x, y, diameter, id, chargeType) {
+	constructor(x, y, chargeType) {
 		this.chargeType = chargeType;
 		this.x = x;
 		this.y = y;
 		this.position = createVector(x, y);
 		this.bandPosition = createVector(x, y);
-		this.diameter = diameter;
+		this.diameter = 10;
 		this.time = 0;
-		this.id = id;
 		this.maxspeed = 5;
 		this.velocity = createVector(0, 0);
 		this.maxforce = 1;
@@ -119,15 +118,13 @@ class Charge {
 
 		// right
 		if (this.position.x > (xMax - buffer) * sx) {
-			if (this.id == "h" && !this.vehicleCreated) {
+			if (this.chargeType == "h" && !this.vehicleCreated) {
 				// if hole goes out of capacitor on the right, put back another hole from the right side
 				const buffer = 14;
 				var vehicle = new Charge(
 					(xMax - buffer) * sx,
 					random(yMin + buffer, yMax - buffer) * sy,
-					10,
-					"h",
-					1
+					"h"
 				);
 				vehicle.direction = createVector(-1, random(-1, 1));
 				vehicle.movingVelocity = this.movingVelocity;
@@ -139,7 +136,7 @@ class Charge {
 				this.direction.x = 10;
 				this.showing = false;
 				this.velocity = createVector(0, 0);
-			} else if (this.id == "e") {
+			} else if (this.chargeType == "e") {
 				this.position.x -= buffer;
 				this.velocity.x = -this.velocity.x;
 			}

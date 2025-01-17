@@ -83,6 +83,49 @@
 					<button class="button xxButton" type="button" onclick="">
 						Button
 					</button>
+
+					<div class="controls">
+						<button
+							class="button control"
+							value="ib"
+							type="button"
+							onclick="toggleBattery(this.value)"
+						>
+							Toggle Inner Battery
+						</button>
+						<button
+							class="button control"
+							value="ob"
+							type="button"
+							onclick="toggleBattery(this.value)"
+						>
+							Toggle Outer Battery
+						</button>
+						<button
+							class="button control"
+							value="cd"
+							type="button"
+							onclick="triggerControls(this.value)"
+						>
+							Plot Charge Density
+						</button>
+						<button
+							class="button control"
+							value="ef"
+							type="button"
+							onclick="triggerControls(this.value)"
+						>
+							Plot Electric Field
+						</button>
+						<button
+							class="button control"
+							value="bd"
+							type="button"
+							onclick="triggerControls(this.value)"
+						>
+							Plot Band Diagram
+						</button>
+					</div>
 				</div>
 			</div>
 

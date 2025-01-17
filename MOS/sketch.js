@@ -314,7 +314,7 @@ function draw() {
 
 	if (scene(1) || scene(2)) {
 		drawGraph();
-		updateChargeMovement();
+		updateCharges();
 		checkRecombines();
 		drawBandDiagram();
 	}
@@ -340,7 +340,7 @@ function doRecombine(chargeArray1, chargeArray2) {
 					recomDistance &&
 				abs(chargeArray1[i].position.y - chargeArray2[k].position.y) <
 					recomDistance &&
-				chargeArray1[i].id != chargeArray2[k].id &&
+				chargeArray1[i].chargeType != chargeArray2[k].chargeType &&
 				chargeArray1[i].showing &&
 				chargeArray2[k].showing
 			) {
@@ -1231,7 +1231,6 @@ function onRefresh() {
 
 //reset button
 function resetScene() {
-	console.log("resetscene: fetchBanddiagramdata");
 	fetchBandDiagramData();
 	genElectrons = [];
 	genHoles = [];
@@ -1381,7 +1380,7 @@ function generateCharges(num) {
 				);
 
 				// create new generated electron
-				let newElectron = new Charge(xPosition, yPosition, 10, chargeID, "e");
+				let newElectron = new Charge(xPosition, yPosition, "e");
 				newElectron.bandOrigin.x = closestValueToElectronBand;
 
 				newElectron.top = 1;
@@ -1394,7 +1393,7 @@ function generateCharges(num) {
 				// create new generated hole
 				let closestValueToHoleBand = findClosestValue(holeBand, xPosition);
 
-				let newHole = new Charge(xPosition, yPosition, 10, chargeID, "h");
+				let newHole = new Charge(xPosition, yPosition, "h");
 
 				newHole.bandOrigin.x = closestValueToHoleBand;
 				newHole.top = 1;
@@ -1525,7 +1524,7 @@ function updateDopingConcentration(a) {
 				fixedCharges.push(new Effect(xPosition, yPosition, 10, "fixneg", i)); // fixed negative charges
 
 				// free holes
-				var Charge2 = new Charge(xPosition, yPosition, 10, "h", "h");
+				var Charge2 = new Charge(xPosition, yPosition, "h");
 				Charge2.botz = getRandomBotz[i];
 				initHoles.push(Charge2);
 				chargeID += 1;
@@ -1534,7 +1533,7 @@ function updateDopingConcentration(a) {
 				fixedCharges.push(new Effect(xPosition, yPosition, 10, "fixpos", i)); // fixed positive charges
 
 				// free electron
-				var Charge2 = new Charge(xPosition, yPosition, 10, "e", "e");
+				var Charge2 = new Charge(xPosition, yPosition, "e");
 				Charge2.botz = getRandomBotz[i];
 				initElectrons.push(Charge2); // working
 				chargeID += 1;
@@ -1672,8 +1671,63 @@ function toggleRecombine() {
 	}
 }
 
+function checkHoleCount() {
+	// check if #holes dipping too low, if so - repopulate from right side
+	const holeCount = initHoles.length + genHoles.length;
+	console.log(holeCount);
+
+	if (dopingConcen > 10000000000000) {
+		if (holeCount < 190) {
+			const buffer = 14;
+			var vehicle = new Charge(
+				(xMax - buffer) * sx,
+				random(yMin + buffer, yMax - buffer) * sy,
+				"h"
+			);
+			vehicle.direction = createVector(-1, random(-1, 1));
+			vehicle.movingVelocity = this.movingVelocity;
+			vehicle.velocity = createVector(-10, 0);
+			vehicle.botz = this.botz;
+			initHoles.push(vehicle);
+			// for density 10^17, default init hole count  = ~200
+		}
+	} else {
+		if (holeCount < 90) {
+			const buffer = 14;
+			var vehicle = new Charge(
+				(xMax - buffer) * sx,
+				random(yMin + buffer, yMax - buffer) * sy,
+				"h"
+			);
+			vehicle.direction = createVector(-1, random(-1, 1));
+			vehicle.movingVelocity = this.movingVelocity;
+			vehicle.velocity = createVector(-10, 0);
+			vehicle.botz = this.botz;
+			initHoles.push(vehicle);
+			// for density 10^17, default init hole count  = ~100
+		}
+	}
+
+	// if (scene)
+
+	// const buffer = 14;
+	// var vehicle = new Charge(
+	// 	(xMax - buffer) * sx,
+	// 	random(yMin + buffer, yMax - buffer) * sy,
+	// 	10,
+	// 	"h",
+	// 	1
+	// );
+	// vehicle.direction = createVector(-1, random(-1, 1));
+	// vehicle.movingVelocity = this.movingVelocity;
+	// vehicle.velocity = createVector(-10, 0);
+	// vehicle.botz = this.botz;
+	// initHoles.push(vehicle);
+}
+
 // the function to update the electron hole movements and animations
-function updateChargeMovement() {
+function updateCharges() {
+	checkHoleCount();
 	function moveHelper(chargeArray) {
 		for (let i = 0; i < chargeArray.length; i++) {
 			if (chargeArray[i].active) {
@@ -1696,6 +1750,18 @@ function updateChargeMovement() {
 	for (let i = 0; i < genEffects.length; i++) {
 		if (genEffects[i].generationOpacity < 1) {
 			genEffects.splice(i, 1);
+		}
+	}
+
+	for (let i = 0; i < genHoles.length; i++) {
+		if (genHoles[i].showing == false) {
+			genHoles.splice(i, 1);
+		}
+	}
+
+	for (let i = 0; i < initHoles.length; i++) {
+		if (initHoles[i].showing == false) {
+			initHoles.splice(i, 1);
 		}
 	}
 
@@ -1738,7 +1804,10 @@ function updateChargeMovement() {
 		if (typeof recomEffectsForHoles[i] != "undefined") {
 			for (let k = 0; k < recomEffectsForElectrons.length; k++) {
 				if (typeof recomEffectsForElectrons[k] != "undefined") {
-					if (recomEffectsForHoles[i].id == recomEffectsForElectrons[k].id) {
+					if (
+						recomEffectsForHoles[i].chargeType ==
+						recomEffectsForElectrons[k].chargeType
+					) {
 						recomEffectsForElectrons[k].seek(
 							p5.Vector.div(
 								p5.Vector.add(

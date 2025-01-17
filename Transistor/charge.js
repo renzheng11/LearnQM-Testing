@@ -1,63 +1,54 @@
 class Charge {
-	constructor(x, y, diameter, type, age) {
+	constructor(x, y, type, age) {
 		this.x = x;
 		this.y = y;
 		this.position = createVector(x, y);
 		this.positionBand = createVector(x, y);
-		this.diameter = diameter;
+		this.diameter = 10;
 		this.maxspeed = 15;
 		this.velocity = createVector(0, 0);
 		this.maxforce = 1;
 		this.acceleration = createVector(0, 0);
 		this.desired = createVector(0, 0);
 		this.steer = createVector(0, 0);
-		this.type = type; // "e: electron", "h: hole"
+		this.type = type; // "e: electron", "h: hole", "ge: generation effect", "re: recombination effect"
 		this.age = age; // "i: initial, g: generated"
 		this.location; // "s: source, "d: drain""
 		this.show = 1;
 		this.botz = 1;
 		this.direction = createVector(random(-1, 1), random(-1, 1));
 		this.movingVelocity = 0;
-		this.starting_p = createVector(x, y);
 		this.alpha = 255;
 		this.appear = 0;
 		this.target = createVector(0, 0);
 		this.dead = 0;
-		this.box = 0;
-		this.chargeCreated = false; // add a flag variable
-		this.origin = createVector(0, 0);
-		this.within = 0;
-		this.straight = 0;
-		this.transitionTime = 100; // for example, transition over 60 frames
-		this.elapsedTime = 0; // initialize this somewhere in your object
+		this.opacity = 255;
 
-		setTimeout(() => {
-			this.checkProperties();
-		}, 8000);
+		// setTimeout(() => {
+		// 	this.checkProperties();
+		// }, 8000);
 	}
 
-	checkProperties() {
-		// Check if the top is 1 and origin is {x: 0, y: 0}
+	// checkProperties() {
+	// 	// Check if the top is 1 and origin is {x: 0, y: 0}
 
-		// if (appliedVoltage <= 0) { // UNCOMMENT!!!
-		if (this.type == "e") {
-			if (this.position.x < (550 + (400 / 8) * voltageDepletionWidth) * sx) {
-				this.show = 0;
-			}
-			this.origin.x = 0;
-			this.origin.y = 0;
-			// console.log("The conditions are met for a vehicle instance.");
-		} else if (this.type == "h") {
-			//electron
+	// 	// if (appliedVoltage <= 0) { // UNCOMMENT!!!
+	// 	if (this.type == "e") {
+	// 		if (this.position.x < (550 + (400 / 8) * voltageDepletionWidth) * sx) {
+	// 			this.show = 0;
+	// 		}
 
-			if (this.position.x > (550 - (400 / 8) * voltageDepletionWidth) * sx) {
-				this.show = 0;
-			}
-			this.origin.x = 0;
-			this.origin.y = 0;
-		}
-		// }
-	}
+	// 		// console.log("The conditions are met for a vehicle instance.");
+	// 	} else if (this.type == "h") {
+	// 		//electron
+
+	// 		if (this.position.x > (550 - (400 / 8) * voltageDepletionWidth) * sx) {
+	// 			this.show = 0;
+	// 		}
+
+	// 	}
+	// 	// }
+	// }
 
 	noShow() {
 		this.show = 0;
@@ -67,7 +58,7 @@ class Charge {
 		this.dead = 1;
 	}
 
-	zap() {
+	opacity() {
 		this.appear -= 20;
 	}
 
@@ -83,43 +74,6 @@ class Charge {
 	// 	this.acceleartion = createVector(0, 0);
 	// 	this.movingVelocity = ((5 * parseInt(scattering_velocity)) / 5) * this.botz;
 	// 	this.maxspeed = 5;
-	// }
-
-	applyForce(force) {
-		this.acceleration.add(force);
-	}
-
-	// seek(target) {
-	// 	this.target = target;
-	// 	this.desired = p5.Vector.sub(target, this.position);
-
-	// 	this.desired.setMag(this.maxspeed);
-
-	// 	this.steer = p5.Vector.sub(this.desired, this.velocity);
-	// 	this.steer.limit(this.maxforce);
-
-	// 	this.applyForce(this.steer);
-	// }
-
-	// easy_seek() {
-	// 	this.velocity = createVector(0, 0);
-	// 	this.acceleartion = createVector(0, 0);
-	// 	this.movingVelocity = 0;
-	// 	var m = createVector(
-	// 		this.target.x - this.position.x,
-	// 		this.target.y - this.position.y
-	// 	);
-	// 	m.normalize();
-	// 	this.position.x += 20 * m.x;
-	// 	this.position.y += 20 * m.y;
-	// }
-
-	// update() {
-	// 	// this.velocity.add(this.acceleration);
-	// 	this.velocity.limit(this.maxspeed);
-	// 	// this.position.add(this.velocity);
-	// 	// this.position.add(createVector(10, 10));
-	// 	this.acceleartion = createVector(0, 0);
 	// }
 
 	findClosestValue(array, targetX) {
@@ -144,157 +98,64 @@ class Charge {
 
 			fill(...color.electron, this.appear);
 			stroke(...color.electron, this.appear);
-		} else {
+			ellipse(this.position.x, this.position.y, this.diameter);
+		} else if (this.type == "h") {
 			//hole
 			noFill();
 			stroke(...color.hole, this.appear);
 			strokeWeight(1);
+			ellipse(this.position.x, this.position.y, this.diameter);
+		} else if (this.type == "fp") {
+			//plus sign add electron
+			stroke(255, 120);
+			strokeWeight(5);
+			line(this.x - 10, this.y, this.x + 10, this.y);
+			line(this.x, this.y - 10, this.x, this.y + 10);
+			noStroke();
+			strokeWeight(1);
+		} else if (this.type == "fn") {
+			//plus sign add electron
+			stroke(255, 120);
+			strokeWeight(5);
+			line(this.x - 10, this.y, this.x + 10, this.y);
+			// line(this.x, this.y - 10, this.x, this.y + 10);
+			noStroke();
+			strokeWeight(1);
+		} else if (this.type == "ge") {
+			// generation effect
+			strokeWeight(1);
+			fill(...color.electron, this.opacity);
+			stroke(...color.electron, this.opacity);
+			ellipse(this.position.x, this.position.y, this.diameter);
+		} else if (this.type == "re") {
+			stroke(...color.hole, this.alpha);
+			strokeWeight(2);
+			noFill();
+			ellipse(this.position.x, this.position.y, this.diameter);
 		}
-		ellipse(this.position.x, this.position.y, this.diameter);
-
-		// if (this.type == "e") {
-		// 	//middle part
-
-		// 	if (this.origin.x == 0) {
-		// 	} else {
-		// 		if (this.straight == 0) {
-		// 			fill(...color.electron, 100);
-		// 			stroke(...color.electron, 100);
-		// 			ellipse(this.position.x, this.positionBand.y, 5);
-		// 			this.positionBand.x = this.position.x;
-		// 		} else {
-		// 			fill(...color.electron, 100);
-		// 			stroke(...color.electron, 100);
-		// 			ellipse(this.position.x, this.positionBand.y, 5);
-		// 			this.positionBand.x = this.position.x;
-		// 		}
-		// 	}
-		// } else if (sceneCount != 3) {
-		// 	//hole
-		// 	let k = 0;
-		// 	let s = 0;
-		// 	if (scene(2) || scene(3)) {
-		// 		k = -30;
-		// 	}
-
-		// 	if (scene(1)) {
-		// 		s = 0;
-		// 	}
-
-		// 	if (this.origin.x == 0 && this.origin.y == 0) {
-		// 	} else {
-		// 		if (this.straight == 0) {
-		// 			noFill();
-		// 			stroke(...color.hole, 100);
-		// 			strokeWeight(1);
-
-		// 			ellipse(this.position.x, this.positionBand.y, 5);
-		// 			this.positionBand.x = this.position.x;
-		// 		} else {
-		// 			noFill();
-		// 			stroke(...color.hole, 100);
-		// 			strokeWeight(1);
-
-		// 			ellipse(this.position.x, this.positionBand.y, 5);
-		// 			this.positionBand.x = this.position.x;
-		// 		}
-		// 	}
-		// }
-		// }
 	}
 
-	// opposite_walk() {
-	// 	let uPOS = p5.Vector.mult(this.direction, this.movingVelocity);
-	// 	this.position.add(uPOS);
-
-	// 	const r = floor(random(10));
-	// 	const r2 = floor(random(10));
-
-	// 	if (floor(this.position.x) % r == 0 && floor(this.position.y) % r2 == 0) {
-	// 		this.direction = createVector(random(-1, 1), random(-1, 1));
-	// 	}
-
-	// 	if (
-	// 		this.position.x < this.diameter ||
-	// 		this.position.x > 950 * sx - this.diameter
-	// 	) {
-	// 		this.direction.x *= -1;
-	// 	}
-	// 	if (
-	// 		this.position.y < this.diameter ||
-	// 		this.position.y > 950 * sy - this.diameter
-	// 	) {
-	// 		this.direction.y *= -1;
-	// 	}
-	// }
-
-	straight_walk() {
-		// try {
-		// 	let uPOS = p5.Vector.mult(this.direction, this.movingVelocity);
-		// 	this.position.add(uPOS);
-		// } catch (error) {
-		// 	//
-		// 	this.position.add(createVector(0, 0));
-		// }
-		// if (this.position.y < 50 * sy) {
-		// 	this.direction = createVector(0, 1);
-		// }
+	update() {
+		if (this.color == "ge") {
+			this.opacity -= 15;
+			this.diameter += 3;
+		} else if (this.color == "re") {
+			this.opacity -= 15;
+			this.diameter -= 3;
+		}
 	}
 
 	move() {
-		this.accelerate(); // accelerate() will update this.velocity
+		// this.accelerate(); // accelerate() will update this.velocity
 		this.velocity.limit(this.maxspeed);
-		this.position.add(this.velocity); // add the effect of acceleration to position
-		// }
+		this.position.add(this.velocity); // Update this.position dimd on its velocity
 
-		// const r = floor(random(10));
-		// const r2 = floor(random(10));
-
-		// if (scene(1) || scene(2) || scene(3)) {
-		// UNCOMMENT !!!!
-		// if (
-		// 	this.position.x > (550 - (400 / 8) * voltageDepletionWidth) * sx &&
-		// 	this.position.x <
-		// 		(550 -
-		// 			(400 / 8) * voltageDepletionWidth +
-		// 			(400 / 8) * voltageDepletionWidth * 2) *
-		// 			sx
-		// ) {
-		// 	this.within = 1;
-		// } else {
-		// 	this.within = 0;
-		// }
-
-		// if (willScatter == false) { // UNCOMMENT ?
-		// 	//if false no scatter
-		// } else {
-		// console.log("setting random v and dire");
-		// UNCOMMENT - scatter
-		// this.direction = createVector(random(-1, 1), random(-1, 1));
 		this.movingVelocity = 1.6;
 
 		// random_botz[Math.floor(Math.random() * random_botz.length)]; // UNCOMMENT!
 		this.botz = this.movingVelocity;
 
 		this.velocity = this.direction.mult(this.movingVelocity);
-		// console.log("direction", this.direction);
-		// console.log("movingVelocity", this.movingVelocity);
-		// console.log("velocity", this.velocity);
-		// this.velocity = createVector(10, 10);
-		// UNCOMMENT ONCE YOU HAVE BANDS!!!
-		// if (this.type == "e") {
-		// 	//electron
-		// 	this.origin.x = findClosestValue(electronBand, this.position.x);
-		// 	this.positionBand.y =
-		// 		this.origin.x - (this.botz * this.botz * sy * 8.8 * 0.2) / 6;
-		// }
-		// if (this.type == "h") {
-		// 	//hole
-		// 	this.origin.y = findClosestValue(holeBand, this.position.x);
-		// 	this.positionBand.y =
-		// 		this.origin.y + (this.botz * this.botz * sy * 8.8 * 0.2) / 6;
-		// }
-		// }
 
 		////////////////////// avoid going into the bandgap (added by Azad)
 
@@ -334,45 +195,51 @@ class Charge {
 		let buffer = 24;
 
 		let boundary = []; // l, r, t, b
+		boundary = [base.x, base.x + base.width, base.y, base.endY];
 
-		if (this.type == "h") {
-			boundary = [base.x, base.x + base.width, base.y, base2.baseEndY];
-		} else if (this.type == "e" && this.age == "i") {
-			boundary = [base.x, base2.sourceEndX, base.y, base2.sourceEndY];
-		}
+		// if (this.type == "h") {
+		// 	boundary = [base.x, base.x + base.width, base.y, base.endY];
+		// } else if (this.type == "e" && this.age == "i") {
+		// 	boundary = [base.x, base.sourceEndX, base.y, base.sourceEndY];
+		// }
 
 		// bounce holes off source
-		if (this.type == "h") {
-			// if hole within source x, bounce off source y
-			if (this.position.x < base2.sourceEndX) {
-				if (this.position.y < base2.sourceEndY + buffer) {
-					this.direction.y *= -1;
-				}
-			}
+		// if (this.type == "h") {
+		// 	// if hole within source x, bounce off source y
+		// 	if (this.position.x < base.sourceEndX) {
+		// 		if (this.position.y < base.sourceEndY + buffer) {
+		// 			this.direction.y *= -1;
+		// 		}
+		// 	}
 
-			// if hole within source y, bounce off source x
-			if (this.position.y < base2.sourceEndY) {
-				if (this.position.x < base2.sourceEndX + buffer) {
-					this.direction.x *= -1;
-				}
-			}
-		}
+		// 	// if hole within source y, bounce off source x
+		// 	if (this.position.y < base.sourceEndY) {
+		// 		if (this.position.x < base.sourceEndX + buffer) {
+		// 			this.direction.x *= -1;
+		// 		}
+		// 	}
+		// }
 
+		//////////////////Note from Azad, We don't need these boundries between source, body and drain. The electric field will take care of them.
+		//////////////////We only need to enforce the boundries at the 4 sides of the device. The one at the bottom would be an open boundry and the other three will
+		///////////////// be hard boudnries that electrons and holes will just bounce back.
+
+		//////////////////////////////////////////////////////
 		// bounce holes off drain
-		if (this.type == "h") {
-			// if hole within drain x, bounce off drain y
-			if (this.position.x > base2.drainX) {
-				if (this.position.y < base2.drainEndY + buffer) {
-					this.direction.y *= -1;
-				}
-			}
-			// if hole within drain y, bounce off drain x
-			if (this.position.y < base2.drainEndY) {
-				if (this.position.x > base2.drainX - buffer) {
-					this.direction.x *= -1;
-				}
-			}
-		}
+		// if (this.type == "h") {
+		// 	// if hole within drain x, bounce off drain y
+		// 	if (this.position.x > base.drainX) {
+		// 		if (this.position.y < base.drainEndY + buffer) {
+		// 			this.direction.y *= -1;
+		// 		}
+		// 	}
+		// 	// if hole within drain y, bounce off drain x
+		// 	if (this.position.y < base.drainEndY) {
+		// 		if (this.position.x > base.drainX - buffer) {
+		// 			this.direction.x *= -1;
+		// 		}
+		// 	}
+		// }
 
 		if (this.position.x - this.diameter < boundary[0] + buffer) {
 			// l
@@ -393,247 +260,40 @@ class Charge {
 	}
 
 	accelerate() {
-		this.acceleration = 5;
-		// let a = (voltageDepletionWidth * bandDiagramHeight) / 20;
-		// let x_depletion_start = (550 - (400 / 8) * voltageDepletionWidth) * sx;
-		// let x_depletion_middle = 550 * sx;
-		// let x_depletion_end = (550 + (400 / 8) * voltageDepletionWidth) * sx;
-		// let x_depletion_width = x_depletion_end - x_depletion_start;
-		// //console.log("a",a)
-		// if (
-		// 	this.position.x > x_depletion_start &&
-		// 	this.position.x < x_depletion_middle
-		// ) {
-		// 	if (this.type == "e") {
-		// 		this.acceleration =
-		// 			(a * (this.position.x - x_depletion_start)) /
-		// 			(0.5 * x_depletion_width);
-		// 	} else if (this.type == "h") {
-		// 		this.acceleration =
-		// 			(-a * (this.position.x - x_depletion_start)) /
-		// 			(0.5 * x_depletion_width);
-		// 	} else {
-		// 	}
-		// } else if (
-		// 	this.position.x > x_depletion_middle &&
-		// 	this.position.x < x_depletion_end
-		// ) {
-		// 	if (this.type == "e") {
-		// 		this.acceleration =
-		// 			(a * (x_depletion_end - this.position.x)) / (0.5 * x_depletion_width);
-		// 	} else if (this.type == "h") {
-		// 		this.acceleration =
-		// 			(-a * (x_depletion_end - this.position.x)) /
-		// 			(0.5 * x_depletion_width);
-		// 	} else {
-		// 	}
-		// } else {
-		// 	this.acceleration = 0;
-		// }
+		//Need to Read the electric field at (this.position.x,this.position.y)
+		//The electric feild that we read has x and y components. Let's call them Ex and Ey. For now I just give them values.
+		let Ex = 1;
+		let Ey = 2;
+
+		//We need to multpliy the elctric feild by a constant to convert it to accelration on our screen. We need to find the value with trial and error. For now I just use a factor of 5.
+
+		let AccelerationFactor = 5; ////It might be better to make it a global variable that we define. We can do that later.
+		this.acceleration.x = Ex * AccelerationFactor;
+		this.acceleration.y = Ey * AccelerationFactor;
+
+		if (this.type == "e") {
+			//if an electron, acceleration in in the opposite direction of the electric field.
+			this.acceleration.x = -this.acceleration.x;
+			this.acceleration.y = -this.acceleration.y;
+		}
+
+		this.velocity = p5.Vector.add(this.acceleration, this.velocity); //update velocity
 	}
-
-	// tube_walk() {
-	// 	let uPOS = p5.Vector.mult(this.direction, this.movingVelocity);
-	// 	this.position.add(uPOS);
-
-	// 	if (this.time < 100) {
-	// 		this.direction = createVector(0, 1);
-	// 		this.time++;
-	// 	}
-	// }
-
-	// alpha_update() {
-	// 	this.alpha -= 10;
-	// }
 
 	updateAppear() {
 		if (this.appear < 255) {
 			this.appear += 20;
 		}
 	}
-}
 
-class Appear {
-	constructor(x, y, length, type, id) {
-		this.x = x;
-		this.y = y;
-		this.position = createVector(x, y);
-		this.length = length;
-		this.time = 0;
-		this.type = type; // "p: fixed positive", "n: fixed negative"
-		this.show = 1;
-		this.starting_p = createVector(x, y);
-		this.alpha = 135; //appear opacity
-		this.beta = 0;
-		this.zap = 255;
-		this.d = 1;
-		this.dd = 50;
-		this.occupied = 0;
-		this.dead = 0;
-
-		this.acceleration = createVector(0, 0);
-		this.desired = createVector(0, 0);
-		this.steer = createVector(0, 0);
-		this.velocity = createVector(0, 0);
-		this.maxforce = 0.1;
-		this.maxspeed = 0.8;
-	}
-
-	display() {
-		if (this.show == 1) {
-			if (this.type == "e") {
-				noStroke();
-				fill(...color.electron, this.alpha);
-
-				ellipse(this.position.x, this.position.y, this.d);
-			} else if (this.type == "h") {
-				stroke(...color.hole, this.alpha);
-				strokeWeight(2);
-				noFill();
-
-				ellipse(this.position.x, this.position.y, this.dd);
-			} else if (this.type == 2) {
-				// recombination?
-				strokeWeight(1);
-				fill(...color.electron, this.zap);
-				stroke(...color.electron, this.zap);
-				ellipse(this.position.x, this.position.y, 10);
-			} else if (this.type == 3) {
-				// recombination?
-				//hollow
-				strokeWeight(1);
-				noFill();
-				stroke(...color.hole, this.zap);
-				ellipse(this.position.x, this.position.y, 10);
-			} else if (this.type == "p") {
-				//plus sign add electron
-				stroke(255, this.beta);
-				strokeWeight(5);
-				line(this.x - 10, this.y, this.x + 10, this.y);
-				line(this.x, this.y - 10, this.x, this.y + 10);
-				noStroke();
-				strokeWeight(1);
-			} else if (this.type == "n") {
-				//minus sign add electron
-				stroke(255, this.beta);
-				strokeWeight(5);
-				line(this.x - 10, this.y, this.x + 10, this.y);
-				noStroke();
-				strokeWeight(1);
-			}
+	updateOpacity() {
+		if (this.type == "ge") {
+			this.opacity -= 15;
+			this.diameter += 3;
+		} else if (this.type == "re") {
+			this.opacity -= 15;
+			this.diameter -= 3;
 		}
-	}
-
-	noShow() {
-		this.show = 0;
-	}
-
-	dead() {
-		this.dead = 1;
-	}
-
-	stop() {
-		this.velocity = createVector(0, 0);
-		this.acceleartion = createVector(0, 0);
-		this.movingVelocity = 0;
-		this.maxspeed = 0;
-	}
-
-	update() {
-		if (this.type == "e") {
-			this.alpha -= 15;
-			this.d += 5;
-		} else if (this.type == "h") {
-			this.alpha -= 15;
-			this.dd -= 3;
-		} else if (this.type == "p" || this.type == "n") {
-			if (this.beta < 100) {
-				this.beta += 30;
-				// this.d += 4;
-			}
-		}
-	}
-
-	update_location() {
-		this.velocity.add(this.acceleration);
-		this.velocity.limit(this.maxspeed);
-		this.position.add(this.velocity);
-		this.acceleartion = createVector(0, 0);
-	}
-
-	update_circle() {
-		this.zap -= 20;
-	}
-
-	seek(target) {
-		this.target = target;
-		this.desired = p5.Vector.sub(target, this.position);
-
-		this.desired.setMag(this.maxspeed);
-
-		this.steer = p5.Vector.sub(this.desired, this.velocity);
-		this.steer.limit(this.maxforce);
-
-		this.applyForce(this.steer);
-	}
-
-	applyForce(force) {
-		this.acceleration.add(force);
-	}
-}
-
-class Disappear {
-	constructor(x, y, length, type, target) {
-		this.x = x;
-		this.y = y;
-		this.position = createVector(x, y);
-		this.length = length;
-		this.time = 0;
-		this.maxspeed = 5;
-		this.type = type;
-		this.show = 1;
-		this.starting_p = createVector(x, y);
-		this.alpha = 255;
-		this.zap = 255;
-		this.d = 1;
-		this.dd = 50;
-		this, (target = target);
-		this.occupied = 0;
-	}
-
-	display() {
-		if (this.show == 1) {
-			if (this.type == "e") {
-				noStroke();
-				fill(...color.electron, this.alpha);
-
-				ellipse(this.position.x, this.position.y, this.d);
-			} else if (this.type == "h") {
-				stroke(...color.hole, this.alpha);
-				strokeWeight(2);
-				noFill();
-				ellipse(this.position.x, this.position.y, this.dd);
-			} else if (this.type == 2) {
-				strokeWeight(1);
-				fill(...color.electron, this.zap);
-				stroke(...color.electron, this.zap);
-				ellipse(this.position.x, this.position.y, 10);
-			}
-		}
-	}
-
-	update() {
-		if (this.type == "e") {
-			this.alpha -= 15;
-			this.d += 5;
-		} else if (this.type == "h") {
-			this.alpha -= 15;
-			this.dd -= 3;
-		}
-	}
-
-	update_circle() {
-		this.zap -= 20;
 	}
 }
 
