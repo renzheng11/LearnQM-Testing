@@ -1,10 +1,9 @@
 class Charge {
 	//the class to change electron hole pairs movements
-	constructor(x, y, id, chargeType) {
+	constructor(x, y, chargeType) {
 		this.chargeType = chargeType;
 		this.x = x;
 		this.y = y;
-		this.id = id;
 		this.position = createVector(x, y);
 		this.bandPosition = createVector(x, y);
 		this.diameter = 10;

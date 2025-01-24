@@ -1,7 +1,8 @@
 class Charge {
-	constructor(x, y, type, age) {
+	constructor(x, y, type, id, age) {
 		this.x = x;
 		this.y = y;
+		this.id = id;
 		this.position = createVector(x, y);
 		this.positionBand = createVector(x, y);
 		this.diameter = 10;
@@ -14,11 +15,10 @@ class Charge {
 		this.type = type; // "e: electron", "h: hole", "ge: generation effect", "re: recombination effect"
 		this.age = age; // "i: initial, g: generated"
 		this.location; // "s: source, "d: drain""
-		this.show = 1;
+		this.show = true;
 		this.botz = 1;
 		this.direction = createVector(random(-1, 1), random(-1, 1));
 		this.movingVelocity = 0;
-		this.alpha = 255;
 		this.appear = 0;
 		this.target = createVector(0, 0);
 		this.dead = 0;
@@ -50,8 +50,8 @@ class Charge {
 	// 	// }
 	// }
 
-	noShow() {
-		this.show = 0;
+	hide() {
+		this.show = false;
 	}
 
 	deadd() {
@@ -92,55 +92,77 @@ class Charge {
 	}
 
 	display() {
-		// if (this.show == 1) {
-		if (this.type == "e") {
-			//electron
-
-			fill(...color.electron, this.appear);
-			stroke(...color.electron, this.appear);
-			ellipse(this.position.x, this.position.y, this.diameter);
-		} else if (this.type == "h") {
-			//hole
-			noFill();
-			stroke(...color.hole, this.appear);
-			strokeWeight(1);
-			ellipse(this.position.x, this.position.y, this.diameter);
-		} else if (this.type == "fp") {
-			//plus sign add electron
-			stroke(255, 120);
-			strokeWeight(5);
-			line(this.x - 10, this.y, this.x + 10, this.y);
-			line(this.x, this.y - 10, this.x, this.y + 10);
-			noStroke();
-			strokeWeight(1);
-		} else if (this.type == "fn") {
-			//plus sign add electron
-			stroke(255, 120);
-			strokeWeight(5);
-			line(this.x - 10, this.y, this.x + 10, this.y);
-			// line(this.x, this.y - 10, this.x, this.y + 10);
-			noStroke();
-			strokeWeight(1);
-		} else if (this.type == "ge") {
-			// generation effect
-			strokeWeight(1);
-			fill(...color.electron, this.opacity);
-			stroke(...color.electron, this.opacity);
-			ellipse(this.position.x, this.position.y, this.diameter);
-		} else if (this.type == "re") {
-			stroke(...color.hole, this.alpha);
-			strokeWeight(2);
-			noFill();
-			ellipse(this.position.x, this.position.y, this.diameter);
+		if (this.show) {
+			if (this.type == "e") {
+				//electron
+				fill(...color.electron, this.appear);
+				noStroke();
+				ellipse(this.position.x, this.position.y, this.diameter);
+			} else if (this.type == "h") {
+				//hole
+				noFill();
+				stroke(...color.hole, this.appear);
+				strokeWeight(1);
+				ellipse(this.position.x, this.position.y, this.diameter);
+			} else if (this.type == "te") {
+				// temp electron for recombination effect
+				fill(...color.electron, this.opacity);
+				noStroke();
+				ellipse(this.position.x, this.position.y, this.diameter);
+			} else if (this.type == "th") {
+				// temp hole for recombination effect
+				noFill();
+				stroke(...color.hole, this.opacity);
+				strokeWeight(1);
+				ellipse(this.position.x, this.position.y, this.diameter);
+			} else if (this.type == "fp") {
+				//plus sign add electron
+				stroke(255, 120);
+				strokeWeight(5);
+				line(this.x - 10, this.y, this.x + 10, this.y);
+				line(this.x, this.y - 10, this.x, this.y + 10);
+				noStroke();
+				strokeWeight(1);
+			} else if (this.type == "fn") {
+				//plus sign add electron
+				stroke(255, 120);
+				strokeWeight(5);
+				line(this.x - 10, this.y, this.x + 10, this.y);
+				// line(this.x, this.y - 10, this.x, this.y + 10);
+				noStroke();
+				strokeWeight(1);
+			} else if (this.type == "ge") {
+				// generation effect
+				strokeWeight(1);
+				fill(...color.electron, this.opacity);
+				stroke(...color.electron, this.opacity);
+				ellipse(this.position.x, this.position.y, this.diameter);
+			} else if (this.type == "re") {
+				// recombination effect
+				stroke(...color.hole, this.opacity);
+				noFill();
+				strokeWeight(1);
+				// ellipse(this.position.x, this.position.y, this.diameter);
+				ellipse(this.position.x, this.position.y, this.diameter);
+			}
 		}
 	}
 
 	update() {
-		if (this.color == "ge") {
+		if (this.type == "e" || this.type == "h") {
+			// slowly appear at beginning
+			if (this.appear < 255) {
+				this.appear += 20;
+			}
+		} else if (this.type == "te") {
+			this.opacity -= 10;
+		} else if (this.type == "th") {
+			this.opacity -= 10;
+		} else if (this.type == "ge") {
 			this.opacity -= 15;
 			this.diameter += 3;
-		} else if (this.color == "re") {
-			this.opacity -= 15;
+		} else if (this.type == "re") {
+			this.opacity -= 10;
 			this.diameter -= 3;
 		}
 	}
@@ -280,20 +302,20 @@ class Charge {
 		this.velocity = p5.Vector.add(this.acceleration, this.velocity); //update velocity
 	}
 
-	updateAppear() {
-		if (this.appear < 255) {
-			this.appear += 20;
-		}
+	seek(target) {
+		this.target = target;
+		this.desired = p5.Vector.sub(target, this.position);
+
+		this.desired.setMag(this.maxspeed);
+
+		this.steer = p5.Vector.sub(this.desired, this.velocity);
+		this.steer.limit(this.maxforce);
+
+		this.applyForce(this.steer);
 	}
 
-	updateOpacity() {
-		if (this.type == "ge") {
-			this.opacity -= 15;
-			this.diameter += 3;
-		} else if (this.type == "re") {
-			this.opacity -= 15;
-			this.diameter -= 3;
-		}
+	applyForce(force) {
+		this.acceleration.add(force);
 	}
 }
 

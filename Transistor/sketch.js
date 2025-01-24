@@ -26,7 +26,7 @@ let color = {
 	electron: [254, 246, 182],
 	hole: [125, 241, 148],
 	graph: [102, 194, 255],
-	wires: [150, 150, 150],
+	wires: [255, 255, 255],
 	EFColor: [218, 112, 214], // electric field
 	CDColor: [2, 104, 255], // charge density
 	controls: [102, 194, 255],
@@ -45,10 +45,6 @@ let color = {
 	// scanner: [218, 107, 107],
 };
 
-// Intervals  ===================================================================
-let generationInterval;
-let generationRate = 4000;
-
 // Charges + Electrons + Holes ============================================================
 let fixedCharges = []; // fixed positive + negative charges
 let electrons = [];
@@ -59,16 +55,31 @@ let holes = [];
 // let generatedHoles = []; // holes that are generated
 let electronCount;
 let holeCount;
+let chargeID = 0;
+
+// Transfer charges on wires ============================================================
+
+let wireElectrons = [];
 
 // Effects for generation & recombination ===============================================
 
 let generationEffects = []; // circle that appears around a generated pair
-let recombineEffects = []; // circle that appears around a recombined pair
-let recombinedElectrons = []; // electron that appears briefly at recombination location
-let recombinedHoles = []; // hole that appears briefly at recombination location
-let recombinePositions = []; //middle position store
-let recombineCount = 0; //disappear numChargesber count
-let recombineDistance = 1; // distance between electron and hole required to recombine, smaller number decreases likelihood of recombination
+// let recomEffects = []; // circle that appears around a recomd pair
+let recomdElectrons = []; // electron that appears briefly at recombination location
+let recomdHoles = []; // hole that appears briefly at recombination location
+let recomPositions = []; //middle position store
+// let recomCount = 0; //disappear numChargesber count
+// let recomDistance = 10; // distance between electron and hole required to recom, smaller number decreases likelihood of recombination
+let generationInterval;
+let generationRate = 4000;
+let recomRate = 4000;
+let recomOn = true;
+let recomDistance = 2; //distance for recom
+let recomEffectsPositions = [];
+let recomCount = 0;
+let recomEffects = [];
+let recomTempElectrons = [];
+let recomTempHoles = [];
 
 //
 let botzDistribution = [];
@@ -95,20 +106,23 @@ const unit = 8;
 // base dimensions
 const dim = {
 	x: unit * 26,
-	y: unit * 28,
+	y: unit * 36,
 
 	width: unit * 80,
 	height: unit * 50,
 
 	// metal + insulator
-	metalWidth: unit * 52,
-	metalHeight: unit * 6,
+	metalWidth: unit * 40,
+	metalHeight: unit * 5,
 
 	// source + drain
 	sourceWidth: unit * 20,
 	sourceHeight: unit * 20,
 
 	batteryHeight: 20,
+
+	innerY: unit * 20, // inner wire
+	outerY: unit * 14, // outer wire
 };
 
 const controls = {
@@ -126,15 +140,18 @@ const base = {
 	endX: dim.x + dim.width,
 	endY: dim.y + dim.height,
 
+	innerY: dim.innerY,
+	outerY: dim.outerY,
+
 	width: dim.width,
 	height: dim.height,
 
-	// metal + insulator
+	// gate metal + insulator
 	metalX: dim.x + (dim.width - dim.metalWidth) / 2,
 
 	metalWidth: dim.metalWidth,
 	metalHeight: dim.metalHeight,
-	bottomMetalHeight: 60,
+	bottomMetalHeight: 40,
 
 	// source + drain
 	sourceWidth: dim.sourceWidth,
@@ -151,13 +168,25 @@ const base = {
 	sourceEndX: dim.x + dim.sourceWidth,
 	sourceEndY: dim.y + dim.sourceHeight,
 
-	innerBatteryX: dim.x + dim.width / 2 - 32,
-	innerBatteryY: dim.y - 160,
 	batteryWidth: 65,
+	innerBatteryX: dim.x + dim.width / 2 - 32,
+	innerBatteryY: dim.innerY - 16, // custom change
 	outerBatteryX: dim.x + dim.width / 2 - 32,
-	outerBatteryY: dim.y - 220,
-	innerBatteryMidY: dim.y - 160 + dim.batteryHeight / 2,
-	outerBatteryMidY: dim.y - 220 + dim.batteryHeight / 2,
+	outerBatteryY: dim.outerY - 16, // custom change
+
+	leftGroundX: dim.x + dim.sourceWidth / 2 - 40,
+	insulatorLabelY: dim.y - (dim.metalHeight / 2) * 0.75,
+
+	wirePos0: [dim.x + dim.sourceWidth / 2, dim.y - dim.metalHeight],
+	wirePos1: [dim.x + dim.sourceWidth / 2, dim.innerY],
+	wirePos2: [dim.x + 420, dim.innerY],
+	wirePos3: [dim.x + 420, dim.y - dim.metalHeight * 2],
+	wirePos4: [dim.x + dim.sourceWidth / 2, dim.outerY],
+	wirePos5: [dim.x + dim.width - dim.sourceWidth / 2, dim.outerY],
+	wirePos6: [dim.x + dim.width - dim.sourceWidth / 2, dim.y - dim.metalHeight],
+
+	wirePos7: [dim.x + dim.sourceWidth / 2, dim.y + 200],
+	wirePos8: [dim.x + 420, dim.y + 200],
 };
 
 // Tools ============================================================
@@ -208,6 +237,7 @@ function setup() {
 	batteryPosOn = loadImage("batteryPosOn.png");
 	batteryNegOn = loadImage("batteryNegOn.png");
 	groundImg = loadImage("ground.png");
+	leftGroundImg = loadImage("leftGround.png");
 }
 
 function scaleToWindow() {
@@ -232,6 +262,7 @@ function draw() {
 		drawWires();
 		drawGraph();
 		drawBandDiagram();
+		updateWireElectrons();
 		// drawControls();
 	}
 }
@@ -240,17 +271,26 @@ function resetScene() {
 	background(...color.bg);
 	fixedCharges = [];
 	initCharges();
+	initWireElectrons();
 }
 
 // Updating Functions ============================================================
+function initWireElectrons() {
+	for (let i = 0; i < 30; i++) {
+		let x = base.x + base.sourceWidth / 2;
+		let y = base.wirePos7[1];
+
+		wireElectrons.push(new wireCharge(x, y));
+	}
+}
 
 function initCharges() {
 	let fixedPosChargesLeft = 15;
 	let fixedPosChargesRight = 15;
 	let fixedNegCharges = 40;
 
-	holeCount = 40;
-	electronCount = 20; // source and drain each
+	holeCount = 20;
+	electronCount = 10; // source and drain each
 
 	let buffer = 12; // draw inside box borders
 	// let electronCount =
@@ -260,14 +300,14 @@ function initCharges() {
 	for (let i = 0; i < fixedPosChargesLeft; i++) {
 		let x = random(base.x + buffer, base.sourceEndX - buffer);
 		let y = random(base.y + buffer, base.sourceEndY - buffer);
-		fixedCharges.push(new Charge(x, y, "fp"));
+		fixedCharges.push(new Charge(x, y, "fp", chargeID));
 	}
 
 	// drain fixed positive charges
 	for (let i = 0; i < fixedPosChargesRight; i++) {
 		let x = random(base.drainX + buffer, base.drainEndX - buffer);
 		let y = random(base.y + buffer, base.drainEndY - buffer);
-		fixedCharges.push(new Charge(x, y, "fp"));
+		fixedCharges.push(new Charge(x, y, "fp", chargeID));
 	}
 
 	for (let i = 0; i < fixedNegCharges; i++) {
@@ -283,7 +323,7 @@ function initCharges() {
 			y = random(base.y + buffer, base.y + base.height);
 		}
 
-		fixedCharges.push(new Charge(x, y, "fn"));
+		fixedCharges.push(new Charge(x, y, "fn", chargeID));
 	}
 
 	random_botz = botzDistribution;
@@ -301,10 +341,11 @@ function initCharges() {
 			y = random(base.y + buffer, base.y + base.height);
 		}
 
-		let newCharge = new Charge(x, y, "h", "i");
+		let newCharge = new Charge(x, y, "h", chargeID, "i");
 		newCharge.botz =
 			random_botz[Math.floor(Math.random() * random_botz.length)];
 		holes.push(newCharge);
+		chargeID++;
 	}
 
 	for (let i = 0; i < electronCount; i++) {
@@ -313,11 +354,12 @@ function initCharges() {
 		// let b = random(30*sy,730*sy);
 		let y = random(base.y + buffer, base.y + base.sourceHeight - buffer);
 
-		let newCharge = new Charge(x, y, "e", "i");
+		let newCharge = new Charge(x, y, "e", chargeID, "i");
 
 		newCharge.botz =
 			random_botz[Math.floor(Math.random() * random_botz.length)];
 		electrons.push(newCharge);
+		chargeID++;
 
 		// initiate drain electrons
 		x = random(
@@ -326,23 +368,34 @@ function initCharges() {
 		);
 		// let b = random(30*sy,730*sy);
 		y = random(base.y + buffer, base.y + base.sourceHeight - buffer);
-		newCharge = new Charge(x, y, "e", "i");
+		newCharge = new Charge(x, y, "e", chargeID, "i");
 		newCharge.botz =
 			random_botz[Math.floor(Math.random() * random_botz.length)];
 		electrons.push(newCharge);
+		chargeID++;
+	}
+}
+
+function toggleRecombine() {
+	if (recomOn) {
+		recomOn = false;
+	} else {
+		recomOn = true;
 	}
 }
 
 function regenerate() {
 	// // Regenerate pairs at time intervals
 	// setInterval(time_graph, 0.00000000002);
-	// // allow for recombine during interval
+	// // allow for recom during interval
 	// setInterval(toggleRecombine, 2000);
 
 	// generate balls based on frequency
 	generationInterval = setInterval(function () {
 		generateCharges(1);
 	}, generationRate); // scene changing T
+
+	setInterval(toggleRecombine, recomRate);
 
 	// run_outer = setInterval(function () {
 	// 	generateCharges_outer(1);
@@ -378,22 +431,23 @@ function generateCharges(numCharges) {
 		let x = random(base.x, base.endX);
 		let y = random(base.y, base.endY);
 
-		generationEffects.push(new Charge(x, y, "ge"));
-		// console.log(generationEffects);
+		generationEffects.push(new Charge(x, y, "ge", chargeID));
 		//let xx = findClosestValue(electronLine, a);
 		// let xx = findClosestValue(electronBand, a);
 
-		let newElectron = new Charge(x, y, "e", "g");
+		let newElectron = new Charge(x, y, "e", chargeID, "g");
 		// aa.origin.x = xx;
 		// aa.top = 1;
 		electrons.push(newElectron);
 
 		// let yy = findClosestValue(holeBand, a);
 
-		let newHole = new Charge(x, y, "h", "g");
+		let newHole = new Charge(x, y, "h", chargeID, "g");
 		// bb.origin.y = yy;
 		// bb.top = 1;
 		holes.push(newHole);
+
+		chargeID += 1;
 	}
 	// }
 	// }
@@ -459,9 +513,129 @@ function updateBotz() {
 		}
 	}
 }
+
+function recom(electrons, holes) {
+	for (let i = 0; i < electrons.length; i++) {
+		for (let k = 0; k < holes.length; k++) {
+			if (
+				abs(electrons[i].position.x - holes[k].position.x) < recomDistance &&
+				abs(electrons[i].position.y - holes[k].position.y) < recomDistance &&
+				electrons[i].id != holes[k].id &&
+				electrons[i].show &&
+				holes[k].show
+			) {
+				electrons[i].stop();
+				holes[k].stop();
+				electrons[i].hide();
+				holes[k].hide();
+				// electrons[i].deactivate();
+				// holes[k].deactivate();
+
+				recomEffectsPositions[recomCount] = p5.Vector.div(
+					p5.Vector.add(holes[k].position, electrons[i].position),
+					2
+				);
+
+				//effects
+
+				recomEffects[recomCount] = new Charge(
+					recomEffectsPositions[recomCount].x,
+					recomEffectsPositions[recomCount].y,
+					"re",
+					recomCount
+				);
+				recomTempElectrons[recomCount] = new Charge(
+					electrons[i].position.x,
+					electrons[i].position.y,
+					"te",
+					recomCount
+				);
+				recomTempHoles[recomCount] = new Charge(
+					holes[k].position.x,
+					holes[k].position.y,
+					"th",
+					recomCount
+				);
+
+				recomCount++;
+
+				let b = electrons[i].position.y;
+
+				electrons.splice(i, 1);
+				holes.splice(k, 1);
+
+				break;
+			}
+		}
+	}
+}
+
+function checkDest(electron, dest) {
+	xCondition =
+		electron.position.x < dest.x + 5 && electron.position.x > dest.x - 5;
+	yCondition =
+		electron.position.y < dest.y + 5 && electron.position.y > dest.y - 5;
+
+	if (xCondition && yCondition) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+function updateWireElectrons() {
+	let stops = [];
+	stops.push(createVector(base.wirePos1[0], base.wirePos1[1]));
+	stops.push(createVector(base.wirePos2[0], base.wirePos2[1]));
+	stops.push(createVector(base.wirePos8[0], base.wirePos8[1]));
+	stops.push(createVector(base.wirePos7[0], base.wirePos7[1]));
+
+	for (let i = 0; i < wireElectrons.length; i++) {
+		let electron = wireElectrons[i];
+		electron.display();
+
+		let atDest1 = checkDest(electron, stops[0], false);
+		let atDest2 = checkDest(electron, stops[1], false);
+		let atDest3 = checkDest(electron, stops[2], false);
+		let atDest4 = checkDest(electron, stops[3], false);
+
+		if (atDest1) {
+			if (!electron.passedDest.includes(1)) {
+				electron.updatePassed(1);
+			}
+		}
+		if (atDest2) {
+			if (!electron.passedDest.includes(2)) {
+				electron.updatePassed(2);
+			}
+		}
+		if (atDest3) {
+			if (!electron.passedDest.includes(3)) {
+				electron.updatePassed(8);
+			}
+		}
+		if (atDest4) {
+			electron.clearPassed();
+		}
+
+		if (electron.passedDest.includes(0) && !electron.passedDest.includes(1)) {
+			electron.move(stops[0]);
+		}
+		if (electron.passedDest.includes(1) && !electron.passedDest.includes(2)) {
+			electron.move(stops[1]);
+		}
+		if (electron.passedDest.includes(2) && !electron.passedDest.includes(8)) {
+			electron.move(stops[2]);
+		}
+		if (electron.passedDest.includes(8) && !electron.passedDest.includes(7)) {
+			electron.move(stops[3]);
+		}
+	}
+}
+
 function updateCharges() {
-	// recombine holes and electrons
-	// recombineArrays(holes, electrons);
+	// recom holes and electrons
+	// recomArrays(holes, electrons);
 
 	// display charges
 	for (let i = 0; i < fixedCharges.length; i++) {
@@ -471,7 +645,6 @@ function updateCharges() {
 
 	for (let i = 0; i < electrons.length; i++) {
 		electrons[i].display();
-		electrons[i].updateAppear();
 		electrons[i].update();
 
 		if (electrons[i].appear > 255) {
@@ -484,7 +657,6 @@ function updateCharges() {
 
 	for (let i = 0; i < holes.length; i++) {
 		holes[i].display();
-		holes[i].updateAppear();
 		holes[i].update();
 
 		if (holes[i].appear > 255) {
@@ -495,18 +667,16 @@ function updateCharges() {
 		}
 	}
 
-	for (let i = 0; i < generationEffects.length; i++) {
-		if (generationEffects[i].alpha < 1) {
-			generationEffects.splice(i, 1);
-		}
-	}
-
 	// Show appear effect when electron is generated
 	for (let i = 0; i < generationEffects.length; i++) {
-		// console.log(i);
-		// console.log(generationEffects[i]);
 		generationEffects[i].display();
-		generationEffects[i].updateOpacity();
+		generationEffects[i].update();
+	}
+
+	// show recom effect
+	for (let i = 0; i < recomEffects.length; i++) {
+		recomEffects[i].display();
+		recomEffects[i].update();
 	}
 
 	// get rid of generation effect circle when it reaches 0 opacity
@@ -516,26 +686,79 @@ function updateCharges() {
 		}
 	}
 
-	// get rid of recombine effect circle when it reaches 0 opacity
-	for (let i = 0; i < recombineEffects.length; i++) {
-		if (recombineEffects[i].opacity < 1) {
-			recombineEffects.splice(i, 1);
+	// get rid of recom effect circle when it reaches 0 opacity
+	// for (let i = 0; i < recomEffects.length; i++) {
+	// 	if (recomEffects[i].opacity < 1) {
+	// 		recomEffects.splice(i, 1);
+	// 	}
+	// }
+
+	// check for recombination
+	if (recomOn) {
+		recom(electrons, holes);
+	}
+
+	// update effects
+	// (recombination visual effect, electron fading )
+	for (let i = 0; i < recomTempElectrons.length; i++) {
+		if (typeof recomTempElectrons[i] != "undefined") {
+			recomTempElectrons[i].display();
+			recomTempElectrons[i].update();
 		}
 	}
+
+	//(recombination visual effect, hole fading)
+	for (let i = 0; i < recomTempHoles.length; i++) {
+		if (typeof recomTempHoles[i] != "undefined") {
+			recomTempHoles[i].display();
+			recomTempHoles[i].update();
+		}
+	}
+
+	// for (let i = 0; i < recomTempHoles.length; i++) {
+	// 	if (typeof recomTempHoles[i] != "undefined") {
+	// 		for (let k = 0; k < recomTempElectrons.length; k++) {
+	// 			if (typeof recomTempElectrons[k] != "undefined") {
+	// 				if (
+	// 					recomTempHoles[i].chargeType == recomTempElectrons[k].chargeType
+	// 				) {
+	// 					recomTempElectrons[k].seek(
+	// 						p5.Vector.div(
+	// 							p5.Vector.add(
+	// 								recomTempElectrons[k].position,
+	// 								recomTempHoles[i].position
+	// 							),
+	// 							2
+	// 						)
+	// 					);
+	// 					recomTempHoles[i].seek(
+	// 						p5.Vector.div(
+	// 							p5.Vector.add(
+	// 								recomTempElectrons[k].position,
+	// 								recomTempHoles[i].position
+	// 							),
+	// 							2
+	// 						)
+	// 					);
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+	// }
 }
 
-function recombineArrays(array1, array2, num) {
-	let recombineProb = 0.5;
+function recomArrays(array1, array2, num) {
+	let recomProb = 0.5;
 
 	for (let i = 0; i < array1.length; i++) {
 		for (let k = 0; k < array2.length; k++) {
-			// check if electron and hole are close and they are showing, not same ID
+			// check if electron and hole are close and they are show, not same ID
 			let condition =
-				abs(array1[i].position.x - array2[k].position.x) < recombineDistance &&
-				abs(array1[i].position.y - array2[k].position.y) < recombineDistance &&
+				abs(array1[i].position.x - array2[k].position.x) < recomDistance &&
+				abs(array1[i].position.y - array2[k].position.y) < recomDistance &&
 				array1[i].show == 1 &&
 				array2[k].show == 1 &&
-				random() < recombineProb;
+				random() < recomProb;
 
 			// if (scene(2) || scene(3)) {
 			// 	condition = condition && array1[i].within == 0;
@@ -551,39 +774,43 @@ function recombineArrays(array1, array2, num) {
 				array2[k].stop();
 
 				// set to no show
-				array1[i].noShow();
-				array2[k].noShow();
+				array1[i].hide();
+				array2[k].hide();
 
 				// label for removal
 				// if (num == 3 && num == 4) {
 				// 	array1[i].deadd();
 				// 	array2[k].deadd();
 				// }
+				// generationEffects.push(new Charge(x, y, "ge", chargeID));
 
-				recombinePositions[recombineCount] = p5.Vector.div(
+				recomPositions[recomCount] = p5.Vector.div(
 					p5.Vector.add(array2[k].position, array1[i].position),
 					2
 				);
 
 				//effects
 
-				recombineEffects[recombineCount] = new Charge(
-					recombinePositions[recombineCount].x,
-					recombinePositions[recombineCount].y,
-					"re"
+				recomEffects[recomCount] = new Charge(
+					recomPositions[recomCount].x,
+					recomPositions[recomCount].y,
+					"re",
+					chargeID
 				);
-				recombinedElectrons[recombineCount] = new Charge(
+				recomdElectrons[recomCount] = new Charge(
 					array1[i].position.x,
 					array1[i].position.y,
-					"re"
+					"re",
+					chargeID
 				);
-				recombinedHoles[recombineCount] = new Charge(
+				recomdHoles[recomCount] = new Charge(
 					array2[k].position.x,
 					array2[k].position.y,
-					"re"
+					"re",
+					chargeID
 				);
 
-				recombineCount++;
+				recomCount++;
 
 				// if (
 				// 	initialElectrons.length + generatedElectrons.length <
@@ -772,11 +999,29 @@ function drawBase() {
 		base.smallRadius
 	);
 
-	// metal
+	// gate metal
 	rect(
 		base.metalX,
 		base.y - base.metalHeight * 2,
 		base.metalWidth,
+		base.metalHeight,
+		base.smallRadius
+	);
+
+	// metal above source
+	rect(
+		base.x,
+		base.y - base.metalHeight,
+		base.sourceWidth,
+		base.metalHeight,
+		base.smallRadius
+	);
+
+	// metal above drain
+	rect(
+		base.drainX,
+		base.y - base.metalHeight,
+		base.sourceWidth,
 		base.metalHeight,
 		base.smallRadius
 	);
@@ -797,7 +1042,7 @@ function drawBase() {
 		base.largeRadius
 	);
 
-	// ground
+	// bottom ground
 	image(
 		groundImg,
 		base.midX - 22,
@@ -806,24 +1051,36 @@ function drawBase() {
 		batteryNegOff.height
 	);
 
+	// left ground
+	image(
+		leftGroundImg,
+		base.leftGroundX,
+		base.innerY - 20,
+		leftGroundImg.width,
+		leftGroundImg.height
+	);
+
 	// labels
 	styleText();
 	textAlign(CENTER);
 	text("Substrate", base.x + base.width / 2, base.y + base.height / 2);
 	text("Source", base.x + base.sourceWidth / 2, base.y + base.sourceHeight / 2);
+
+	// source metal
+	text("Metal", base.x + base.sourceWidth / 2, base.insulatorLabelY);
+
+	// drain metal
+	text("Metal", base.drainX + base.sourceWidth / 2, base.insulatorLabelY);
+	// drain
 	text(
 		"Drain",
-		base.x + base.width - base.sourceWidth / 2,
+		base.drainX + base.sourceWidth / 2,
 		base.y + base.sourceHeight / 2
 	);
 
 	text("Metal", base.x + base.width / 2, base.y - base.metalHeight * 1.35);
 
-	text(
-		"Insulator",
-		base.x + base.width / 2,
-		base.y - (base.metalHeight / 2) * 0.75
-	);
+	text("Insulator", base.x + base.width / 2, base.insulatorLabelY);
 
 	// bottom metal
 	text(
@@ -881,51 +1138,32 @@ function drawWires() {
 	let wireOffsetX = 20;
 
 	let wireGap = 8; // * 2 = 16
-	// wire from source to inner battery
+	// wire from source metal to inner battery
 	beginShape();
-	vertex(base.x, base.y + base.sourceHeight / 2 - wireGap); // source
-	vertex(base.x - wireOffsetX, base.y + base.sourceHeight / 2 - wireGap); // corner left of source
-	vertex(base.x - wireOffsetX, base.innerBatteryMidY); // top left corner
-	vertex(base.innerBatteryX, base.innerBatteryMidY);
+	vertex(base.x + base.sourceWidth / 2, base.y - base.metalHeight); // source
+	vertex(base.x + base.sourceWidth / 2, base.innerY); // top left corner
+	vertex(base.innerBatteryX, base.innerY);
 	endShape(); // battery
 
-	// wire from source to bottom metal
+	// wire from inner battery to gate metal
 	beginShape();
-	vertex(base.x, base.y + base.sourceHeight / 2 + wireGap); // source
-	vertex(base.x - wireOffsetX, base.y + base.sourceHeight / 2 + wireGap); // corner left of source
-	vertex(base.x - wireOffsetX, base.endY + 24); // bottom left corner
-	vertex(base.x, base.endY + 24); // metal
-	endShape();
-
-	// wire from inner battery to top metal
-	beginShape();
-	vertex(base.innerBatteryX + base.batteryWidth, base.innerBatteryMidY);
-	vertex(base.innerBatteryX + 160, base.innerBatteryMidY);
-	vertex(base.innerBatteryX + 160, base.y - base.metalHeight * 2);
+	vertex(base.innerBatteryX + base.batteryWidth, base.innerY);
+	vertex(base.wirePos2[0], base.innerY);
+	vertex(base.wirePos2[0], base.y - base.metalHeight * 2);
 	endShape(); // battery
-
-	// wire from drain to bottom metal
-	beginShape();
-	vertex(base.endX, base.y + base.sourceHeight / 2 + wireGap); // drain
-	vertex(base.endX + wireOffsetX, base.y + base.sourceHeight / 2 + wireGap); // corner right of drain
-	vertex(base.endX + wireOffsetX, base.endY + 24); // bottom right corner
-	vertex(base.endX, base.endY + 24); // metal
-	endShape();
 
 	// wire from source to outer battery
-
-	// wire from outer battery to drain
 	beginShape();
-	vertex(base.x + base.sourceWidth / 2, base.y); // source
-	vertex(base.x + base.sourceWidth / 2, base.outerBatteryMidY); // top let corner
-	vertex(base.outerBatteryX, base.outerBatteryMidY);
+	vertex(base.x + base.sourceWidth / 2, base.y - base.metalHeight); // source
+	vertex(base.x + base.sourceWidth / 2, base.outerY); // top left corner
+	vertex(base.outerBatteryX, base.outerY);
 	endShape(); // outer battery
 
-	// wire from outer battery to drain
+	// wire from outer battery to drain metal
 	beginShape();
-	vertex(base.outerBatteryX + base.batteryWidth, base.outerBatteryMidY); // outer battery
-	vertex(base.endX - base.sourceWidth / 2, base.outerBatteryMidY); // corner
-	vertex(base.endX - base.sourceWidth / 2, base.y); // corner left of source
+	vertex(base.outerBatteryX + base.batteryWidth, base.outerY); // outer battery
+	vertex(base.endX - base.sourceWidth / 2, base.outerY); // corner
+	vertex(base.endX - base.sourceWidth / 2, base.y - base.metalHeight); // drain metal
 	endShape(); // battery
 }
 
@@ -1127,3 +1365,5 @@ function drawGraph() {
 		}
 	}
 }
+
+// CLASSES ====================================

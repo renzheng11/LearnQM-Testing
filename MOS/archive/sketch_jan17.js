@@ -340,7 +340,7 @@ function doRecombine(chargeArray1, chargeArray2) {
 					recomDistance &&
 				abs(chargeArray1[i].position.y - chargeArray2[k].position.y) <
 					recomDistance &&
-				chargeArray1[i].id != chargeArray2[k].id &&
+				chargeArray1[i].chargeType != chargeArray2[k].chargeType &&
 				chargeArray1[i].showing &&
 				chargeArray2[k].showing
 			) {
@@ -1380,7 +1380,7 @@ function generateCharges(num) {
 				);
 
 				// create new generated electron
-				let newElectron = new Charge(xPosition, yPosition, chargeID, "e");
+				let newElectron = new Charge(xPosition, yPosition, "e");
 				newElectron.bandOrigin.x = closestValueToElectronBand;
 
 				newElectron.top = 1;
@@ -1393,7 +1393,7 @@ function generateCharges(num) {
 				// create new generated hole
 				let closestValueToHoleBand = findClosestValue(holeBand, xPosition);
 
-				let newHole = new Charge(xPosition, yPosition, chargeID, "h");
+				let newHole = new Charge(xPosition, yPosition, "h");
 
 				newHole.bandOrigin.x = closestValueToHoleBand;
 				newHole.top = 1;
@@ -1673,31 +1673,15 @@ function toggleRecombine() {
 
 function checkHoleCount() {
 	// check if #holes dipping too low, if so - repopulate from right side
-	let holeCount = initHoles.length + genHoles.length;
-	//console.log('holeCount=',holeCount);
-	if (appliedVoltage / 20 == -0.4) {
-		holeCount = holeCount * 0.98;
-	}
-	if (appliedVoltage / 20 == -0.8) {
-		holeCount = holeCount * 0.96;
-	}
-	if (appliedVoltage / 20 == -1.2) {
-		holeCount = holeCount * 0.94;
-	}
-	if (appliedVoltage / 20 == -1.6) {
-		holeCount = holeCount * 0.92;
-	}
-	if (appliedVoltage / 20 == -2.0) {
-		holeCount = holeCount * 0.9;
-	}
+	const holeCount = initHoles.length + genHoles.length;
+	console.log(holeCount);
 
 	if (dopingConcen > 10000000000000) {
-		if (holeCount < 200) {
+		if (holeCount < 190) {
 			const buffer = 14;
 			var vehicle = new Charge(
 				(xMax - buffer) * sx,
 				random(yMin + buffer, yMax - buffer) * sy,
-				chargeID,
 				"h"
 			);
 			vehicle.direction = createVector(-1, random(-1, 1));
@@ -1705,17 +1689,14 @@ function checkHoleCount() {
 			vehicle.velocity = createVector(-10, 0);
 			vehicle.botz = this.botz;
 			initHoles.push(vehicle);
-			chargeID++;
 			// for density 10^17, default init hole count  = ~200
-			//console.log('holeCount1=',holeCount);
 		}
 	} else {
-		if (holeCount < 100) {
+		if (holeCount < 90) {
 			const buffer = 14;
 			var vehicle = new Charge(
 				(xMax - buffer) * sx,
 				random(yMin + buffer, yMax - buffer) * sy,
-				chargeID,
 				"h"
 			);
 			vehicle.direction = createVector(-1, random(-1, 1));
@@ -1723,9 +1704,7 @@ function checkHoleCount() {
 			vehicle.velocity = createVector(-10, 0);
 			vehicle.botz = this.botz;
 			initHoles.push(vehicle);
-			chargeID++;
 			// for density 10^17, default init hole count  = ~100
-			//console.log('holeCount2=',holeCount);
 		}
 	}
 
@@ -1821,37 +1800,37 @@ function updateCharges() {
 		}
 	}
 
-	// for (let i = 0; i < recomEffectsForHoles.length; i++) {
-	// 	if (typeof recomEffectsForHoles[i] != "undefined") {
-	// 		for (let k = 0; k < recomEffectsForElectrons.length; k++) {
-	// 			if (typeof recomEffectsForElectrons[k] != "undefined") {
-	// 				if (
-	// 					recomEffectsForHoles[i].chargeType ==
-	// 					recomEffectsForElectrons[k].chargeType
-	// 				) {
-	// 					recomEffectsForElectrons[k].seek(
-	// 						p5.Vector.div(
-	// 							p5.Vector.add(
-	// 								recomEffectsForElectrons[k].position,
-	// 								recomEffectsForHoles[i].position
-	// 							),
-	// 							2
-	// 						)
-	// 					);
-	// 					recomEffectsForHoles[i].seek(
-	// 						p5.Vector.div(
-	// 							p5.Vector.add(
-	// 								recomEffectsForElectrons[k].position,
-	// 								recomEffectsForHoles[i].position
-	// 							),
-	// 							2
-	// 						)
-	// 					);
-	// 				}
-	// 			}
-	// 		}
-	// 	}
-	// }
+	for (let i = 0; i < recomEffectsForHoles.length; i++) {
+		if (typeof recomEffectsForHoles[i] != "undefined") {
+			for (let k = 0; k < recomEffectsForElectrons.length; k++) {
+				if (typeof recomEffectsForElectrons[k] != "undefined") {
+					if (
+						recomEffectsForHoles[i].chargeType ==
+						recomEffectsForElectrons[k].chargeType
+					) {
+						recomEffectsForElectrons[k].seek(
+							p5.Vector.div(
+								p5.Vector.add(
+									recomEffectsForElectrons[k].position,
+									recomEffectsForHoles[i].position
+								),
+								2
+							)
+						);
+						recomEffectsForHoles[i].seek(
+							p5.Vector.div(
+								p5.Vector.add(
+									recomEffectsForElectrons[k].position,
+									recomEffectsForHoles[i].position
+								),
+								2
+							)
+						);
+					}
+				}
+			}
+		}
+	}
 
 	// draw metal on right side - drawn here to hide charges going into metal
 	stroke(...color.white);
