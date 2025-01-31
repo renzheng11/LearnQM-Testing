@@ -11,14 +11,15 @@
 #body_parent {
 	background-color: #121212;
 	padding-bottom: 50px;
+	margin: auto;
 }
 
 .container {
-	margin-left: 56px !important;
+	width: 1000px;
 }
 
 .title {
-	margin-top: 300px;
+	margin-top: 240px;
 }
 
 .title h1 {

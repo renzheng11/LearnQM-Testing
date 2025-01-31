@@ -3,9 +3,14 @@ Authors: Ren Zheng, Azad Naeemi
 Contact: renzheng112@gmail.com
 ------------------------------- */
 
-// KEY
-// !!! go back to, need to revisit
-// ? question
+// tools
+function qs(selector) {
+	return document.querySelector(selector);
+}
+
+function scene(num) {
+	return sceneCount == num;
+}
 
 // Variables ============================================================
 // P5 canvas
@@ -59,7 +64,12 @@ let chargeID = 0;
 
 // Transfer charges on wires ============================================================
 
-let wireElectrons = [];
+let innerLoopElectrons = [];
+let outerLoopElectrons = [];
+let innerLoopOn = false; // toggles inner battery electron transfer
+let outerLoopOn = false; // toggles outer battery electron transfer
+let numInnerLoop = 30;
+let numOuterLoop = 30;
 
 // Effects for generation & recombination ===============================================
 
@@ -106,10 +116,10 @@ const unit = 8;
 // base dimensions
 const dim = {
 	x: unit * 26,
-	y: unit * 36,
+	y: unit * 38,
 
 	width: unit * 80,
-	height: unit * 50,
+	height: unit * 40,
 
 	// metal + insulator
 	metalWidth: unit * 40,
@@ -181,13 +191,50 @@ const base = {
 	wirePos1: [dim.x + dim.sourceWidth / 2, dim.innerY],
 	wirePos2: [dim.x + 420, dim.innerY],
 	wirePos3: [dim.x + 420, dim.y - dim.metalHeight * 2],
-	wirePos4: [dim.x + dim.sourceWidth / 2, dim.outerY],
-	wirePos5: [dim.x + dim.width - dim.sourceWidth / 2, dim.outerY],
-	wirePos6: [dim.x + dim.width - dim.sourceWidth / 2, dim.y - dim.metalHeight],
 
-	wirePos7: [dim.x + dim.sourceWidth / 2, dim.y + 200],
-	wirePos8: [dim.x + 420, dim.y + 200],
+	wirePos4: [dim.x + 420, dim.y - dim.metalHeight - 12],
+	wirePos5: [dim.x + dim.sourceWidth + 16, dim.y - dim.metalHeight],
+
+	wirePos6: [dim.x + dim.sourceWidth / 2, dim.outerY],
+	wirePos7: [dim.x + dim.width - dim.sourceWidth / 2, dim.outerY],
+	wirePos8: [dim.x + dim.width - dim.sourceWidth / 2, dim.y - dim.metalHeight],
+
+	efXMin: dim.x + 150.4,
+	efXMax: dim.x + 203,
+
+	efYMin: dim.y + 150.4,
+	efYMax: dim.y + 203,
+
+	ef: {
+		source: {
+			xMin: dim.x + 150.4,
+			xMax: dim.x + 203,
+			yMin: dim.y + 150.4,
+			yMax: dim.y + 203,
+		},
+		drain: {
+			xMin: dim.x + 150.4,
+			xMax: dim.x + 203,
+			yMin: dim.y + 150.4,
+			yMax: dim.y + 203,
+		},
+	},
 };
+
+// ef: {
+// 		source: {
+// 			xMin: dim.x + 150.4,
+// 			xMax: dim.x + 203,
+// 			yMin: dim.y + 150.4,
+// 			yMax: dim.y + 203,
+// 		},
+// 		drain: {
+// 			xMin: dim.x + 150.4,
+// 			xMax: dim.x + 203,
+// 			yMin: dim.y + 150.4,
+// 			yMax: dim.y + 203,
+// 		},
+// 	},
 
 // Tools ============================================================
 function qs(selector) {
@@ -265,6 +312,22 @@ function draw() {
 		updateWireElectrons();
 		// drawControls();
 	}
+
+	// y - source
+	rect(
+		base.x,
+		base.ef.source.yMin,
+		base.width,
+		base.efYMax - base.ef.source.yMin
+	);
+
+	// x
+	rect(
+		base.ef.source.xMin,
+		base.y,
+		base.efXMax - base.ef.source.xMin,
+		base.height
+	);
 }
 
 function resetScene() {
@@ -272,15 +335,43 @@ function resetScene() {
 	fixedCharges = [];
 	initCharges();
 	initWireElectrons();
+
+	// holes = [];
+	// electrons = [];
+	// chargeID = 0;
+
+	// innerLoopElectrons = [];
+	// outerLoopElectrons = [];
+	// innerLoopOn = false;
+	// outerLoopOn = false;
+	// numInnerLoop = 30;
+	// numOuterLoop = 30;
+
+	// generationEffects = [];
+
+	// recomdElectrons = [];
+	// recomdHoles = [];
+	// recomPositions = [];
+
+	// recomEffectsPositions = [];
+	// recomCount = 0;
+	// recomEffects = [];
+	// recomTempElectrons = [];
+	// recomTempHoles = [];
 }
 
 // Updating Functions ============================================================
 function initWireElectrons() {
-	for (let i = 0; i < 30; i++) {
-		let x = base.x + base.sourceWidth / 2;
-		let y = base.wirePos7[1];
+	for (let i = 0; i < numOuterLoop; i++) {
+		let x = base.wirePos0[0];
+		let y = base.wirePos0[1];
+		outerLoopElectrons.push(new wireCharge(x, y, 1));
+	}
 
-		wireElectrons.push(new wireCharge(x, y));
+	for (let i = 0; i < numInnerLoop; i++) {
+		let x = base.wirePos0[0];
+		let y = base.wirePos0[1];
+		innerLoopElectrons.push(new wireCharge(x, y, 0));
 	}
 }
 
@@ -289,8 +380,8 @@ function initCharges() {
 	let fixedPosChargesRight = 15;
 	let fixedNegCharges = 40;
 
-	holeCount = 20;
-	electronCount = 10; // source and drain each
+	holeCount = 40;
+	electronCount = 20; // source and drain each
 
 	let buffer = 12; // draw inside box borders
 	// let electronCount =
@@ -571,10 +662,13 @@ function recom(electrons, holes) {
 }
 
 function checkDest(electron, dest) {
+	let buffer = 8;
 	xCondition =
-		electron.position.x < dest.x + 5 && electron.position.x > dest.x - 5;
+		electron.position.x < dest.x + buffer &&
+		electron.position.x > dest.x - buffer;
 	yCondition =
-		electron.position.y < dest.y + 5 && electron.position.y > dest.y - 5;
+		electron.position.y < dest.y + buffer &&
+		electron.position.y > dest.y - buffer;
 
 	if (xCondition && yCondition) {
 		return true;
@@ -583,53 +677,141 @@ function checkDest(electron, dest) {
 	}
 }
 
-function updateWireElectrons() {
-	let stops = [];
-	stops.push(createVector(base.wirePos1[0], base.wirePos1[1]));
-	stops.push(createVector(base.wirePos2[0], base.wirePos2[1]));
-	stops.push(createVector(base.wirePos8[0], base.wirePos8[1]));
-	stops.push(createVector(base.wirePos7[0], base.wirePos7[1]));
+function updateOuterLoop() {
+	let stopPositions = [];
+	stopPositions.push(createVector(base.wirePos6[0], base.wirePos6[1]));
+	stopPositions.push(createVector(base.wirePos7[0], base.wirePos7[1]));
+	stopPositions.push(createVector(base.wirePos8[0], base.wirePos8[1]));
+	let stops = [1, 2, 3]; // based on stopPositions
 
-	for (let i = 0; i < wireElectrons.length; i++) {
-		let electron = wireElectrons[i];
+	for (let i = 0; i < outerLoopElectrons.length; i++) {
+		let electron = outerLoopElectrons[i];
 		electron.display();
 
-		let atDest1 = checkDest(electron, stops[0], false);
-		let atDest2 = checkDest(electron, stops[1], false);
-		let atDest3 = checkDest(electron, stops[2], false);
-		let atDest4 = checkDest(electron, stops[3], false);
+		let atDest1 = checkDest(electron, stopPositions[0], false);
+		let atDest2 = checkDest(electron, stopPositions[1], false);
+		let atDest3 = checkDest(electron, stopPositions[2], false);
 
 		if (atDest1) {
-			if (!electron.passedDest.includes(1)) {
-				electron.updatePassed(1);
+			if (!electron.passedDest.includes(stops[0])) {
+				electron.updatePassed(stops[0]);
 			}
 		}
 		if (atDest2) {
-			if (!electron.passedDest.includes(2)) {
-				electron.updatePassed(2);
+			if (!electron.passedDest.includes(stops[1])) {
+				electron.updatePassed(stops[1]);
 			}
 		}
 		if (atDest3) {
-			if (!electron.passedDest.includes(3)) {
-				electron.updatePassed(8);
+			if (!electron.passedDest.includes(stops[2])) {
+				electron.updatePassed(stops[2]);
 			}
 		}
-		if (atDest4) {
+
+		if (!electron.passedDest.includes(stops[0])) {
+			electron.move(stopPositions[0]);
+		}
+		if (
+			electron.passedDest.includes(stops[0]) &&
+			!electron.passedDest.includes(stops[1])
+		) {
+			electron.move(stopPositions[1]);
+		}
+		if (
+			electron.passedDest.includes(stops[1]) &&
+			!electron.passedDest.includes(stops[2])
+		) {
+			electron.move(stopPositions[2]);
+		}
+		if (electron.passedDest.includes(stops[2])) {
 			electron.clearPassed();
+			electron.position = createVector(base.wirePos0[0], base.wirePos0[1]);
+		}
+	}
+}
+
+function updateInnerLoop() {
+	let stopPositions = [];
+	stopPositions.push(createVector(...base.wirePos1));
+	stopPositions.push(createVector(...base.wirePos2));
+	stopPositions.push(createVector(...base.wirePos4));
+
+	let stops = [1, 2, 3]; // based on stopPositions
+
+	for (let i = 0; i < innerLoopElectrons.length; i++) {
+		let electron = innerLoopElectrons[i];
+		electron.display();
+
+		let atDest1 = checkDest(electron, stopPositions[0], false);
+		let atDest2 = checkDest(electron, stopPositions[1], false);
+		let atDest3 = checkDest(electron, stopPositions[2], false);
+
+		if (atDest1) {
+			if (!electron.passedDest.includes(stops[0])) {
+				electron.updatePassed(stops[0]);
+			}
+		}
+		if (atDest2) {
+			if (!electron.passedDest.includes(stops[1])) {
+				electron.updatePassed(stops[1]);
+			}
+		}
+		if (atDest3) {
+			if (!electron.passedDest.includes(stops[2])) {
+				electron.updatePassed(stops[2]);
+			}
 		}
 
-		if (electron.passedDest.includes(0) && !electron.passedDest.includes(1)) {
-			electron.move(stops[0]);
+		if (!electron.passedDest.includes(stops[0])) {
+			electron.move(stopPositions[0]);
 		}
-		if (electron.passedDest.includes(1) && !electron.passedDest.includes(2)) {
-			electron.move(stops[1]);
+		if (
+			electron.passedDest.includes(stops[0]) &&
+			!electron.passedDest.includes(stops[1])
+		) {
+			electron.move(stopPositions[1]);
 		}
-		if (electron.passedDest.includes(2) && !electron.passedDest.includes(8)) {
-			electron.move(stops[2]);
+		if (
+			electron.passedDest.includes(stops[1]) &&
+			!electron.passedDest.includes(stops[2])
+		) {
+			electron.move(stopPositions[2]);
 		}
-		if (electron.passedDest.includes(8) && !electron.passedDest.includes(7)) {
-			electron.move(stops[3]);
+		if (electron.passedDest.includes(stops[2])) {
+			// electron.move(
+			// 	createVector(base.wirePos5[0] + electron.gateStop, base.wirePos5[1])
+			// );
+			// if (electron.position.x > base.wirePos5[0] + electron.gateStop) {
+			// 	electron.position.x -= 8;
+			// }
+			electron.update();
 		}
+	}
+}
+
+function toggleOuterBattery() {
+	outerLoopOn = !outerLoopOn;
+}
+function toggleInnerBattery() {
+	innerLoopOn = true;
+}
+function updateInnerBatteryCharge(numCharges) {
+	numInnerLoop = numCharges;
+
+	innerLoopElectrons = [];
+	for (let i = 0; i < numInnerLoop; i++) {
+		let x = base.wirePos0[0];
+		let y = base.wirePos0[1];
+		innerLoopElectrons.push(new wireCharge(x, y, 0));
+	}
+	console.log(innerLoopElectrons);
+}
+function updateWireElectrons() {
+	if (outerLoopOn) {
+		updateOuterLoop();
+	}
+	if (innerLoopOn) {
+		updateInnerLoop();
 	}
 }
 
@@ -1045,19 +1227,19 @@ function drawBase() {
 	// bottom ground
 	image(
 		groundImg,
-		base.midX - 22,
+		base.midX - 16,
 		base.endY + base.bottomMetalHeight,
-		batteryNegOff.width / 2,
-		batteryNegOff.height
+		groundImg.width * 0.4,
+		groundImg.height * 0.4
 	);
 
 	// left ground
 	image(
 		leftGroundImg,
-		base.leftGroundX,
-		base.innerY - 20,
-		leftGroundImg.width,
-		leftGroundImg.height
+		base.leftGroundX + 8,
+		base.innerY - 16,
+		leftGroundImg.width * 0.8,
+		leftGroundImg.height * 0.8
 	);
 
 	// labels

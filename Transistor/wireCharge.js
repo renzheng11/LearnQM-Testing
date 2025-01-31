@@ -1,32 +1,33 @@
 class wireCharge {
-	constructor(x, y) {
+	constructor(x, y, loop) {
 		this.position = createVector(x, y);
-		this.velocity = p5.Vector.random2D().mult(4); // Initial random velocity
+		this.velocity = createVector(random(4, 12), 0); // Initial random velocity
 		this.show = true;
 		this.passedDest = [0];
-		this.speed = random(6, 10);
+		this.speed = random(8, 12); // 8, 12, buffer = 8 working
+		this.loop = loop;
+		this.gateStop = random(0, 360);
 	}
 
 	display() {
-		fill("red");
 		noStroke();
 
-		if (
-			this.position.x < base.innerBatteryX &&
-			this.position.y < base.y - base.metalHeight
-		) {
-			fill(...color.electron);
-		} else if (
-			this.position.x > base.innerBatteryX &&
-			this.position.y < base.y - base.metalHeight * 2
-		) {
-			fill(...color.electron);
-		}
+		this.position.x > base.innerBatteryX &&
+			this.position.y < base.y - base.metalHeight * 2;
+		fill(...color.electron);
 		ellipse(this.position.x, this.position.y, 10);
 	}
 
 	update() {
 		this.position.add(this.velocity);
+
+		let buffer = 18;
+		if (
+			this.position.x < base.x + base.sourceWidth + buffer ||
+			this.position.x > base.endX - base.sourceWidth - buffer
+		) {
+			this.velocity.x *= -1;
+		}
 	}
 
 	updatePassed(value) {
@@ -52,5 +53,23 @@ class wireCharge {
 
 		// Update the position based on the direction vector
 		this.position.add(direction);
+
+		if ((this.loop = 1)) {
+			// outer loop
+			if (this.position.y < base.outerY) {
+				this.position.y += 1;
+			}
+			if (this.position.y > base.outerY) {
+				this.position.y -= 1;
+			}
+		} else {
+			// inner loop
+			if (this.position.y < base.innerY) {
+				this.position.y += 1;
+			}
+			if (this.position.y > base.innerY) {
+				this.position.y -= 1;
+			}
+		}
 	}
 }

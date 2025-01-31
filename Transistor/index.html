@@ -17,7 +17,7 @@
 		</script>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Capacitors</title>
+		<title>Transistors</title>
 		<link href="./style.css" rel="stylesheet" />
 		<link
 			href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
@@ -88,14 +88,6 @@
 					<div class="controls">
 						<button
 							class="button control"
-							value="ib"
-							type="button"
-							onclick="toggleBattery(this.value)"
-						>
-							Toggle Inner Battery
-						</button>
-						<button
-							class="button control"
 							value="ob"
 							type="button"
 							onclick="toggleBattery(this.value)"
@@ -133,19 +125,63 @@
 			<div class="row row2" id="scene2">
 				<div class="col-lg-4">
 					<h1>Scene 2</h1>
-					<p>Prompt</p>
+					<p>Try applying a charge</p>
 
-					<input class="xxSlider" type="range" list="tickmarks" onchange="" />
+					<input
+						class="xxSlider"
+						type="range"
+						list="tickmarks"
+						onchange="updateInnerBatteryCharge(this.value)"
+					/>
 
 					<datalist>
-						<option value="0" label="x"></option>
-						<option value="100" label="x"></option>
+						<option value="0" label="-10"></option>
+						<option value="100" label="10"></option>
 					</datalist>
-					<label for="xxSlider" class="labels">Charge Q</label>
+					<label for="xxSlider" class="labels">(µC/cm<sup>2</sup>)</label>
 					<br /><br />
-					<button class="button xxButton" type="button" onclick="">
-						Button
+					<button
+						class="button xxButton"
+						type="button"
+						onclick="toggleInnerBattery()"
+					>
+						Apply Charge
 					</button>
+
+					<div class="controls">
+						<button
+							class="button control"
+							value="ob"
+							type="button"
+							onclick="toggleOuterBattery(this.value)"
+						>
+							Toggle Outer Battery
+						</button>
+						<button
+							class="button control"
+							value="cd"
+							type="button"
+							onclick="triggerControls(this.value)"
+						>
+							Plot Charge Density
+						</button>
+						<button
+							class="button control"
+							value="ef"
+							type="button"
+							onclick="triggerControls(this.value)"
+						>
+							Plot Electric Field
+						</button>
+						<button
+							class="button control"
+							value="bd"
+							type="button"
+							onclick="triggerControls(this.value)"
+						>
+							Plot Band Diagram
+						</button>
+					</div>
 				</div>
 			</div>
 
@@ -160,7 +196,9 @@
 						<option value="0" label="x"></option>
 						<option value="100" label="x"></option>
 					</datalist>
-					<label for="xxSlider" class="labels">Charge Q</label>
+					<label for="xxSlider" class="labels"
+						>Charge Q (µC/cm<sup>2</sup>)</label
+					>
 					<br /><br />
 
 					<br /><br />

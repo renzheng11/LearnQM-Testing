@@ -9,7 +9,7 @@ class Charge {
 		this.maxspeed = 15;
 		this.velocity = createVector(0, 0);
 		this.maxforce = 1;
-		this.acceleration = createVector(0, 0);
+		this.accel = createVector(0, 0);
 		this.desired = createVector(0, 0);
 		this.steer = createVector(0, 0);
 		this.type = type; // "e: electron", "h: hole", "ge: generation effect", "re: recombination effect"
@@ -23,6 +23,7 @@ class Charge {
 		this.target = createVector(0, 0);
 		this.dead = 0;
 		this.opacity = 255;
+		this.color = null;
 
 		// setTimeout(() => {
 		// 	this.checkProperties();
@@ -98,11 +99,20 @@ class Charge {
 				fill(...color.electron, this.appear);
 				noStroke();
 				ellipse(this.position.x, this.position.y, this.diameter);
+			} else if (this.type == "eef") {
+				fill("red");
+				noStroke();
+				ellipse(this.position.x, this.position.y, this.diameter);
 			} else if (this.type == "h") {
 				//hole
 				noFill();
 				stroke(...color.hole, this.appear);
 				strokeWeight(1);
+				ellipse(this.position.x, this.position.y, this.diameter);
+			} else if (this.type == "hef") {
+				noFill();
+				stroke("blue");
+				strokeWeight(2);
 				ellipse(this.position.x, this.position.y, this.diameter);
 			} else if (this.type == "te") {
 				// temp electron for recombination effect
@@ -168,7 +178,7 @@ class Charge {
 	}
 
 	move() {
-		// this.accelerate(); // accelerate() will update this.velocity
+		this.accelerate(); // update this.velocity baed on EF
 		this.velocity.limit(this.maxspeed);
 		this.position.add(this.velocity); // Update this.position dimd on its velocity
 
@@ -181,7 +191,7 @@ class Charge {
 
 		////////////////////// avoid going into the bandgap (added by Azad)
 
-		// UNCOMMENT ONCE YOU HAVE BANDS!!!
+		// UNCOMMENT ONCE YOU HAVE BANDS!
 		// if (this.type == "e") {
 		// 	//             //electron
 		// 	let zz = findClosestValue(electronBand, this.position.x);
@@ -199,7 +209,7 @@ class Charge {
 		// }
 		////////////////////////////////////////////////
 
-		// UNCOMMENT !!! ?
+		// UNCOMMENT ! ?
 		// if (this.position.x > 940 * sx && opening == 1 && this.straight == 0) {
 		// 	this.direction.x = 10;
 		// 	this.show = 0;
@@ -214,92 +224,140 @@ class Charge {
 		// 	}
 		// }
 		// Bounce off boundaries
-		let buffer = 24;
+		let buffer = 0;
 
-		let boundary = []; // l, r, t, b
-		boundary = [base.x, base.x + base.width, base.y, base.endY];
-
-		// if (this.type == "h") {
-		// 	boundary = [base.x, base.x + base.width, base.y, base.endY];
-		// } else if (this.type == "e" && this.age == "i") {
-		// 	boundary = [base.x, base.sourceEndX, base.y, base.sourceEndY];
-		// }
-
-		// bounce holes off source
-		// if (this.type == "h") {
-		// 	// if hole within source x, bounce off source y
-		// 	if (this.position.x < base.sourceEndX) {
-		// 		if (this.position.y < base.sourceEndY + buffer) {
-		// 			this.direction.y *= -1;
-		// 		}
-		// 	}
-
-		// 	// if hole within source y, bounce off source x
-		// 	if (this.position.y < base.sourceEndY) {
-		// 		if (this.position.x < base.sourceEndX + buffer) {
-		// 			this.direction.x *= -1;
-		// 		}
-		// 	}
-		// }
-
-		//////////////////Note from Azad, We don't need these boundries between source, body and drain. The electric field will take care of them.
-		//////////////////We only need to enforce the boundries at the 4 sides of the device. The one at the bottom would be an open boundry and the other three will
-		///////////////// be hard boudnries that electrons and holes will just bounce back.
-
-		//////////////////////////////////////////////////////
-		// bounce holes off drain
-		// if (this.type == "h") {
-		// 	// if hole within drain x, bounce off drain y
-		// 	if (this.position.x > base.drainX) {
-		// 		if (this.position.y < base.drainEndY + buffer) {
-		// 			this.direction.y *= -1;
-		// 		}
-		// 	}
-		// 	// if hole within drain y, bounce off drain x
-		// 	if (this.position.y < base.drainEndY) {
-		// 		if (this.position.x > base.drainX - buffer) {
-		// 			this.direction.x *= -1;
-		// 		}
-		// 	}
-		// }
-
-		if (this.position.x - this.diameter < boundary[0] + buffer) {
+		if (this.position.x - this.diameter < base.x + buffer) {
 			// l
-			this.direction.x *= -1;
+			this.velocity.x = -this.velocity.x;
+			this.position.x += 8;
 		}
-		if (this.position.x + this.diameter > boundary[1] - buffer) {
+		if (this.position.x + this.diameter > base.endX - buffer) {
 			// r
-			this.direction.x *= -1;
+			this.velocity.x = -this.velocity.x;
+			this.position.x -= 8;
 		}
-		if (this.position.y < boundary[2] + buffer) {
+		if (this.position.y - this.diameter < base.y + buffer) {
 			// t
-			this.direction.y *= -1;
+			this.velocity.y = -this.velocity.y;
+			this.position.y += 8;
 		}
-		if (this.position.y + this.diameter > boundary[3] - buffer) {
+		if (this.position.y + this.diameter > base.endY - buffer) {
 			// b
-			this.direction.y *= -1;
+			this.velocity.y = -this.velocity.y;
+			this.position.y -= 8;
 		}
 	}
 
 	accelerate() {
 		//Need to Read the electric field at (this.position.x,this.position.y)
 		//The electric feild that we read has x and y components. Let's call them Ex and Ey. For now I just give them values.
-		let Ex = 1;
-		let Ey = 2;
+
+		// check if in zones with EF
+		// check if x zone
+
+		// console.log("efmin", base.efMin);
+		// console.log("pos.x", this.position.x);
+		// console.log("x > base.efmin", this.position.x > base.efMin);
+
+		let Ex = 0;
+		let Ey = 0;
+
+		// --- SOURCE ---
+		// check in x zone
+		if (
+			this.position.x > base.ef.source.xMin &&
+			this.position.x < base.ef.source.xMax
+		) {
+			// check in y zone within x zone
+			if (this.position.y < base.efYMax) {
+				// in EF zone
+				let xDistance = this.position.x - base.x;
+				let yDistance = this.position.y - base.y;
+				Ex = xDistance * 160;
+				Ey = yDistance * 160;
+
+				this.diameter = 24;
+			}
+		} else if (
+			this.position.y > base.ef.source.yMin &&
+			this.position.y < base.ef.source.yMax
+		) {
+			if (this.position.x < base.efXMax) {
+				// in EF zone
+				let xDistance = this.position.x - base.x;
+				let yDistance = this.position.y - base.y;
+				Ex = xDistance * 160;
+				Ey = yDistance * 160;
+				this.diameter = 24;
+			}
+		}
+		// if (this.position.x > base.efXMin && this.position.x < base.efXMax) {
+		// 	// check in y zone within x zone
+		// 	if (this.position.y < base.efYMax) {
+		// 		// in EF zone
+		// 		let xDistance = this.position.x - base.x;
+		// 		let yDistance = this.position.y - base.y;
+		// 		Ex = xDistance * 160;
+		// 		Ey = yDistance * 160;
+
+		// 		this.diameter = 24;
+		// 	}
+		// } else if (this.position.y > base.efYMin && this.position.y < base.efYMax) {
+		// 	if (this.position.x < base.efXMax) {
+		// 		// in EF zone
+		// 		let xDistance = this.position.x - base.x;
+		// 		let yDistance = this.position.y - base.y;
+		// 		Ex = xDistance * 160;
+		// 		Ey = yDistance * 160;
+		// 		this.diameter = 24;
+		// 	}
+		// }
+		// --- SOURCE ---
+		// if (this.position.x > base.efXMin && this.position.x < base.efXMax) {
+		// 	// check in y zone within x zone
+		// 	if (this.position.y < base.efYMax) {
+		// 		// in EF zone
+		// 		let xDistance = this.position.x - base.x;
+		// 		let yDistance = this.position.y - base.y;
+		// 		Ex = xDistance * 160;
+		// 		Ey = yDistance * 160;
+
+		// 		this.diameter = 24;
+		// 	}
+		// } else if (this.position.y > base.efYMin && this.position.y < base.efYMax) {
+		// 	if (this.position.x < base.efXMax) {
+		// 		// in EF zone
+		// 		let xDistance = this.position.x - base.x;
+		// 		let yDistance = this.position.y - base.y;
+		// 		Ex = xDistance * 160;
+		// 		Ey = yDistance * 160;
+		// 		this.diameter = 24;
+		// 	}
+		// }
+		else {
+			// if (this.type == "eef") {
+			// 	this.type = "ef";
+			// } else if (this.type == "hef") {
+			// 	this.type = "h";
+			// }
+			Ex = 0;
+			Ey = 0;
+			this.diameter = 10;
+		}
 
 		//We need to multpliy the elctric feild by a constant to convert it to accelration on our screen. We need to find the value with trial and error. For now I just use a factor of 5.
 
-		let AccelerationFactor = 5; ////It might be better to make it a global variable that we define. We can do that later.
-		this.acceleration.x = Ex * AccelerationFactor;
-		this.acceleration.y = Ey * AccelerationFactor;
+		let accelFactor = 10; ////It might be better to make it a global variable that we define. We can do that later.
+		this.accel.x = Ex * accelFactor;
+		this.accel.y = Ey * accelFactor;
 
 		if (this.type == "e") {
-			//if an electron, acceleration in in the opposite direction of the electric field.
-			this.acceleration.x = -this.acceleration.x;
-			this.acceleration.y = -this.acceleration.y;
+			//if an electron, accel in in the opposite direction of the electric field.
+			this.accel.x = -this.accel.x;
+			this.accel.y = -this.accel.y;
 		}
 
-		this.velocity = p5.Vector.add(this.acceleration, this.velocity); //update velocity
+		this.velocity.add(this.accel);
 	}
 
 	seek(target) {
@@ -315,7 +373,7 @@ class Charge {
 	}
 
 	applyForce(force) {
-		this.acceleration.add(force);
+		this.accel.add(force);
 	}
 }
 
