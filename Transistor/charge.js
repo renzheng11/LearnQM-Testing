@@ -262,92 +262,78 @@ class Charge {
 		let Ex = 0;
 		let Ey = 0;
 
-		// --- SOURCE ---
+		// --- SOURCE electric field ---
 		// check in x zone
 		if (
 			this.position.x > base.ef.source.xMin &&
 			this.position.x < base.ef.source.xMax
 		) {
 			// check in y zone within x zone
-			if (this.position.y < base.efYMax) {
+			if (this.position.y < base.ef.source.yMax) {
+				//  base.efYMax
 				// in EF zone
 				let xDistance = this.position.x - base.x;
 				let yDistance = this.position.y - base.y;
 				Ex = xDistance * 160;
-				Ey = yDistance * 160;
+				// Ey = yDistance * 160;
 
-				this.diameter = 24;
+				// this.diameter = 24;
 			}
 		} else if (
 			this.position.y > base.ef.source.yMin &&
 			this.position.y < base.ef.source.yMax
 		) {
-			if (this.position.x < base.efXMax) {
+			if (this.position.x < base.ef.source.xMax) {
+				// base.efXMax
 				// in EF zone
 				let xDistance = this.position.x - base.x;
 				let yDistance = this.position.y - base.y;
-				Ex = xDistance * 160;
+				// Ex = xDistance * 160;
 				Ey = yDistance * 160;
-				this.diameter = 24;
+				// this.diameter = 24;
 			}
 		}
-		// if (this.position.x > base.efXMin && this.position.x < base.efXMax) {
-		// 	// check in y zone within x zone
-		// 	if (this.position.y < base.efYMax) {
-		// 		// in EF zone
-		// 		let xDistance = this.position.x - base.x;
-		// 		let yDistance = this.position.y - base.y;
-		// 		Ex = xDistance * 160;
-		// 		Ey = yDistance * 160;
 
-		// 		this.diameter = 24;
-		// 	}
-		// } else if (this.position.y > base.efYMin && this.position.y < base.efYMax) {
-		// 	if (this.position.x < base.efXMax) {
-		// 		// in EF zone
-		// 		let xDistance = this.position.x - base.x;
-		// 		let yDistance = this.position.y - base.y;
-		// 		Ex = xDistance * 160;
-		// 		Ey = yDistance * 160;
-		// 		this.diameter = 24;
-		// 	}
-		// }
-		// --- SOURCE ---
-		// if (this.position.x > base.efXMin && this.position.x < base.efXMax) {
-		// 	// check in y zone within x zone
-		// 	if (this.position.y < base.efYMax) {
-		// 		// in EF zone
-		// 		let xDistance = this.position.x - base.x;
-		// 		let yDistance = this.position.y - base.y;
-		// 		Ex = xDistance * 160;
-		// 		Ey = yDistance * 160;
+		// --- DRAIN electric field ---
+		if (
+			this.position.x > base.ef.drain.xMin &&
+			this.position.x < base.ef.drain.xMax
+		) {
+			// check in y zone within y zone
+			if (this.position.y < base.ef.drain.yMax) {
+				//  base.efYMax
+				// in EF zone
+				let xDistance = this.position.x - base.x;
+				let yDistance = this.position.y - base.y;
+				Ex = -xDistance * 160;
+				// Ey = yDistance * 160;
 
-		// 		this.diameter = 24;
-		// 	}
-		// } else if (this.position.y > base.efYMin && this.position.y < base.efYMax) {
-		// 	if (this.position.x < base.efXMax) {
-		// 		// in EF zone
-		// 		let xDistance = this.position.x - base.x;
-		// 		let yDistance = this.position.y - base.y;
-		// 		Ex = xDistance * 160;
-		// 		Ey = yDistance * 160;
-		// 		this.diameter = 24;
-		// 	}
-		// }
-		else {
-			// if (this.type == "eef") {
-			// 	this.type = "ef";
-			// } else if (this.type == "hef") {
-			// 	this.type = "h";
-			// }
-			Ex = 0;
-			Ey = 0;
-			this.diameter = 10;
+				// this.diameter = 24;
+			}
+		} else if (
+			this.position.y > base.ef.drain.yMin &&
+			this.position.y < base.ef.drain.yMax
+		) {
+			// check if within x
+			if (this.position.x > base.ef.drain.xMin) {
+				// base.efXMax
+				// in EF zone
+				let xDistance = this.position.x - base.x;
+				let yDistance = this.position.y - base.y;
+				// Ex = xDistance * 160;
+				Ey = yDistance * 160;
+				// this.diameter = 24;
+			}
 		}
+
+		// NOT IN EF
+		// else {
+		// 	this.diameter = 10;
+		// }
 
 		//We need to multpliy the elctric feild by a constant to convert it to accelration on our screen. We need to find the value with trial and error. For now I just use a factor of 5.
 
-		let accelFactor = 10; ////It might be better to make it a global variable that we define. We can do that later.
+		let accelFactor = 5; ////It might be better to make it a global variable that we define. We can do that later.
 		this.accel.x = Ex * accelFactor;
 		this.accel.y = Ey * accelFactor;
 

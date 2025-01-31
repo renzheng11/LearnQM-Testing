@@ -205,18 +205,25 @@ const base = {
 	efYMin: dim.y + 150.4,
 	efYMax: dim.y + 203,
 
+	// ef:
+	// - starts at .94 width (within source / drain)
+	// - peaks at 1.0 width (edge of source / drain)
+	// - stops at 1.3 width (outside source / drain)
+
+	// drain math is inversed using above numbers
+
 	ef: {
 		source: {
-			xMin: dim.x + 150.4,
-			xMax: dim.x + 203,
-			yMin: dim.y + 150.4,
-			yMax: dim.y + 203,
+			xMin: dim.x + 0.94 * dim.sourceWidth,
+			xMax: dim.x + 1.3 * dim.sourceWidth,
+			yMin: dim.y + 0.94 * dim.sourceWidth,
+			yMax: dim.y + 1.3 * dim.sourceWidth,
 		},
 		drain: {
-			xMin: dim.x + 150.4,
-			xMax: dim.x + 203,
-			yMin: dim.y + 150.4,
-			yMax: dim.y + 203,
+			xMin: dim.x + dim.width - dim.sourceWidth - 0.3 * dim.sourceWidth, // drainX - .3*drain width
+			xMax: dim.x + dim.width - dim.sourceWidth + 0.06 * dim.sourceWidth, // drainX + .06*drain width
+			yMin: dim.y + 0.94 * dim.sourceWidth, // same as source
+			yMax: dim.y + 1.3 * dim.sourceWidth, // same as source
 		},
 	},
 };
@@ -321,13 +328,15 @@ function draw() {
 		base.efYMax - base.ef.source.yMin
 	);
 
-	// x
 	rect(
-		base.ef.source.xMin,
+		base.ef.drain.xMin,
 		base.y,
-		base.efXMax - base.ef.source.xMin,
-		base.height
+		base.ef.drain.xMax - base.ef.drain.xMin,
+		204
 	);
+
+	// x
+	rect(base.ef.source.xMin, base.y, base.efXMax - base.ef.source.xMin, 204);
 }
 
 function resetScene() {
