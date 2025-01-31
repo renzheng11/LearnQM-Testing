@@ -838,7 +838,7 @@ function updateCharges() {
 		electrons[i].display();
 		electrons[i].update();
 
-		if (electrons[i].appear > 255) {
+		if (electrons[i].appear > 20) {
 			// electrons[i].straight_walk();
 			// if (electrons[i].position.y > 49 * sy) {
 			electrons[i].move();
@@ -850,7 +850,7 @@ function updateCharges() {
 		holes[i].display();
 		holes[i].update();
 
-		if (holes[i].appear > 255) {
+		if (holes[i].appear > 20) {
 			// holes[i].straight_walk();
 			// if (holes[i].position.y > 49 * sy) {
 			holes[i].move();

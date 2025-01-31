@@ -24,6 +24,7 @@ class Charge {
 		this.dead = 0;
 		this.opacity = 255;
 		this.color = null;
+		this.chargeCreated = false;
 
 		// setTimeout(() => {
 		// 	this.checkProperties();
@@ -209,42 +210,63 @@ class Charge {
 		// }
 		////////////////////////////////////////////////
 
-		// UNCOMMENT ! ?
-		// if (this.position.x > 940 * sx && opening == 1 && this.straight == 0) {
-		// 	this.direction.x = 10;
-		// 	this.show = 0;
-		// 	if (this.type == "e" && !this.chargeCreated) {
-		// 		var newCharge = new Charge(950 * sx, random(400, 760) * sy, 10, "e");
-		// 		newCharge.direction = createVector(-1, random(-1, 1));
-		// 		newCharge.movingVelocity = this.movingVelocity;
-		// 		newCharge.velocity = createVector(-10, 0);
-		// 		newCharge.botz = this.botz;
-		// 		generatedElectrons.push(newCharge);
-		// 		this.chargeCreated = true;
-		// 	}
-		// }
 		// Bounce off boundaries
 		let buffer = 0;
 
 		if (this.position.x - this.diameter < base.x + buffer) {
-			// l
+			// left
 			this.velocity.x = -this.velocity.x;
 			this.position.x += 8;
 		}
 		if (this.position.x + this.diameter > base.endX - buffer) {
-			// r
+			// right
 			this.velocity.x = -this.velocity.x;
 			this.position.x -= 8;
 		}
 		if (this.position.y - this.diameter < base.y + buffer) {
-			// t
+			// top
 			this.velocity.y = -this.velocity.y;
 			this.position.y += 8;
 		}
-		if (this.position.y + this.diameter > base.endY - buffer) {
-			// b
-			this.velocity.y = -this.velocity.y;
-			this.position.y -= 8;
+
+		// Move in and out of metal on bottom
+		if (this.position.y > base.endY) {
+			this.direction.y = 10;
+			this.show = 0;
+
+			if (this.type == "h" && !this.chargeCreated) {
+				// holes
+				var newCharge = new Charge(
+					random(base.x, base.endX),
+					base.endY,
+					"h",
+					chargeID,
+					"g"
+				);
+				newCharge.direction = createVector(random(-1, 1), -1);
+				newCharge.movingVelocity = this.movingVelocity;
+				newCharge.velocity = createVector(0, -10);
+				newCharge.botz = this.botz;
+				this.chargeCreated = true;
+				chargeID++;
+				holes.push(newCharge);
+			} else if (this.type == "e" && !this.chargeCreated) {
+				// electrons
+				var newCharge = new Charge(
+					random(base.x, base.endX),
+					base.endY,
+					"e",
+					chargeID,
+					"g"
+				);
+				newCharge.direction = createVector(random(-1, 1), -1);
+				newCharge.movingVelocity = this.movingVelocity;
+				newCharge.velocity = createVector(0, -10);
+				newCharge.botz = this.botz;
+				this.chargeCreated = true;
+				chargeID++;
+				electrons.push(newCharge);
+			}
 		}
 	}
 

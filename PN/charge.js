@@ -402,6 +402,7 @@ class Charge {
 			}
 			////////////////////////////////////////////////
 
+			// if charge goes out the right, replace with new charge (shows charges going in and out of metal)
 			if (this.position.x > 940 * sx && opening == 1 && this.straight == 0) {
 				this.direction.x = 10;
 				this.show = 0;
@@ -432,6 +433,7 @@ class Charge {
 				this.position.x = 50 * sx;
 			}
 
+			// if charge goes out the left, replace with new charge (shows charges going in and out of metal)
 			if (this.position.x < 150 * sx && opening == 1 && this.straight == 0) {
 				this.direction.x = -10;
 				this.show = 0;
@@ -464,6 +466,7 @@ class Charge {
 			// 	this.direction.y = 1;
 			// }
 
+			// bounce off top boundary
 			if (this.position.y < 405 * sy) {
 				this.velocity.y = -this.velocity.y;
 				this.position.y = 410 * sy;
@@ -472,6 +475,7 @@ class Charge {
 			// 	this.direction.y = -1;
 			// }
 
+			// bounce off bottom boundary
 			if (this.position.y > 770 * sy) {
 				this.velocity.y = -this.velocity.y;
 				this.position.y = 765 * sy;
