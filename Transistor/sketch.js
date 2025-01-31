@@ -35,6 +35,7 @@ let color = {
 	EFColor: [218, 112, 214], // electric field
 	CDColor: [2, 104, 255], // charge density
 	controls: [102, 194, 255],
+	pos: [200, 122, 121], // red
 	// electron: [255, 255, 0],
 	// grey: [175, 175, 175],
 	// pos: [125, 241, 148],
@@ -68,8 +69,13 @@ let innerLoopElectrons = [];
 let outerLoopElectrons = [];
 let innerLoopOn = false; // toggles inner battery electron transfer
 let outerLoopOn = false; // toggles outer battery electron transfer
-let numInnerLoop = 30;
+let numInnerLoop = 5;
 let numOuterLoop = 30;
+
+let innerLoopDirection = 0; // left - pos to neg
+
+let showMetalPosCharges;
+let metalPosCharges = [];
 
 // Effects for generation & recombination ===============================================
 
@@ -116,7 +122,7 @@ const unit = 8;
 // base dimensions
 const dim = {
 	x: unit * 26,
-	y: unit * 38,
+	y: unit * 44,
 
 	width: unit * 80,
 	height: unit * 40,
@@ -131,8 +137,8 @@ const dim = {
 
 	batteryHeight: 20,
 
-	innerY: unit * 20, // inner wire
-	outerY: unit * 14, // outer wire
+	innerY: unit * 26, // inner wire
+	outerY: unit * 20, // outer wire
 };
 
 const controls = {
@@ -187,17 +193,29 @@ const base = {
 	leftGroundX: dim.x + dim.sourceWidth / 2 - 40,
 	insulatorLabelY: dim.y - (dim.metalHeight / 2) * 0.75,
 
-	wirePos0: [dim.x + dim.sourceWidth / 2, dim.y - dim.metalHeight],
-	wirePos1: [dim.x + dim.sourceWidth / 2, dim.innerY],
-	wirePos2: [dim.x + 420, dim.innerY],
-	wirePos3: [dim.x + 420, dim.y - dim.metalHeight * 2],
+	wire: {
+		leftMetal: [dim.x + dim.sourceWidth / 2, dim.y - dim.metalHeight + 16],
+		innerBatteryLeft: [dim.x + dim.sourceWidth / 2, dim.innerY], // corner
+		innerBatteryRight: [dim.x + 420, dim.innerY], // corner
+		topMetal: [dim.x + 420, dim.y - dim.metalHeight * 2],
+		outerBatteryLeft: [dim.x + dim.sourceWidth / 2, dim.outerY],
+		outerBatteryRight: [dim.x + dim.width - dim.sourceWidth / 2, dim.outerY],
+		rightMetal: [
+			dim.x + dim.width - dim.sourceWidth / 2,
+			dim.y - dim.metalHeight,
+		],
+	},
+
+	// wire.leftMetal: [dim.x + dim.sourceWidth / 2, dim.y - dim.metalHeight],
+	// wire.innerBatteryLeft: [dim.x + dim.sourceWidth / 2, dim.innerY],
+	// wire.innerBatteryRight: [dim.x + 420, dim.innerY],
+	// wire.topMetal: [dim.x + 420, dim.y - dim.metalHeight * 2],
 
 	wirePos4: [dim.x + 420, dim.y - dim.metalHeight - 12],
-	wirePos5: [dim.x + dim.sourceWidth + 16, dim.y - dim.metalHeight],
 
-	wirePos6: [dim.x + dim.sourceWidth / 2, dim.outerY],
-	wirePos7: [dim.x + dim.width - dim.sourceWidth / 2, dim.outerY],
-	wirePos8: [dim.x + dim.width - dim.sourceWidth / 2, dim.y - dim.metalHeight],
+	// wire.outerBatteryLeft: [dim.x + dim.sourceWidth / 2, dim.outerY],
+	// wire.outerBatteryRight: [dim.x + dim.width - dim.sourceWidth / 2, dim.outerY],
+	// wire.rightMetal: [dim.x + dim.width - dim.sourceWidth / 2, dim.y - dim.metalHeight],
 
 	efXMin: dim.x + 150.4,
 	efXMax: dim.x + 203,
@@ -320,23 +338,25 @@ function draw() {
 		// drawControls();
 	}
 
-	// y - source
-	rect(
-		base.x,
-		base.ef.source.yMin,
-		base.width,
-		base.efYMax - base.ef.source.yMin
-	);
+	// // y - source
+	// stroke("red");
+	// noFill();
+	// rect(
+	// 	base.x,
+	// 	base.ef.source.yMin,
+	// 	base.width,
+	// 	base.efYMax - base.ef.source.yMin
+	// );
 
-	rect(
-		base.ef.drain.xMin,
-		base.y,
-		base.ef.drain.xMax - base.ef.drain.xMin,
-		204
-	);
+	// rect(
+	// 	base.ef.drain.xMin,
+	// 	base.y,
+	// 	base.ef.drain.xMax - base.ef.drain.xMin,
+	// 	204
+	// );
 
-	// x
-	rect(base.ef.source.xMin, base.y, base.efXMax - base.ef.source.xMin, 204);
+	// // x
+	// rect(base.ef.source.xMin, base.y, base.efXMax - base.ef.source.xMin, 204);
 }
 
 function resetScene() {
@@ -372,15 +392,24 @@ function resetScene() {
 // Updating Functions ============================================================
 function initWireElectrons() {
 	for (let i = 0; i < numOuterLoop; i++) {
-		let x = base.wirePos0[0];
-		let y = base.wirePos0[1];
+		let x = base.wire.rightMetal[0];
+		let y = base.wire.rightMetal[1] + random(0, 500);
 		outerLoopElectrons.push(new wireCharge(x, y, 1));
 	}
 
 	for (let i = 0; i < numInnerLoop; i++) {
-		let x = base.wirePos0[0];
-		let y = base.wirePos0[1];
+		let x = base.wire.topMetal[0];
+		let y = base.wire.topMetal[1] + random(0, 80);
 		innerLoopElectrons.push(new wireCharge(x, y, 0));
+
+		x = random(
+			base.x + base.sourceWidth + 16,
+			base.endX - base.sourceWidth - 16
+		);
+		y = base.y - base.metalHeight * 1.3;
+		let newCharge = new Charge(x, y, "mp", chargeID, "g");
+		metalPosCharges.push(newCharge);
+		chargeID++;
 	}
 }
 
@@ -686,11 +715,17 @@ function checkDest(electron, dest) {
 	}
 }
 
-function updateOuterLoop() {
+function animateOuterLoop() {
 	let stopPositions = [];
-	stopPositions.push(createVector(base.wirePos6[0], base.wirePos6[1]));
-	stopPositions.push(createVector(base.wirePos7[0], base.wirePos7[1]));
-	stopPositions.push(createVector(base.wirePos8[0], base.wirePos8[1]));
+	stopPositions.push(
+		createVector(base.wire.outerBatteryRight[0], base.wire.outerBatteryRight[1])
+	);
+	stopPositions.push(
+		createVector(base.wire.outerBatteryLeft[0], base.wire.outerBatteryLeft[1])
+	);
+	stopPositions.push(
+		createVector(base.wire.leftMetal[0], base.wire.leftMetal[1])
+	);
 	let stops = [1, 2, 3]; // based on stopPositions
 
 	for (let i = 0; i < outerLoopElectrons.length; i++) {
@@ -734,66 +769,109 @@ function updateOuterLoop() {
 		}
 		if (electron.passedDest.includes(stops[2])) {
 			electron.clearPassed();
-			electron.position = createVector(base.wirePos0[0], base.wirePos0[1]);
+			electron.position = createVector(
+				base.wire.rightMetal[0],
+				base.wire.rightMetal[1]
+			);
 		}
 	}
 }
 
-function updateInnerLoop() {
-	let stopPositions = [];
-	stopPositions.push(createVector(...base.wirePos1));
-	stopPositions.push(createVector(...base.wirePos2));
-	stopPositions.push(createVector(...base.wirePos4));
+function animateInnerLoop() {
+	// let stopPositions = [];
+	// stopPositions.push(createVector(...base.wire.innerBatteryRight));
+	// stopPositions.push(createVector(...base.wire.innerBatteryLeft));
+	// stopPositions.push(createVector(...base.wire.leftMetal));
 
-	let stops = [1, 2, 3]; // based on stopPositions
+	// let stops = [1, 2, 3]; // based on stopPositions
+
+	let positions = [];
 
 	for (let i = 0; i < innerLoopElectrons.length; i++) {
 		let electron = innerLoopElectrons[i];
 		electron.display();
 
-		let atDest1 = checkDest(electron, stopPositions[0], false);
-		let atDest2 = checkDest(electron, stopPositions[1], false);
-		let atDest3 = checkDest(electron, stopPositions[2], false);
+		// let atDest1 = checkDest(electron, stopPositions[0], false);
+		// let atDest2 = checkDest(electron, stopPositions[1], false);
+		// let atDest3 = checkDest(electron, stopPositions[2], false);
 
-		if (atDest1) {
-			if (!electron.passedDest.includes(stops[0])) {
-				electron.updatePassed(stops[0]);
+		if (innerLoopDirection == 0) {
+			if (
+				electron.position.x > base.innerBatteryX + 8 &&
+				electron.position.y > base.wire.innerBatteryRight[1]
+			) {
+				electron.move(createVector(...base.wire.innerBatteryRight));
+			} else if (electron.position.x > base.wire.innerBatteryLeft[0] + 8) {
+				electron.move(createVector(...base.wire.innerBatteryLeft));
+			} else if (
+				electron.position.x < base.wire.innerBatteryLeft[0] + 8 &&
+				electron.position.y < base.wire.leftMetal[1]
+			) {
+				electron.move(createVector(...base.wire.leftMetal)); // down
+				setTimeout(() => {
+					showMetalPosCharges = true;
+				}, 1000);
 			}
-		}
-		if (atDest2) {
-			if (!electron.passedDest.includes(stops[1])) {
-				electron.updatePassed(stops[1]);
+		} else {
+			if (
+				electron.position.x < base.innerBatteryX + 8 &&
+				electron.position.y > base.wire.innerBatteryLeft[1]
+			) {
+				electron.move(createVector(...base.wire.innerBatteryLeft)); // up
+			} else if (electron.position.x < base.wire.innerBatteryRight[0] + 8) {
+				if (electron.position.x > base.wire.innerBatteryRight[0] - 8) {
+					// if on right line
+					console.log("3");
+					electron.move(createVector(...base.wire.topMetal)); // down
+					setTimeout(() => {
+						showMetalPosCharges = false;
+					}, 1000);
+				} else {
+					console.log("2");
+					electron.move(createVector(...base.wire.innerBatteryRight)); // right done
+				}
 			}
-		}
-		if (atDest3) {
-			if (!electron.passedDest.includes(stops[2])) {
-				electron.updatePassed(stops[2]);
-			}
-		}
-
-		if (!electron.passedDest.includes(stops[0])) {
-			electron.move(stopPositions[0]);
-		}
-		if (
-			electron.passedDest.includes(stops[0]) &&
-			!electron.passedDest.includes(stops[1])
-		) {
-			electron.move(stopPositions[1]);
-		}
-		if (
-			electron.passedDest.includes(stops[1]) &&
-			!electron.passedDest.includes(stops[2])
-		) {
-			electron.move(stopPositions[2]);
-		}
-		if (electron.passedDest.includes(stops[2])) {
-			// electron.move(
-			// 	createVector(base.wirePos5[0] + electron.gateStop, base.wirePos5[1])
-			// );
-			// if (electron.position.x > base.wirePos5[0] + electron.gateStop) {
-			// 	electron.position.x -= 8;
+			// if (
+			// 	electron.position.x < base.innerBatteryX &&
+			// 	electron.position.y > base.wire.innerBatteryRight[1]
+			// ) {
+			// 	electron.move(createVector(...base.wire.innerBatteryLeft));
+			// 	console.log("1");
+			// } else if (electron.position.x < base.wire.innerBatteryLeft[0]) {
+			// 	electron.move(createVector(...base.wire.innerBatteryRight));
+			// 	console.log("2");
+			// } else if (
+			// 	electron.position.x > base.innerBatteryX &&
+			// 	electron.position.y < base.wire.leftMetal[1]
+			// ) {
+			// 	electron.move(createVector(...base.wire.topMetal));
+			// 	console.log("3");
 			// }
-			electron.update();
+			// if (
+			// 	electron.position.x < base.wire.innerBatteryLeft[0] + 8 &&
+			// 	electron.position.y < base.wire.leftMetal[1]
+			// ) {
+			// 	console.log("back 1");
+			// 	electron.move(createVector(...base.wire.innerBatteryLeft));
+			// } else if (
+			// 	electron.position.x < base.wire.innerBatteryRight[0] &&
+			// 	electron.position.y < base.wire.innerBatteryRight[1]
+			// ) {
+			// 	console.log("back 2");
+			// 	electron.move(createVector(...base.wire.innerBatteryRight));
+			// } else if (electron.position.x > base.wire.innerBatteryRight[0] - 16) {
+			// 	console.log("back 3");
+			// 	electron.move(createVector(...base.wire.topMetal));
+			// }
+		}
+	}
+
+	// drawMetalPosCharges();
+
+	// draw pos charges in top metal
+	if (showMetalPosCharges) {
+		for (let i = 0; i < metalPosCharges.length; i++) {
+			metalPosCharges[i].display();
 		}
 	}
 }
@@ -801,26 +879,44 @@ function updateInnerLoop() {
 function toggleOuterBattery() {
 	outerLoopOn = !outerLoopOn;
 }
+
 function toggleInnerBattery() {
-	innerLoopOn = true;
+	const btn = document.querySelector(`.chargeButton${sceneCount}`);
+
+	if (btn.innerText == "Reset") {
+		btn.innerText = "Apply Charge";
+		innerLoopOn = true;
+		innerLoopDirection = 1;
+	} else if (btn.innerText == "Apply Charge") {
+		btn.innerText = "Reset";
+		innerLoopOn = true;
+		innerLoopDirection = 0;
+	}
 }
+
 function updateInnerBatteryCharge(numCharges) {
 	numInnerLoop = numCharges;
 
 	innerLoopElectrons = [];
+	metalPosCharges = [];
 	for (let i = 0; i < numInnerLoop; i++) {
-		let x = base.wirePos0[0];
-		let y = base.wirePos0[1];
+		let x = base.wire.topMetal[0];
+		let y = base.wire.topMetal[1];
 		innerLoopElectrons.push(new wireCharge(x, y, 0));
+
+		x = random(base.x + base.sourceWidth, base.endX - base.sourceWidth);
+		y = base.y - base.metalHeight * 1.5;
+		let newCharge = new Charge(x, y, "mp", chargeID, "g");
+		metalPosCharges.push(newCharge);
+		chargeID++;
 	}
-	console.log(innerLoopElectrons);
 }
 function updateWireElectrons() {
 	if (outerLoopOn) {
-		updateOuterLoop();
+		animateOuterLoop();
 	}
 	if (innerLoopOn) {
-		updateInnerLoop();
+		animateInnerLoop();
 	}
 }
 
@@ -1160,7 +1256,7 @@ function drawBase() {
 	// style depletion regions
 
 	// drawSourceBaseDepletionRegion();
-	drawFullDepletionRegion();
+	// drawFullDepletionRegion();
 	// drawChannel();
 
 	// style bases
@@ -1282,7 +1378,7 @@ function drawBase() {
 }
 
 function drawWires() {
-	if (innerBatteryOn) {
+	if (innerLoopDirection == 0) {
 		// inner battery on
 		image(
 			batteryNegOn,
@@ -1303,7 +1399,7 @@ function drawWires() {
 	}
 
 	// outer battery
-	if (outerBatteryOn) {
+	if (outerLoopOn) {
 		// outer battery on
 		image(
 			batteryNegOn,
@@ -1339,8 +1435,8 @@ function drawWires() {
 	// wire from inner battery to gate metal
 	beginShape();
 	vertex(base.innerBatteryX + base.batteryWidth, base.innerY);
-	vertex(base.wirePos2[0], base.innerY);
-	vertex(base.wirePos2[0], base.y - base.metalHeight * 2);
+	vertex(base.wire.innerBatteryRight[0], base.innerY);
+	vertex(base.wire.innerBatteryRight[0], base.y - base.metalHeight * 2);
 	endShape(); // battery
 
 	// wire from source to outer battery
@@ -1398,14 +1494,6 @@ function mouseClicked() {
 	// } else if (abs(164 * sx - mouseX) < 100 * sx && yCondition < 16 * sy) {
 	// 	switchGraph = false; // show electric field graph
 	// }
-}
-
-function toggleBattery(value) {
-	if (value == "ib") {
-		innerBatteryOn = !innerBatteryOn;
-	} else if (value == "ob") {
-		outerBatteryOn = !outerBatteryOn;
-	}
 }
 
 function triggerControls(value) {

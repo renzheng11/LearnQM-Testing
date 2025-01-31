@@ -100,20 +100,11 @@ class Charge {
 				fill(...color.electron, this.appear);
 				noStroke();
 				ellipse(this.position.x, this.position.y, this.diameter);
-			} else if (this.type == "eef") {
-				fill("red");
-				noStroke();
-				ellipse(this.position.x, this.position.y, this.diameter);
 			} else if (this.type == "h") {
 				//hole
 				noFill();
 				stroke(...color.hole, this.appear);
 				strokeWeight(1);
-				ellipse(this.position.x, this.position.y, this.diameter);
-			} else if (this.type == "hef") {
-				noFill();
-				stroke("blue");
-				strokeWeight(2);
 				ellipse(this.position.x, this.position.y, this.diameter);
 			} else if (this.type == "te") {
 				// temp electron for recombination effect
@@ -134,6 +125,19 @@ class Charge {
 				line(this.x, this.y - 10, this.x, this.y + 10);
 				noStroke();
 				strokeWeight(1);
+
+				// fill(...color.pos, 160);
+				// circle(this.x, this.y, 20);
+			} else if (this.type == "mp") {
+				// positive charge in metal
+				stroke(255, 120);
+				strokeWeight(5);
+				line(this.x - 10, this.y, this.x + 10, this.y);
+				line(this.x, this.y - 10, this.x, this.y + 10);
+				noStroke();
+
+				// fill(...color.pos, 160);
+				// circle(this.x, this.y, 20);
 			} else if (this.type == "fn") {
 				//plus sign add electron
 				stroke(255, 120);
@@ -285,66 +289,57 @@ class Charge {
 		let Ey = 0;
 
 		// --- SOURCE electric field ---
-		// check in x zone
+		// check if in x
 		if (
 			this.position.x > base.ef.source.xMin &&
 			this.position.x < base.ef.source.xMax
 		) {
-			// check in y zone within x zone
+			// check in y
 			if (this.position.y < base.ef.source.yMax) {
-				//  base.efYMax
 				// in EF zone
-				let xDistance = this.position.x - base.x;
-				let yDistance = this.position.y - base.y;
+				let xDistance = Math.abs(this.position.x - base.sourceEndX);
+				// let xDistance = this.position.x - base.x;
 				Ex = xDistance * 160;
-				// Ey = yDistance * 160;
-
-				// this.diameter = 24;
 			}
-		} else if (
+		}
+
+		// check if in y
+		else if (
 			this.position.y > base.ef.source.yMin &&
 			this.position.y < base.ef.source.yMax
 		) {
+			// check if in x
 			if (this.position.x < base.ef.source.xMax) {
-				// base.efXMax
 				// in EF zone
-				let xDistance = this.position.x - base.x;
-				let yDistance = this.position.y - base.y;
-				// Ex = xDistance * 160;
+				let yDistance = Math.abs(this.position.y - base.sourceEndY);
 				Ey = yDistance * 160;
-				// this.diameter = 24;
 			}
 		}
 
 		// --- DRAIN electric field ---
+		// check if in x
 		if (
 			this.position.x > base.ef.drain.xMin &&
 			this.position.x < base.ef.drain.xMax
 		) {
-			// check in y zone within y zone
+			// check in y
 			if (this.position.y < base.ef.drain.yMax) {
-				//  base.efYMax
 				// in EF zone
-				let xDistance = this.position.x - base.x;
-				let yDistance = this.position.y - base.y;
+				// let xDistance = this.position.x - base.x;
+				let xDistance = Math.abs(base.drainX - this.position.x);
 				Ex = -xDistance * 160;
-				// Ey = yDistance * 160;
-
-				// this.diameter = 24;
 			}
-		} else if (
+		}
+		// check if in y
+		else if (
 			this.position.y > base.ef.drain.yMin &&
 			this.position.y < base.ef.drain.yMax
 		) {
-			// check if within x
+			// check if x
 			if (this.position.x > base.ef.drain.xMin) {
-				// base.efXMax
 				// in EF zone
-				let xDistance = this.position.x - base.x;
-				let yDistance = this.position.y - base.y;
-				// Ex = xDistance * 160;
+				let yDistance = Math.abs(this.position.y - base.sourceEndY);
 				Ey = yDistance * 160;
-				// this.diameter = 24;
 			}
 		}
 
@@ -354,6 +349,9 @@ class Charge {
 		// }
 
 		//We need to multpliy the elctric feild by a constant to convert it to accelration on our screen. We need to find the value with trial and error. For now I just use a factor of 5.
+
+		// let randomXdirection = createVector(random(-1, 1), 1);
+		// let randomYdirection = createVector(1, random(-1, 1));
 
 		let accelFactor = 5; ////It might be better to make it a global variable that we define. We can do that later.
 		this.accel.x = Ex * accelFactor;
