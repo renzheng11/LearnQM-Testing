@@ -81,7 +81,7 @@ let graphTextSize = 12;
 // band diagram
 let bandScale = 1; //change the verticle distribution scale of band diagram
 let getRandomBotz = []; //velocity of random distribution
-let boltzDistribution = []; //New random velocity distribution added by Azad
+let boltzDistribution = []; //New random velocity distribution
 let electronBand = []; //graph negative line
 let holeBand = []; //graph green line
 
@@ -197,7 +197,7 @@ let tesx; //used to read electric field at a given point in Accelerate function
 
 let timeSinceLastInteraction = 0;
 
-fetchBandDiagramData(); // DO NOT REMOVE, included in multiple places to prevent load failures
+fetchBandDiagramData(); // DO NOT REMOVE this call, included in multiple places to prevent load failures
 
 function fetchBandDiagramData() {
 	fetch("v_data_1.json")
@@ -1316,6 +1316,7 @@ function timeIt() {
 
 //actual scattering happening
 function scattering() {
+	console.log("scattercount", scatteringCount);
 	//timebetween scatter
 	if (scatteringCount > 2) {
 		//time when straight line no scatter

@@ -4,9 +4,10 @@ class Charge {
 		this.y = y;
 		this.id = id;
 		this.position = createVector(x, y);
-		this.positionBand = createVector(x, y);
+		this.bandPosition = createVector(x, y);
+		this.bandOrigin = createVector(0, 0);
 		this.diameter = 10;
-		this.maxspeed = 15;
+		this.maxspeed = 5;
 		this.velocity = createVector(0, 0);
 		this.maxforce = 1;
 		this.accel = createVector(0, 0);
@@ -40,7 +41,6 @@ class Charge {
 	// 			this.show = 0;
 	// 		}
 
-	// 		// console.log("The conditions are met for a vehicle instance.");
 	// 	} else if (this.type == "h") {
 	// 		//electron
 
@@ -78,22 +78,30 @@ class Charge {
 	// 	this.maxspeed = 5;
 	// }
 
+	//find closest value of the y value of the generated point
 	findClosestValue(array, targetX) {
+		// Initialize closest diff with a very large value
 		let closestDiff = 1000;
+		// Initialize closestBValue as undefined
 		let closestBValue;
 
 		for (let i = 0; i < array.length; i++) {
+			// Calculate absolute difference between targetX and current x value
 			let diff = Math.abs(targetX - array[i][0]);
+			// If this difference is less than closest diff found so far
 			if (diff < closestDiff) {
+				// Update closest diff and closestBValue
 				closestDiff = diff;
-				closestBValue = array[i][1];
+				closestBValue = array[i][1]; // Assuming 'b' is represented as second element in sub-array
 			}
 		}
 
+		// Return the 'b' value of the element with the x value closest to targetX
 		return closestBValue;
 	}
 
-	display() {
+	draw() {
+		// draw charges in transistor
 		if (this.show) {
 			if (this.type == "e") {
 				//electron
@@ -160,10 +168,42 @@ class Charge {
 				// ellipse(this.position.x, this.position.y, this.diameter);
 				ellipse(this.position.x, this.position.y, this.diameter);
 			}
+			this.drawOnBand();
+		}
+
+		// draw charges in band diagram
+	}
+
+	drawOnBand() {
+		let buffer = 16;
+		if (this.type == "e") {
+			// draw electrons
+			fill(...color.electron, 160);
+			noStroke();
+			// don't draw until it has botz calculated and has snapped to band
+			if (this.bandPosition.y > 10) {
+				ellipse(this.position.x, this.bandPosition.y, 5);
+			}
+			this.bandPosition.y = this.bandOrigin.y - (this.botz * 8.8 * 2 * 0.1) / 3; //
+			// subtracting bc electron is above band
+			// }
+		} else if (this.type == "h") {
+			// draw holes on band diagram
+			//added pairs senario
+			noFill();
+			stroke(...color.hole, 160); //
+			strokeWeight(1);
+
+			// don't draw until it has botz calculated and has snapped to band
+
+			if (this.bandPosition.y > 10) {
+				ellipse(this.position.x, this.bandPosition.y, 5);
+			}
+			this.bandPosition.y = this.bandOrigin.y + (this.botz * 8.8 * 2 * 0.1) / 3; // adding bc hole is below band
 		}
 	}
 
-	update() {
+	updateOpacity() {
 		if (this.type == "e" || this.type == "h") {
 			// slowly appear at beginning
 			if (this.appear < 255) {
@@ -182,36 +222,71 @@ class Charge {
 		}
 	}
 
-	move() {
+	moveBandDiagram() {
+		let band;
+		this.type == "e" ? (band = electronBand) : (band = holeBand);
+		let closestToBand = findClosestValue(band, this.position.x);
+		this.bandOrigin.y = closestToBand;
+
+		if (this.type == "e") {
+			//             //electron
+			let closestPos = findClosestValue(electronBand, this.position.x);
+			if (this.bandPosition.y > closestPos) {
+				// this.velocity.x = Math.abs(this.velocity.x);
+				// this.position.add(this.velocity.x);
+			}
+		} else {
+			//hole
+			let closestPos = findClosestValue(holeBand, this.position.x);
+			if (this.bandPosition.y < closestPos) {
+				// this.velocity.x = -Math.abs(this.velocity.x);
+				// this.position.add(this.velocity.x);
+			}
+		}
+
+		if (this.chargeType == "e") {
+			//electron
+			///////find the near_index: find where the electron appear (on which line they should bounce back when hit the band diagram)
+			let smallestDifference = Math.abs(
+				electronBand[0].y - this.bandPosition.y
+			);
+			for (let i = 0; i < electronBand.length; i++) {
+				let difference = Math.abs(electronBand[i].y - this.bandPosition.y);
+
+				if (difference < smallestDifference) {
+					smallestDifference = difference;
+					this.near_index = i;
+				}
+			}
+		}
+		if (this.chargeType == "h") {
+			//hole
+			///////find the near_index: find where the hole appear  (on which line they should bounce back when hit the band diagram)
+			let smallestDifference = Math.abs(holeBand[0].y - this.bandPosition.y);
+			for (let i = 0; i < holeBand.length; i++) {
+				let difference = Math.abs(holeBand[i].y - this.bandPosition.y);
+				if (difference < smallestDifference) {
+					smallestDifference = difference;
+					this.near_index = i;
+				}
+			}
+		}
+	}
+
+	update() {
 		this.accelerate(); // update this.velocity baed on EF
 		this.velocity.limit(this.maxspeed);
 		this.position.add(this.velocity); // Update this.position dimd on its velocity
+		this.moveBandDiagram();
+		// this.movingVelocity = 1.6;
 
-		this.movingVelocity = 1.6;
-
-		// random_botz[Math.floor(Math.random() * random_botz.length)]; // UNCOMMENT!
-		this.botz = this.movingVelocity;
+		// botzDistribution[Math.floor(Math.random() * botzDistribution.length)]; // UNCOMMENT!
+		// this.botz = this.movingVelocity;
 
 		this.velocity = this.direction.mult(this.movingVelocity);
 
 		////////////////////// avoid going into the bandgap (added by Azad)
 
-		// UNCOMMENT ONCE YOU HAVE BANDS!
-		// if (this.type == "e") {
-		// 	//             //electron
-		// 	let zz = findClosestValue(electronBand, this.position.x);
-		// 	if (this.positionBand.y > zz) {
-		// 		this.velocity.x = Math.abs(this.velocity.x);
-		// 		this.position.add(this.velocity.x);
-		// 	}
-		// } else {
-		// 	//hole
-		// 	let zz = findClosestValue(holeBand, this.position.x);
-		// 	if (this.positionBand.y < zz) {
-		// 		this.velocity.x = -Math.abs(this.velocity.x);
-		// 		this.position.add(this.velocity.x);
-		// 	}
-		// }
 		////////////////////////////////////////////////
 
 		// Bounce off boundaries
@@ -272,6 +347,35 @@ class Charge {
 				electrons.push(newCharge);
 			}
 		}
+
+		// Scatter
+		if (willScatter && random(1)) {
+			this.direction = createVector(random(-1, 1), random(-1, 1));
+			this.botz =
+				botzDistribution[Math.floor(Math.random() * botzDistribution.length)];
+			this.movingVelocity = this.botz;
+			this.velocity = p5.Vector.mult(this.direction, this.movingVelocity);
+
+			let band;
+			this.type == "e" ? (band = electronBand) : (band = holeBand);
+			// move position on band diagram
+			// if (this.type == "e") {
+			// 	//electron
+			// 	let closestToBand = findClosestValue(electronBand, this.position.x);
+
+			// 	// this.bandOrigin.x = findClosestValue(electronBand, this.position.x);
+			// 	// this.bandPosition.y =
+			// 	// 	this.bandOrigin.x - (this.botz * this.botz * sy * 8.8 * 0.2) / 6;
+			// }
+			// if (this.type == "h") {
+			// 	//hole
+			// 	let closestToBand = findClosestValue(electronBand, this.position.x);
+			// 	// this.bandPosition.y =
+			// 	// 	this.bandOrigin.y + (this.botz * this.botz * sy * 8.8 * 0.2) / 6;
+			// }
+			let closestToBand = findClosestValue(band, this.position.x);
+			this.bandOrigin.y = closestToBand;
+		}
 	}
 
 	accelerate() {
@@ -280,10 +384,6 @@ class Charge {
 
 		// check if in zones with EF
 		// check if x zone
-
-		// console.log("efmin", base.efMin);
-		// console.log("pos.x", this.position.x);
-		// console.log("x > base.efmin", this.position.x > base.efMin);
 
 		let Ex = 0;
 		let Ey = 0;
@@ -350,10 +450,10 @@ class Charge {
 
 		//We need to multpliy the elctric feild by a constant to convert it to accelration on our screen. We need to find the value with trial and error. For now I just use a factor of 5.
 
-		// let randomXdirection = createVector(random(-1, 1), 1);
-		// let randomYdirection = createVector(1, random(-1, 1));
+		let randomXdirection = createVector(random(-1, 1), 1);
+		let randomYdirection = createVector(1, random(-1, 1));
 
-		let accelFactor = 5; ////It might be better to make it a global variable that we define. We can do that later.
+		let accelFactor = 2; ////It might be better to make it a global variable that we define. We can do that later.
 		this.accel.x = Ex * accelFactor;
 		this.accel.y = Ey * accelFactor;
 

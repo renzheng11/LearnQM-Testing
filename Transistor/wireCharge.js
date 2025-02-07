@@ -9,24 +9,37 @@ class wireCharge {
 		this.gateStop = random(0, 360);
 	}
 
-	display() {
+	draw() {
 		noStroke();
 		let show = false;
 
 		// outer loop - only show if above top metals (metal is treated as visual black box)
-		if (this.position.y < base.y - base.metalHeight) {
-			show = true;
+		if (this.loop == "outer") {
+			if (this.position.y < base.y - base.metalHeight) {
+				show = true;
+			}
 		}
 
 		// inner loop
 		// initial y is randomized below metal so they appear to be flowing out separately.. don't show if position is below metal/insulator
 		// if (this.loop == 0) {
 		// if on right side (where top metal is higher)
-		if (this.position.x > base.wire.leftMetal[0] + 24) {
-			if (this.position.y > base.y - base.metalHeight * 2) {
+		if (this.loop == "inner") {
+			show = true;
+			// insulator
+			if (
+				this.position.x > base.wire.leftMetal.x + 24 &&
+				this.position.y > base.y - base.metalHeight * 2
+			) {
+				show = false;
+			} else if (
+				this.position.x < base.wire.leftMetal.x + 24 &&
+				this.position.y > base.y - base.metalHeight
+			) {
 				show = false;
 			}
 		}
+
 		// }
 
 		if (show) {
@@ -55,6 +68,10 @@ class wireCharge {
 		this.passedDest = [0];
 	}
 
+	hide() {
+		this.show = false;
+	}
+
 	move(destination) {
 		// Calculate the vector pointing from the current position to the destination
 		let direction = createVector(
@@ -71,8 +88,7 @@ class wireCharge {
 		// Update the position based on the direction vector
 		this.position.add(direction);
 
-		// make electrons stay on line
-		if (this.loop == 1) {
+		if (this.loop == "outer") {
 			// outer loop
 			// horizontal
 			if (this.position.y < base.outerY) {
@@ -83,14 +99,14 @@ class wireCharge {
 			}
 
 			// vertical
-			if (this.position.x < base.wire.leftMetal[0] - 4) {
-				if (this.position.x < base.wire.leftMetal[0]) {
-					this.position.x += 1;
-				}
-				if (this.position.x > base.wire.leftMetal[0]) {
-					this.position.x -= 1;
-				}
-			}
+			// if (this.position.x < base.wire.leftMetal.x - 4) {
+			// 	if (this.position.x < base.wire.leftMetal.x) {
+			// 		this.position.x += 1;
+			// 	}
+			// 	if (this.position.x > base.wire.leftMetal.x) {
+			// 		this.position.x -= 1;
+			// 	}
+			// }
 		} else {
 			// inner loop
 			if (this.position.y < base.innerY) {
@@ -99,16 +115,14 @@ class wireCharge {
 			if (this.position.y > base.innerY) {
 				this.position.y -= 1;
 			}
-
-			// if (this.position.x < base.wire.leftMetal[0] - 4) {
+			// if (this.position.x < base.wire.leftMetal.x - 4) {
 			// vertical
-			if (this.position.x < base.wire.leftMetal[0]) {
+			if (this.position.x < base.wire.leftMetal.x) {
 				this.position.x += 1;
 			}
-			if (this.position.x > base.wire.leftMetal[0]) {
+			if (this.position.x > base.wire.leftMetal.x) {
 				this.position.x -= 1;
 			}
-			// }
 		}
 	}
 }
