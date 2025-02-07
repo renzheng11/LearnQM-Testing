@@ -248,6 +248,8 @@ const base = {
 			yMax: dim.y + 1.3 * dim.sourceWidth, // same as source
 		},
 	},
+
+	bandThreshold: 30, // only charges above this line get plotted on band diagram
 };
 
 // Tools ============================================================
@@ -966,6 +968,7 @@ function animateInnerLoop() {
 					); // down
 					setTimeout(() => {
 						showMetalPosCharges = false;
+						toggleChargeSliders("on");
 					}, 1000);
 				} else {
 					electron.move(
@@ -1033,15 +1036,33 @@ function toggleInnerBattery() {
 		btn.innerText = "Apply Charge";
 		innerLoopOn = true;
 		innerLoopDirection = 1;
+
+		// if run into issues later, use: resetScene();
 	} else if (btn.innerText == "Apply Charge") {
 		btn.innerText = "Reset";
 		innerLoopOn = true;
 		innerLoopDirection = 0;
+
+		toggleChargeSliders("off");
+	}
+}
+
+function toggleChargeSliders(state) {
+	const chargeSliders = document.querySelectorAll(".chargeSlider");
+	if (state == "on") {
+		chargeSliders.forEach((slider) => {
+			slider.disabled = false;
+		});
+	} else {
+		chargeSliders.forEach((slider) => {
+			slider.disabled = true;
+		});
 	}
 }
 
 function updateInnerBatteryCharge(numCharges) {
 	numInnerLoop = numCharges;
+	console.log(numInnerLoop);
 
 	innerLoop = [];
 	metalPosCharges = [];
@@ -1817,10 +1838,15 @@ function drawGraph() {
 }
 
 function drawBandDiagram() {
-	///////////////////////////////////////////////////////////////////draw new band diagram using json data
-	// stroke(...color.hole);
-	// noFill();
+	// draw band threshold
+	line(
+		base.x,
+		base.y + base.bandThreshold,
+		base.endX,
+		base.y + base.bandThreshold
+	);
 
+	// draw bands
 	let dopingCon = 99763115748444.14; // need to set up
 	let appliedVoltage = 2; // need to set up
 	if (dopingCon == 99763115748444.14) {

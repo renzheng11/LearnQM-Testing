@@ -110,7 +110,6 @@ let run11; //initiation
 let run_outer; //initiation
 
 // dimensions / drawings / images
-// REN NEW VARIABLES
 let outlineWidth = 750;
 let outlineHeight = 180;
 let outlineX = 150;
@@ -126,6 +125,13 @@ let metalWidth = 50;
 let metalHeight = outlineHeight * 2;
 
 let tightThreshold = 10; // make sure charges don't bounce beyond line
+
+let holeRegion = {
+	x: outlineX + metalWidth * 3,
+	y: outlineYs[2],
+	w: outlineWidth - metalWidth * 3,
+	h: outlineHeight * 2,
+};
 
 let batteryPosImg;
 let batteryNegImg;
@@ -304,7 +310,7 @@ function setup() {
  ***************************************************/
 function draw() {
 	timeSinceLastInteraction += 0.1; // approx += 1 every second (depends on framerate)
-	checkTimeout();
+	// checkTimeout();
 
 	background(18, 18, 18);
 
@@ -1316,7 +1322,6 @@ function timeIt() {
 
 //actual scattering happening
 function scattering() {
-	console.log("scattercount", scatteringCount);
 	//timebetween scatter
 	if (scatteringCount > 2) {
 		//time when straight line no scatter
@@ -1673,9 +1678,60 @@ function toggleRecombine() {
 }
 
 function checkHoleCount() {
-	// check if #holes dipping too low, if so - repopulate from right side
-	let holeCount = initHoles.length + genHoles.length;
-	//console.log('holeCount=',holeCount);
+	// this function is to prevent loss of holes when applied voltage is negative and holes concentrate on the left due to strong electric field
+
+	// draw region where holes are being counted
+	stroke(...color.blue);
+	noFill();
+	rect(
+		holeRegion.x * sx,
+		holeRegion.y * sy,
+		holeRegion.w * sx,
+		holeRegion.h * sy
+	);
+
+	// count num holes in left region (10%) -> if concentration gets too high, reset the scene
+	// lower doping: levels at
+
+	let leftHoleCount = 0;
+	for (let i = 0; i < initHoles.length; i++) {
+		if (initHoles[i].position.x < holeRegion.x) {
+			leftHoleCount++;
+		} else {
+		}
+	}
+	for (let i = 0; i < genHoles.length; i++) {
+		if (genHoles[i].position.x < holeRegion.x) {
+			leftHoleCount++;
+		}
+	}
+	if (dopingConcen > 10000000000000) {
+		if (leftHoleCount > 150) {
+			resetScene();
+			alert("Timeout, Visualization Reset"); // measured: didn't reach this point. levels at at around 70-80. enough high energy holes leaving this zone
+		}
+	} else {
+		if (leftHoleCount > 100) {
+			resetScene();
+			alert("Timeout, Visualization Reset"); // measured: takes about 4 min (depends on computer)
+		}
+	}
+	console.log("leftHoleCount", leftHoleCount);
+
+	// count num holes in right region (90%) -> if it dips below regular normal of holes - insert holes from right
+	let holeCount = 0;
+	for (let i = 0; i < initHoles.length; i++) {
+		if (initHoles[i].position.x > holeRegion.x) {
+			holeCount++;
+		} else {
+		}
+	}
+	for (let i = 0; i < genHoles.length; i++) {
+		if (genHoles[i].position.x > holeRegion.x) {
+			holeCount++;
+		}
+	}
+
 	if (appliedVoltage / 20 == -0.4) {
 		holeCount = holeCount * 0.98;
 	}
@@ -1692,6 +1748,7 @@ function checkHoleCount() {
 		holeCount = holeCount * 0.9;
 	}
 
+	// check if #holes dipping too low, if so - repopulate from right side
 	if (dopingConcen > 10000000000000) {
 		if (holeCount < 200) {
 			const buffer = 14;
@@ -1707,8 +1764,6 @@ function checkHoleCount() {
 			vehicle.botz = this.botz;
 			initHoles.push(vehicle);
 			chargeID++;
-			// for density 10^17, default init hole count  = ~200
-			//console.log('holeCount1=',holeCount);
 		}
 	} else {
 		if (holeCount < 100) {
@@ -1725,26 +1780,8 @@ function checkHoleCount() {
 			vehicle.botz = this.botz;
 			initHoles.push(vehicle);
 			chargeID++;
-			// for density 10^17, default init hole count  = ~100
-			//console.log('holeCount2=',holeCount);
 		}
 	}
-
-	// if (scene)
-
-	// const buffer = 14;
-	// var vehicle = new Charge(
-	// 	(xMax - buffer) * sx,
-	// 	random(yMin + buffer, yMax - buffer) * sy,
-	// 	10,
-	// 	"h",
-	// 	1
-	// );
-	// vehicle.direction = createVector(-1, random(-1, 1));
-	// vehicle.movingVelocity = this.movingVelocity;
-	// vehicle.velocity = createVector(-10, 0);
-	// vehicle.botz = this.botz;
-	// initHoles.push(vehicle);
 }
 
 // the function to update the electron hole movements and animations

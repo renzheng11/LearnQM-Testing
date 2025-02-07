@@ -175,31 +175,29 @@ class Charge {
 	}
 
 	drawOnBand() {
-		let buffer = 16;
 		if (this.type == "e") {
-			// draw electrons
+			// draw electrons on band
 			fill(...color.electron, 160);
 			noStroke();
-			// don't draw until it has botz calculated and has snapped to band
-			if (this.bandPosition.y > 10) {
+			if (
+				this.bandPosition.y > 10 &&
+				this.position.y < base.y + base.bandThreshold
+			) {
 				ellipse(this.position.x, this.bandPosition.y, 5);
 			}
-			this.bandPosition.y = this.bandOrigin.y - (this.botz * 8.8 * 2 * 0.1) / 3; //
-			// subtracting bc electron is above band
-			// }
+			this.bandPosition.y = this.bandOrigin.y - (this.botz * 8.8 * 2 * 0.1) / 3;
 		} else if (this.type == "h") {
-			// draw holes on band diagram
-			//added pairs senario
+			// draw holes on band
 			noFill();
 			stroke(...color.hole, 160); //
 			strokeWeight(1);
-
-			// don't draw until it has botz calculated and has snapped to band
-
-			if (this.bandPosition.y > 10) {
+			if (
+				this.bandPosition.y > 10 &&
+				this.position.y < base.y + base.bandThreshold
+			) {
 				ellipse(this.position.x, this.bandPosition.y, 5);
 			}
-			this.bandPosition.y = this.bandOrigin.y + (this.botz * 8.8 * 2 * 0.1) / 3; // adding bc hole is below band
+			this.bandPosition.y = this.bandOrigin.y + (this.botz * 8.8 * 2 * 0.1) / 3;
 		}
 	}
 
