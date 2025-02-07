@@ -534,9 +534,9 @@ function initWireElectrons() {
 }
 
 function initCharges() {
-	let fixedPosChargesLeft = 15;
-	let fixedPosChargesRight = 15;
-	let fixedNegCharges = 40;
+	let fixedPosChargesLeft = 20;
+	let fixedPosChargesRight = 20;
+	let fixedNegCharges = 60;
 
 	holeCount = 60;
 	electronCount = 20; // source and drain each
