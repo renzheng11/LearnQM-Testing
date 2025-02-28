@@ -1248,7 +1248,7 @@ function resetScene() {
 	recomEffectsForHoles = [];
 	recomEffectsForElectrons = [];
 
-	updateDopingConcentration(130);
+	// updateDopingConcentration(130);
 	setScattering(20);
 	setVelocity(9);
 	setDistance(9);
@@ -1530,7 +1530,7 @@ function updateDopingConcentration(a) {
 				fixedCharges.push(new Effect(xPosition, yPosition, 10, "fixneg", i)); // fixed negative charges
 
 				// free holes
-				var Charge2 = new Charge(xPosition, yPosition, "h");
+				var Charge2 = new Charge(xPosition, yPosition, chargeID, "h");
 				Charge2.botz = getRandomBotz[i];
 				initHoles.push(Charge2);
 				chargeID += 1;
@@ -1539,7 +1539,7 @@ function updateDopingConcentration(a) {
 				fixedCharges.push(new Effect(xPosition, yPosition, 10, "fixpos", i)); // fixed positive charges
 
 				// free electron
-				var Charge2 = new Charge(xPosition, yPosition, "e");
+				var Charge2 = new Charge(xPosition, yPosition, chargeID, "e");
 				Charge2.botz = getRandomBotz[i];
 				initElectrons.push(Charge2); // working
 				chargeID += 1;
@@ -1679,107 +1679,96 @@ function toggleRecombine() {
 
 function checkHoleCount() {
 	// this function is to prevent loss of holes when applied voltage is negative and holes concentrate on the left due to strong electric field
-
-	// draw region where holes are being counted
-	stroke(...color.blue);
-	noFill();
-	rect(
-		holeRegion.x * sx,
-		holeRegion.y * sy,
-		holeRegion.w * sx,
-		holeRegion.h * sy
-	);
-
-	// count num holes in left region (10%) -> if concentration gets too high, reset the scene
-	// lower doping: levels at
-
-	let leftHoleCount = 0;
-	for (let i = 0; i < initHoles.length; i++) {
-		if (initHoles[i].position.x < holeRegion.x) {
-			leftHoleCount++;
+	// only for scene 1: p-type MOS capacitor (majority holes)
+	if (scene(1)) {
+		let leftHoleCount = 0;
+		for (let i = 0; i < initHoles.length; i++) {
+			if (initHoles[i].position.x < holeRegion.x) {
+				leftHoleCount++;
+			} else {
+			}
+		}
+		for (let i = 0; i < genHoles.length; i++) {
+			if (genHoles[i].position.x < holeRegion.x) {
+				leftHoleCount++;
+			}
+		}
+		if (dopingConcen > 10000000000000) {
+			if (leftHoleCount > 150) {
+				resetScene();
+				alert("Timeout, Visualization Reset"); // measured: didn't reach this point. levels at at around 70-80. enough high energy holes leaving this zone
+			}
 		} else {
+			if (leftHoleCount > 100) {
+				resetScene();
+				alert("Timeout, Visualization Reset"); // measured: takes about 4 min (depends on computer)
+			}
 		}
-	}
-	for (let i = 0; i < genHoles.length; i++) {
-		if (genHoles[i].position.x < holeRegion.x) {
-			leftHoleCount++;
-		}
-	}
-	if (dopingConcen > 10000000000000) {
-		if (leftHoleCount > 150) {
-			resetScene();
-			alert("Timeout, Visualization Reset"); // measured: didn't reach this point. levels at at around 70-80. enough high energy holes leaving this zone
-		}
-	} else {
-		if (leftHoleCount > 100) {
-			resetScene();
-			alert("Timeout, Visualization Reset"); // measured: takes about 4 min (depends on computer)
-		}
-	}
-	console.log("leftHoleCount", leftHoleCount);
+		console.log("leftHoleCount", leftHoleCount);
 
-	// count num holes in right region (90%) -> if it dips below regular normal of holes - insert holes from right
-	let holeCount = 0;
-	for (let i = 0; i < initHoles.length; i++) {
-		if (initHoles[i].position.x > holeRegion.x) {
-			holeCount++;
+		// count num holes in right region (90%) -> if it dips below regular normal of holes - insert holes from right
+		let holeCount = 0;
+		for (let i = 0; i < initHoles.length; i++) {
+			if (initHoles[i].position.x > holeRegion.x) {
+				holeCount++;
+			} else {
+			}
+		}
+		for (let i = 0; i < genHoles.length; i++) {
+			if (genHoles[i].position.x > holeRegion.x) {
+				holeCount++;
+			}
+		}
+
+		if (appliedVoltage / 20 == -0.4) {
+			holeCount = holeCount * 0.98;
+		}
+		if (appliedVoltage / 20 == -0.8) {
+			holeCount = holeCount * 0.96;
+		}
+		if (appliedVoltage / 20 == -1.2) {
+			holeCount = holeCount * 0.94;
+		}
+		if (appliedVoltage / 20 == -1.6) {
+			holeCount = holeCount * 0.92;
+		}
+		if (appliedVoltage / 20 == -2.0) {
+			holeCount = holeCount * 0.9;
+		}
+
+		// check if #holes dipping too low, if so - repopulate from right side
+		if (dopingConcen > 10000000000000) {
+			if (holeCount < 200) {
+				const buffer = 14;
+				var vehicle = new Charge(
+					(xMax - buffer) * sx,
+					random(yMin + buffer, yMax - buffer) * sy,
+					chargeID,
+					"h"
+				);
+				vehicle.direction = createVector(-1, random(-1, 1));
+				vehicle.movingVelocity = this.movingVelocity;
+				vehicle.velocity = createVector(-10, 0);
+				vehicle.botz = this.botz;
+				initHoles.push(vehicle);
+				chargeID++;
+			}
 		} else {
-		}
-	}
-	for (let i = 0; i < genHoles.length; i++) {
-		if (genHoles[i].position.x > holeRegion.x) {
-			holeCount++;
-		}
-	}
-
-	if (appliedVoltage / 20 == -0.4) {
-		holeCount = holeCount * 0.98;
-	}
-	if (appliedVoltage / 20 == -0.8) {
-		holeCount = holeCount * 0.96;
-	}
-	if (appliedVoltage / 20 == -1.2) {
-		holeCount = holeCount * 0.94;
-	}
-	if (appliedVoltage / 20 == -1.6) {
-		holeCount = holeCount * 0.92;
-	}
-	if (appliedVoltage / 20 == -2.0) {
-		holeCount = holeCount * 0.9;
-	}
-
-	// check if #holes dipping too low, if so - repopulate from right side
-	if (dopingConcen > 10000000000000) {
-		if (holeCount < 200) {
-			const buffer = 14;
-			var vehicle = new Charge(
-				(xMax - buffer) * sx,
-				random(yMin + buffer, yMax - buffer) * sy,
-				chargeID,
-				"h"
-			);
-			vehicle.direction = createVector(-1, random(-1, 1));
-			vehicle.movingVelocity = this.movingVelocity;
-			vehicle.velocity = createVector(-10, 0);
-			vehicle.botz = this.botz;
-			initHoles.push(vehicle);
-			chargeID++;
-		}
-	} else {
-		if (holeCount < 100) {
-			const buffer = 14;
-			var vehicle = new Charge(
-				(xMax - buffer) * sx,
-				random(yMin + buffer, yMax - buffer) * sy,
-				chargeID,
-				"h"
-			);
-			vehicle.direction = createVector(-1, random(-1, 1));
-			vehicle.movingVelocity = this.movingVelocity;
-			vehicle.velocity = createVector(-10, 0);
-			vehicle.botz = this.botz;
-			initHoles.push(vehicle);
-			chargeID++;
+			if (holeCount < 100) {
+				const buffer = 14;
+				var vehicle = new Charge(
+					(xMax - buffer) * sx,
+					random(yMin + buffer, yMax - buffer) * sy,
+					chargeID,
+					"h"
+				);
+				vehicle.direction = createVector(-1, random(-1, 1));
+				vehicle.movingVelocity = this.movingVelocity;
+				vehicle.velocity = createVector(-10, 0);
+				vehicle.botz = this.botz;
+				initHoles.push(vehicle);
+				chargeID++;
+			}
 		}
 	}
 }

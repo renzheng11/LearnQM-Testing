@@ -252,6 +252,13 @@ const base = {
 	bandThreshold: 30, // only charges above this line get plotted on band diagram
 };
 
+// Particle test
+
+let particles = [];
+const PARTICLE_COUNT = 30;
+const SQUARE_SIZE = 300;
+const PARTICLE_SPEED = 8;
+
 // Tools ============================================================
 function qs(selector) {
 	return document.querySelector(selector);
@@ -429,6 +436,14 @@ function setup() {
 	batteryNegOn = loadImage("batteryNegOn.png");
 	groundImg = loadImage("ground.png");
 	leftGroundImg = loadImage("leftGround.png");
+
+	// test particles
+
+	// Initialize particles
+	for (let i = 0; i < PARTICLE_COUNT; i++) {
+		const spacing = (i / PARTICLE_COUNT) * (4 * SQUARE_SIZE);
+		particles[i] = new Particle(SQUARE_SIZE, spacing, PARTICLE_SPEED);
+	}
 }
 
 function scaleToWindow() {
@@ -455,28 +470,23 @@ function draw() {
 		drawBandDiagram();
 		updateWireElectrons();
 		drawBandDiagram();
-		// drawControls();
 	}
 
-	// // y - source
-	// stroke("red");
-	// noFill();
-	// rect(
-	// 	base.x,
-	// 	base.ef.source.yMin,
-	// 	base.width,
-	// 	base.efYMax - base.ef.source.yMin
-	// );
+	// test particle
+	noFill();
+	stroke(200);
+	rect(
+		windowWidth / 2 - SQUARE_SIZE / 2,
+		windowHeight / 2 - SQUARE_SIZE / 2,
+		SQUARE_SIZE,
+		SQUARE_SIZE
+	);
 
-	// rect(
-	// 	base.ef.drain.xMin,
-	// 	base.y,
-	// 	base.ef.drain.xMax - base.ef.drain.xMin,
-	// 	204
-	// );
-
-	// // x
-	// rect(base.ef.source.xMin, base.y, base.efXMax - base.ef.source.xMin, 204);
+	// Update and display particles
+	particles.forEach((particle) => {
+		particle.update();
+		particle.display();
+	});
 }
 
 function resetScene() {
@@ -1112,7 +1122,6 @@ function findClosestValue(array, targetX) {
 
 function updateCharges() {
 	// recom holes and electrons
-	// recomArrays(holes, electrons);
 
 	// display charges
 	for (let i = 0; i < fixedCharges.length; i++) {
@@ -1237,14 +1246,6 @@ function recomArrays(array1, array2, num) {
 				array2[k].show == 1 &&
 				random() < recomProb;
 
-			// if (scene(2) || scene(3)) {
-			// 	condition = condition && array1[i].within == 0;
-			// }
-
-			// if (num == 3 || num == 4) {
-			// 	condition = condition && array1[i].position.x > 190 * sx;
-			// }
-
 			if (condition) {
 				// stop the electron & hole
 				array1[i].stop();
@@ -1254,20 +1255,12 @@ function recomArrays(array1, array2, num) {
 				array1[i].hide();
 				array2[k].hide();
 
-				// label for removal
-				// if (num == 3 && num == 4) {
-				// 	array1[i].deadd();
-				// 	array2[k].deadd();
-				// }
-				// generationEffects.push(new Charge(x, y, "ge", chargeID));
-
 				recomPositions[recomCount] = p5.Vector.div(
 					p5.Vector.add(array2[k].position, array1[i].position),
 					2
 				);
 
 				//effects
-
 				recomEffects[recomCount] = new Charge(
 					recomPositions[recomCount].x,
 					recomPositions[recomCount].y,
@@ -1286,39 +1279,7 @@ function recomArrays(array1, array2, num) {
 					"re",
 					chargeID
 				);
-
 				recomCount++;
-
-				// if (
-				// 	initialElectrons.length + generatedElectrons.length <
-				// 	e_count_limit * 1.1
-				// ) {
-				// 	let b = array1[i].position.y;
-
-				// 	var newCharge = new Charge(150 * sx, b, 10, "h", 1);
-				// 	newCharge.botz = array2[k].botz;
-				// 	newCharge.direction = createVector(1, random(-1, 1));
-				// 	newCharge.movingVelocity = this.movingVelocity;
-				// 	newCharge.velocity = createVector(10, 0);
-				// 	array2.push(newCharge);
-
-				// 	chargeID += 1;
-
-				// 	var newCharge2 = new Charge(950 * sx, b, 10, "e", 0);
-				// 	newCharge2.botz = array1[i].botz;
-				// 	newCharge2.direction = createVector(-1, random(-1, 1));
-				// 	newCharge2.movingVelocity = this.movingVelocity;
-				// 	newCharge2.velocity = createVector(-10, 0);
-
-				// 	array1.push(newCharge2);
-
-				// 	// array1.push(new Charge((930)*sx, b, 10, "e", 0));
-				// 	chargeID += 1;
-
-				// 	array1.splice(i, 1);
-				// 	array2.splice(k, 1);
-				// }
-
 				break;
 			}
 		}

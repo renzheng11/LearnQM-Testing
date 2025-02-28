@@ -9,7 +9,7 @@ class Charge {
 		this.bandPosition = createVector(x, y);
 		this.diameter = 10;
 		this.time = 0;
-		this.maxspeed = 10;
+		this.maxspeed = 5;
 		this.velocity = createVector(0, 0);
 		this.maxforce = 1;
 		this.acceleration = createVector(0, 0);
