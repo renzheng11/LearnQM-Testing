@@ -1,12 +1,19 @@
 @font-face {
 	font-family: "Agency FB";
 	src: local("./Agency_FB.ttf");
-	/* change to url with ../ */
 }
 
-@import url("https://fonts.cdnfonts.com/css/agency-fb");
+@font-face {
+	font-family: "Agency FB";
+	src: url("./Agency_FB.ttf");
+}
 
 @import url("https://fonts.googleapis.com/css2?family=Bai+Jamjuree:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400;1,500;1,600;1,700&display=swap");
+
+:root {
+	--brand: #fff7ae;
+	--bgGrey: #575757;
+}
 
 #body_parent {
 	background-color: #121212;
@@ -23,7 +30,7 @@
 }
 
 .title h1 {
-	font-family: "Bai Jamjuree";
+	font-family: Agency FB;
 	font-style: normal;
 	font-weight: bold;
 	letter-spacing: 2px;
@@ -82,7 +89,7 @@
 .row10 h1,
 .row11 h1,
 .row12 h1 {
-	font-family: "Bai Jamjuree";
+	font-family: Agency FB;
 	font-style: normal;
 	font-weight: normal;
 	font-size: 36px;
@@ -91,9 +98,9 @@
 }
 
 .button {
-	background-color: #fff7ae;
-	/* Green */
+	background-color: var(--brand);
 	border: none;
+	border-radius: 8px;
 	color: black;
 	padding: 12px 16px;
 	text-align: center;
@@ -321,4 +328,66 @@ input {
 	background-color: black;
 	border: 1px solid white;
 	border-radius: 8px;
+}
+
+/* Range slider */
+
+.sliderContainer {
+	margin-top: 32px;
+	margin-bottom: 32px;
+}
+
+.sliderLabel {
+	color: white;
+}
+
+input[type="range"] {
+	-webkit-appearance: none;
+	width: 240px;
+	height: 6px;
+	background: var(--bgGrey);
+	border-radius: 5px;
+	outline: none;
+	transition: background 0.3s;
+	position: relative;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+	width: 240px;
+	height: 6px;
+	border-radius: 5px;
+	background: var(--bgGrey);
+}
+
+input[type="range"]::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	appearance: none;
+	width: 20px;
+	height: 20px;
+	background: var(--brand);
+	border-radius: 50%;
+	cursor: pointer;
+	/* margin-top: -5px; */
+	position: relative;
+	box-shadow: none;
+}
+
+input[type="range"]::-moz-range-thumb {
+	width: 20px;
+	height: 20px;
+	background: var(--brand);
+	border-radius: 50%;
+	cursor: pointer;
+	box-shadow: none;
+}
+
+input[type="range"]::-moz-range-progress {
+	background: var(--brand);
+	height: 6px;
+	border-radius: 5px;
+}
+
+input[type="range"]::-ms-fill-lower {
+	background: var(--brand);
+	border-radius: 5px;
 }

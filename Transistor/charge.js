@@ -278,8 +278,8 @@ class Charge {
 		this.moveBandDiagram();
 		// this.movingVelocity = 1.6;
 
-		// botzDistribution[Math.floor(Math.random() * botzDistribution.length)]; // UNCOMMENT!
-		// this.botz = this.movingVelocity;
+		botzDistribution[Math.floor(Math.random() * botzDistribution.length)]; // UNCOMMENT!
+		this.botz = this.movingVelocity;
 
 		this.velocity = this.direction.mult(this.movingVelocity);
 
@@ -380,11 +380,37 @@ class Charge {
 		//Need to Read the electric field at (this.position.x,this.position.y)
 		//The electric feild that we read has x and y components. Let's call them Ex and Ey. For now I just give them values.
 
-		// check if in zones with EF
-		// check if x zone
+		// READ EF DATA FROM highResGrid.js ==============================================================
+		// subtract base x&y to get dimensions within transistor
 
-		let Ex = 0;
-		let Ey = 0;
+		// width: 640
+		// height: 320
+		let Ex;
+		let Ey;
+
+		let x = this.x - base.x;
+		let y = this.y - base.y;
+		console.log("y, x: ", y, x);
+
+		if (x < 640 && y < 320) {
+			let row = Math.floor(y / 10); // 7 - 7th row
+			let col = Math.floor(x / 10); // 3.5 - round up = 4th row
+
+			console.log("row x col:", row, col);
+
+			console.log("highresgrid", highResGrid);
+			Ex = highResGrid[row][col].efx;
+			Ey = highResGrid[row][col].efy;
+		} else {
+			Ex = 0;
+			Ey = 0;
+		}
+		// ==================================================================================================
+
+		// console.log("chargeEFX x chargeEFY:", chargeEFX, chargeEFY);
+
+		// let Ex = 0;
+		// let Ey = 0;
 
 		// --- SOURCE electric field ---
 		// check if in x

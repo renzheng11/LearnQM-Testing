@@ -81,19 +81,18 @@ let scale_y = 768;
 let sx = 0;
 let sy = 0;
 
-// [vars] Colors ============================================================
+// [vars] Colors -============================================================
 let color = {
 	bg: [18, 18, 18],
 	white: [255, 255, 255],
 	red2: [255, 40, 0],
-	electron: [254, 246, 182],
-	hole: [125, 241, 148],
+	hole: [213, 94, 0],
+	electron: [86, 180, 233],
+	EFColor: [240, 228, 66],
 	graph: [102, 194, 255],
 	wires: [255, 255, 255],
-	EFColor: [218, 112, 214], // electric field
 	CDColor: [2, 104, 255], // charge density
 	controls: [102, 194, 255],
-	pos: [200, 122, 121], // red
 };
 
 // [vars] Charges + Electrons + Holes ============================================================
@@ -473,7 +472,7 @@ function fetchBandDiagramData() {
 // Updating Functions ============================================================
 
 function setup() {
-	accessGrid();
+	// accessGrid();
 	sx = windowWidth / scale_x;
 	sy = windowHeight / scale_y;
 	canvas = createCanvas(windowWidth / 2 + 200, windowHeight);
@@ -518,29 +517,16 @@ function scaleToWindow() {
 function accessGrid() {
 	// create test charge
 	let newCharge = new Charge(35, 70, "h", 1000, "i");
-	// newCharge.botz =
-	// botzDistribution[Math.floor(Math.random() * botzDistribution.length)];
 
-	// let chargeLowResRow = newCharge.y / 8;
-	// let chargeLowResCol = newCharge.x / 16;
-
-	let row = newCharge.y / 10; // 7 - 7th row
-	let col = newCharge.x / 10; // 3.5 - round up = 4th row
+	let row = Math.ceil(newCharge.y / 10); // 7 - 7th row
+	let col = Math.ceil(newCharge.x / 10); // 3.5 - round up = 4th row
 	console.log("row x col:", row, col);
 
-	// let chargeEFX = highResGrid[row][col].efx;
-	// let chargeEFY = highResGrid[row][col].efy;
+	console.log("highresgrid", highResGrid);
+	let chargeEFX = highResGrid[row][col].efx;
+	let chargeEFY = highResGrid[row][col].efy;
 
-	// update charge efx, efy
-
-	// row 2.1875
-
-	// let chargeHighResCol;
-	// let chargeHighResCol;
-
-	// console.log(highResGrid["r1c1"]);
-
-	// What about at different voltages?
+	console.log("chargeEFX x chargeEFY:", chargeEFX, chargeEFY);
 }
 
 function draw() {
