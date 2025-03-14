@@ -158,15 +158,15 @@ class Charge {
 			if (this.color == 0) {
 				//electron
 
-				fill(254, 246, 182, this.appear);
-				stroke(254, 246, 182, this.appear);
+				fill(...color.yellow, this.appear);
+				stroke(...color.yellow, this.appear);
 			} else {
 				//hole
 				noFill();
 
-				stroke(125, 241, 148, this.appear); //green
+				stroke(...color.green, this.appear); //green
 				// stroke(254,246,182, this.appear);
-				strokeWeight(1);
+				strokeWeight(2);
 			}
 			ellipse(this.position.x, this.position.y, this.diameter);
 
@@ -176,8 +176,8 @@ class Charge {
 				if (this.origin.x == 0) {
 					// // console.log("this.origin.x=",this.origin.x);
 					// // console.log("this.origin.y=",this.origin.y);
-					// fill(254, 246, 182, 100);
-					// stroke(254, 246, 182, 100);
+					// fill(...color.yellow, 100);
+					// stroke(...color.yellow, 100);
 					// //yellow
 					// ellipse(
 					// 	this.position.x,
@@ -198,23 +198,24 @@ class Charge {
 					// 	sy;
 					// this.position2.x = this.position.x;
 				} else {
+					// draw electrons on band diagram
 					if (this.straight == 0) {
-						fill(254, 246, 182, 100);
-						stroke(254, 246, 182, 100);
+						fill(...color.yellow, 100);
+						stroke(...color.yellow, 100);
 						ellipse(this.position.x, this.position2.y, 5);
 
 						//this.position2.y = this.origin.x - 4;
 
 						this.position2.x = this.position.x;
 					} else {
-						// fill(254, 246, 182, 100);
-						// stroke(254, 246, 182, 100);
+						// fill(...color.yellow, 100);
+						// stroke(...color.yellow, 100);
 						// ellipse(this.position.x, electronLineData[0].y - 4, 5);
 
 						// this.position2.y = this.origin.x - 4;
 						// this.position2.x = this.position.x;
-						fill(254, 246, 182, 100);
-						stroke(254, 246, 182, 100);
+						fill(...color.yellow, 100);
+						stroke(...color.yellow, 100);
 						ellipse(this.position.x, this.position2.y, 5);
 
 						//this.position2.y = this.origin.x - 4;
@@ -238,41 +239,21 @@ class Charge {
 				}
 
 				if (this.origin.x == 0 && this.origin.y == 0) {
-					// noFill();
-					// stroke(125, 241, 148, 100); //green
-					// strokeWeight(1);
-					// //dense area
-					// //new
-					// ellipse(
-					// 	this.position.x,
-					// 	(s + 111 + this.botz * 8.8 * 0.2 * changeV) * sy,
-					// 	5
-					// );
-					// this.position2.y = (s + 111 + this.botz * 8.8 * 0.2 * changeV) * sy;
-					// this.position2.x = this.position.x;
 				} else {
 					if (this.straight == 0) {
 						noFill();
-						stroke(125, 241, 148, 100); //green
+						stroke(...color.green, 100); //green
 						strokeWeight(1);
-
 						ellipse(this.position.x, this.position2.y, 5);
-
-						//this.position2.y = this.origin.y + 4 - 30 * sy;
-
 						this.position2.x = this.position.x;
 					} else {
 						noFill();
-						stroke(125, 241, 148, 100); //green
+						stroke(...color.green, 100); //green
 						strokeWeight(1);
-
 						ellipse(this.position.x, this.position2.y, 5);
-						//this.position2.y = this.origin.y;
 						this.position2.x = this.position.x;
 					}
 				}
-
-				// }
 			}
 		}
 	}
@@ -801,27 +782,23 @@ class Appear {
 		if (this.show == 1) {
 			if (this.color == 0) {
 				noStroke();
-				fill(254, 246, 182, this.alpha);
-				//fill(125, 241, 148, this.alpha);
+				fill(...color.green, this.alpha);
 				ellipse(this.position.x, this.position.y, this.d);
 			} else if (this.color == 1) {
-				stroke(125, 241, 148, this.alpha);
-				//stroke(255, 121, 97, this.alpha);
+				stroke(...color.green, this.alpha);
 				strokeWeight(2);
 				noFill();
 				ellipse(this.position.x, this.position.y, this.dd);
-				// }
-				// ellipse(this.position.x, this.position.y, this.diameter);
 			} else if (this.color == 2) {
 				strokeWeight(1);
-				fill(254, 246, 182, this.zap);
-				stroke(254, 246, 182, this.zap);
+				fill(...color.green, this.zap);
+				stroke(...color.green, this.zap);
 				ellipse(this.position.x, this.position.y, 10);
 			} else if (this.color == 3) {
 				//hollow
 				strokeWeight(1);
 				noFill();
-				stroke(125, 241, 148, this.zap);
+				stroke(...color.green, this.zap);
 				ellipse(this.position.x, this.position.y, 10);
 			} else if (this.color == 4) {
 				//plus sign add electron
@@ -914,12 +891,12 @@ class Disappear {
 		if (this.show == 1) {
 			if (this.color == 0) {
 				noStroke();
-				fill(254, 246, 182, this.alpha);
+				fill(...color.yellow, this.alpha);
 				//fill(125, 241, 148, this.alpha);
 
 				ellipse(this.position.x, this.position.y, this.d);
 			} else if (this.color == 1) {
-				stroke(125, 241, 148, this.alpha);
+				stroke(...color.green, this.alpha);
 				//stroke(255, 121, 97, this.alpha);
 				strokeWeight(2);
 				noFill();
@@ -936,8 +913,8 @@ class Disappear {
 				// ellipse(this.position.x, this.position.y, this.diameter);
 			} else if (this.color == 2) {
 				strokeWeight(1);
-				fill(254, 246, 182, this.zap);
-				stroke(254, 246, 182, this.zap);
+				fill(...color.yellow, this.zap);
+				stroke(...color.yellow, this.zap);
 				ellipse(this.position.x, this.position.y, 10);
 			}
 		}
@@ -955,353 +932,6 @@ class Disappear {
 
 	update_circle() {
 		this.zap -= 20;
-	}
-}
-
-class LatticeAtom {
-	constructor(x, y, selected, opacity, num) {
-		this.x = x;
-		this.y = y;
-
-		this.selected = selected;
-		this.boundary = false;
-		this.opacity = opacity;
-		this.fadee = opacity;
-		this.num = num;
-		this.appear1 = appear1;
-		this.count = 100;
-
-		this.r = 30;
-	}
-
-	mouseHover() {
-		let d = dist(mouseX, mouseY, this.x, this.y);
-		return d < this.r;
-	}
-
-	show() {
-		// if (scene(1)) {
-		//     stroke(255, 255, 255, this.fadee );
-		//     line(this.x, this.y, this.x + 90, this.y);
-		//     line(this.x, this.y, this.x, this.y + 90);
-		//     noStroke();
-		//     this.fadee -=5;
-		// }
-
-		if (this.selected == false) {
-			//selected !!!
-			if (scene(2)) {
-				drawingContext.setLineDash([]);
-				noStroke();
-				fill(254, 246, 182, this.opacity);
-				ellipse(this.x + width / 45, this.y, 10, 10);
-				ellipse(this.x - width / 45, this.y, 10, 10);
-				ellipse(this.x, this.y + width / 45, 10, 10);
-				ellipse(this.x, this.y - width / 45, 10, 10);
-			} else if (scene(3)) {
-				if (this.num == 1) {
-					drawingContext.setLineDash([]);
-					noStroke();
-					// fill(255, 92, 255, 250); //e
-					fill(198, 92, 255, this.opacity); //e
-					ellipse(this.x, this.y, 30, 30);
-				} else if (this.num == 2) {
-					drawingContext.setLineDash([]);
-					noStroke();
-					fill(254, 246, 182, this.opacity);
-					ellipse(this.x + width / 45, this.y, 10, 10);
-					ellipse(this.x - width / 45, this.y, 10, 10);
-					ellipse(this.x, this.y + width / 45, 10, 10);
-					ellipse(this.x, this.y - width / 45, 10, 10);
-
-					fill(71, 172, 255, this.opacity); //h
-					ellipse(this.x, this.y, 30, 30);
-
-					stroke(255, this.appear1);
-					strokeWeight(5);
-					line(this.x - 10, this.y, this.x + 10, this.y);
-					// line(this.x, this.y-10, this.x, this.y+10);
-					strokeWeight(1);
-
-					this.count -= 10;
-					if (this.count < 0) {
-						this.appear1 += 20;
-					}
-				}
-				// fill(71, 172, 255, this.opacity);
-			} else if (sceneCount == 4) {
-				if (this.num == 1) {
-					fill(198, 92, 255, this.fadee); //e
-					ellipse(this.x, this.y, 30, 30);
-
-					stroke(255, this.appear1);
-					strokeWeight(5);
-					line(this.x - 10, this.y, this.x + 10, this.y);
-					line(this.x, this.y - 10, this.x, this.y + 10);
-					strokeWeight(0);
-
-					this.count -= 10;
-					if (this.count < 0) {
-						this.appear1 += 20;
-					}
-				} else if (this.num == 2) {
-					// drawingContext.setLineDash([]);
-					noStroke();
-					fill(254, 246, 182, this.fadee);
-					ellipse(this.x + width / 45, this.y, 10, 10);
-					ellipse(this.x - width / 45, this.y, 10, 10);
-					ellipse(this.x, this.y + width / 45, 10, 10);
-
-					stroke(255, this.appear1);
-					strokeWeight(5);
-					line(this.x - 10, this.y, this.x + 10, this.y);
-					// line(this.x, this.y-10, this.x, this.y+10);
-					strokeWeight(0);
-				}
-			}
-		}
-
-		if (this.selected) {
-			if (sceneCount == 0.5 || scene(1) || sceneCount == 0.7) {
-				//normal
-				drawingContext.setLineDash([]);
-				noStroke();
-				fill(254, 246, 182, this.opacity);
-				ellipse(this.x + width / 45, this.y, 10, 10);
-				ellipse(this.x - width / 45, this.y, 10, 10);
-				ellipse(this.x, this.y + width / 45, 10, 10);
-
-				ellipse(this.x, this.y - width / 45, 10, 10);
-
-				noStroke();
-				fill(148, 163, 243, this.opacity);
-				ellipse(this.x, this.y, 30, 30);
-			} else if (scene(2)) {
-				//electron
-				drawingContext.setLineDash([]);
-				noStroke();
-				fill(254, 246, 182, this.opacity);
-				ellipse(this.x + width / 45, this.y, 10, 10);
-				ellipse(this.x - width / 45, this.y, 10, 10);
-				ellipse(this.x, this.y + width / 45, 10, 10);
-				ellipse(this.x, this.y - width / 45, 10, 10);
-
-				noStroke();
-				fill(148, 163, 243, this.opacity);
-				ellipse(this.x, this.y, 30, 30);
-			} else if (scene(3)) {
-				//hole
-				drawingContext.setLineDash([]);
-				noStroke();
-				fill(254, 246, 182, this.opacity);
-				ellipse(this.x + width / 45, this.y, 10, 10);
-				ellipse(this.x - width / 45, this.y, 10, 10);
-				ellipse(this.x, this.y + width / 45, 10, 10);
-				ellipse(this.x, this.y - width / 45, 10, 10);
-
-				noStroke();
-				fill(148, 163, 243, this.opacity);
-				ellipse(this.x, this.y, 30, 30);
-			} else if (sceneCount == 4) {
-				//hole
-				drawingContext.setLineDash([]);
-				noStroke();
-				fill(254, 246, 182, this.fadee);
-				ellipse(this.x + width / 45, this.y, 10, 10);
-				ellipse(this.x - width / 45, this.y, 10, 10);
-				ellipse(this.x, this.y + width / 45, 10, 10);
-				ellipse(this.x, this.y - width / 45, 10, 10);
-
-				noStroke();
-				noFill();
-				fill(148, 163, 243, this.fadee);
-				ellipse(this.x, this.y, 30, 30);
-			}
-		} else if (this.boundary) {
-			// clicked
-
-			if (scene(2) || scene(3)) {
-				fill(198, 92, 255, this.opacity + 30);
-				ellipse(this.x, this.y, 30, 30);
-
-				stroke(255, this.appear1);
-				strokeWeight(5);
-
-				line(this.x - 10, this.y, this.x + 10, this.y);
-				line(this.x, this.y - 10, this.x, this.y + 10);
-				strokeWeight(1);
-
-				this.count -= 10;
-				if (this.count < 0) {
-					this.appear1 += 20;
-				}
-			} else if (scene(3)) {
-				if (this.num == 1) {
-					fill(198, 92, 255, this.opacity + 30); //e
-					ellipse(this.x, this.y, 30, 30);
-
-					stroke(255, this.appear1);
-					strokeWeight(5);
-					line(this.x - 10, this.y, this.x + 10, this.y);
-					line(this.x, this.y - 10, this.x, this.y + 10);
-					strokeWeight(1);
-
-					this.count -= 10;
-					if (this.count < 0) {
-						this.appear1 += 20;
-					}
-				} else if (this.num == 2) {
-				}
-			} else if (scene(3)) {
-				if (this.num == 1) {
-					fill(198, 92, 255, this.fadee); //e
-					ellipse(this.x, this.y, 30, 30);
-				} else if (this.num == 2) {
-					fill(71, 172, 255, this.fadee); //h
-					ellipse(this.x, this.y, 30, 30);
-				}
-			}
-		}
-
-		if (this.mouseHover() && this.opacity > 0) {
-			if (scene(2) || scene(3)) {
-				textAlign(CENTER, CENTER);
-				textSize(18);
-				fill(255);
-				noStroke();
-				text("Replace Silicon Atom with Donor Atom", this.x, this.y + 50);
-				textAlign(LEFT, BASELINE);
-			} else if (scene(3)) {
-				textAlign(CENTER, CENTER);
-				textSize(18);
-				fill(255);
-				noStroke();
-				text("Replace Silicon Atom with Acceptor Atom", this.x, this.y + 50);
-				textAlign(LEFT, BASELINE);
-			}
-		}
-	}
-
-	selectAtom() {
-		this.selected = false;
-	}
-}
-
-class freeElectron {
-	constructor(x, y, scene, id) {
-		this.x = x;
-		this.y = y;
-		this.r = 10;
-		this.count = 10;
-		this.scene = scene;
-		this.id = id;
-
-		this.position = createVector(x, y);
-		this.maxspeed = 5;
-		this.velocity = createVector(0, 0);
-		this.maxforce = 0.5;
-		this.acceleration = createVector(0, 0);
-		this.show = 1;
-		this.direction = createVector(random(-1, 1), random(-1, 1));
-		this.movingVelocity = 5;
-	}
-
-	show_1() {
-		if (this.scene == 1) {
-			noStroke();
-			fill(254, 246, 182, 190);
-			ellipse(this.position.x, this.position.y, 10, 10);
-		} else if (this.scene == 2) {
-			fill(18);
-			strokeWeight(2);
-			stroke(125, 241, 148, 225); //green
-
-			ellipse(this.position.x, this.position.y, 10, 10);
-		}
-	}
-
-	update_1() {
-		if (this.count > 0) {
-			this.count--;
-		}
-	}
-
-	random_walk_1() {
-		if (this.scene == 1) {
-			let uPOS = p5.Vector.mult(this.direction, this.movingVelocity);
-			this.position.add(uPOS);
-
-			const r = floor(random(10));
-			const r2 = floor(random(10));
-
-			if (floor(this.position.x) % r == 0 && floor(this.position.y) % r2 == 0) {
-				this.direction = createVector(random(-1, 1), random(-1, 1));
-			}
-
-			if (this.position.x < 90 * sx) {
-				this.direction.x = 1;
-			}
-			if (this.position.x > 940 * sx) {
-				this.direction.x = -1;
-			}
-			if (this.position.y < 20 * sy) {
-				this.direction.y = 1;
-			}
-			if (this.position.y > 770 * sy) {
-				this.direction.y = -1;
-			}
-		}
-
-		if (this.scene == 2) {
-			let d = int(
-				dist(
-					this.position.x,
-					this.position.y,
-					random_hole[this.id].x,
-					random_hole[this.id].y
-				)
-			);
-
-			if (this.position.x <= width / 2 - 6 * 90) {
-				random_hole[this.id] = createVector(
-					width / 2 + 3 * 90,
-					height / 2 + width / 45 + random(random_num1).y * 1 * 90
-				);
-			}
-			if (this.position.x >= width / 2 + 6 * 90) {
-				random_hole[this.id] = createVector(
-					width / 2 - 3 * 90,
-					height / 2 + width / 45 + random(random_num1).y * 1 * 90
-				);
-			}
-			if (this.position.y <= height / 2 - 6 * 90 + width / 45) {
-				random_hole[this.id] = createVector(
-					width / 2 + random(random_num1).x * 2 * 90,
-					height / 2 + width / 45 + 1 * 90
-				);
-			}
-			if (this.position.y >= height / 2 + 6 * 90 + width / 45) {
-				random_hole[this.id] = createVector(
-					width / 2 + random(random_num1).x * 1 * 90,
-					height / 2 + width / 45 + 1 * 90
-				);
-			}
-
-			if (d < 15) {
-				this.position = random_hole[this.id];
-				let numm = int(random(-5, 5));
-				random_hole[this.id] = createVector(
-					this.position.x + random(random_num1).x * numm * 90,
-					this.position.y + random(random_num1).y * numm * 90
-				);
-			}
-			this.direction = p5.Vector.sub(
-				random_hole[this.id],
-				this.position
-			).normalize();
-			let uPOS = p5.Vector.mult(this.direction, this.movingVelocity);
-			this.position.add(uPOS);
-		}
 	}
 }
 

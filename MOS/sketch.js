@@ -24,17 +24,16 @@ const color = {
 	CDColor: [2, 104, 255], // charge density
 	electricFieldOpacity: 160,
 	chargeDensityOpacity: 160,
-	white: [180, 180, 180],
+	grey: [152, 152, 152],
 	black: [0],
 	black2: [30],
 	red: [255],
 	red2: [255, 40, 0],
-	positive: [125, 241, 148],
-	negative: [254, 246, 182],
-	// positive: [255, 122, 121],
-	// negative: [60, 163, 255],
+	positive: [213, 94, 0],
+	negative: [86, 180, 233],
+	efCurve: [204, 121, 167],
+	eiCurve: [240, 228, 66],
 };
-
 /******************************
  * Section: set variables
  *******************************/
@@ -641,7 +640,7 @@ function drawGraph() {
 
 	noFill();
 	textSize(14);
-	stroke(...color.white);
+	stroke(...color.grey);
 
 	context.stroke();
 
@@ -790,7 +789,7 @@ function drawGraph() {
 		80 * sy
 	);
 
-	stroke(...color.white);
+	stroke(...color.grey);
 	fill(30);
 	// draw metal on left side
 	rect(metalX * sx, metalY * sy, metalWidth * sx, metalHeight * sy);
@@ -844,7 +843,7 @@ function drawGraph() {
 		(insulatorLabel.height / 1.5) * sy
 	);
 
-	stroke(...color.white);
+	stroke(...color.grey);
 	strokeWeight(1.5);
 
 	// line from left metal to battery, vertical
@@ -880,7 +879,7 @@ function drawGraph() {
 	);
 
 	// draw outlines
-	stroke(...color.white);
+	stroke(...color.grey);
 	noFill();
 	strokeWeight(1);
 
@@ -1071,7 +1070,7 @@ function drawBandDiagram() {
 	text("c", (920 + subscriptAddX) * sx, (75 + subscriptAddY) * sy); // subscript
 
 	// Ei label
-	fill("#AE8BFF"); // purple
+	fill(...color.eiCurve); // purple
 	textSize(eTextSize * sx);
 	textSize(subscriptTextSize * sx);
 
@@ -1083,7 +1082,8 @@ function drawBandDiagram() {
 	// Ef label
 
 	let yPos_Ef = sceneCount == 1 ? 104 : 90;
-	fill("#FF5839"); // red
+	// fill("#FF5839"); // red
+	fill(...color.efCurve); // test
 	textSize(eTextSize * sx);
 	text("E", 920 * sx, yPos_Ef * sy);
 	textSize(subscriptTextSize * sx);
@@ -1100,7 +1100,7 @@ function drawBandDiagram() {
 
 	noFill();
 	strokeWeight(1);
-	//Draw E_f
+	//Draw E_c
 
 	noFill();
 	stroke(...color.negative);
@@ -1144,7 +1144,7 @@ function drawBandDiagram() {
 	// draw Ei curve
 	strokeWeight(1);
 
-	stroke("#AE8BFF"); // purple
+	stroke(...color.eiCurve); // purple
 	beginShape();
 
 	for (var k = 0; k < bandLength; k++) {
@@ -1161,7 +1161,7 @@ function drawBandDiagram() {
 	endShape();
 
 	// draw Ef curve
-	stroke("#FF5839"); // red
+	stroke(...color.efCurve); // red
 	drawingContext.setLineDash([0]);
 	beginShape();
 	for (var k = 0; k < bandLength; k++) {
@@ -1881,7 +1881,7 @@ function updateCharges() {
 	// }
 
 	// draw metal on right side - drawn here to hide charges going into metal
-	stroke(...color.white);
+	stroke(...color.grey);
 	strokeWeight(1);
 	fill(30);
 	rect(

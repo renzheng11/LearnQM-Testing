@@ -8,9 +8,9 @@ let color = {
 	grey: [152, 152, 152],
 	bg: [18, 18, 18],
 	white: [255, 255, 255],
-	pos: [255, 122, 121],
-	neg: [60, 163, 255],
-	net: [255, 241, 116],
+	pos: [213, 94, 0], // safe
+	neg: [86, 180, 233], // safe
+	net: [240, 228, 66], // safe
 };
 
 let canvas;
@@ -995,6 +995,9 @@ function drawLines(points, rawHeights, color, colorString, drawMid) {
  * @param {*} value
  */
 function toggleArrows(value) {
+	console.log("calling togglearrows");
+	let x = qs("#posToggle5").checked;
+	console.log(x);
 	if (value == "pos") {
 		showPosArrows = !showPosArrows;
 	}
@@ -1045,6 +1048,13 @@ function animateScreen() {
 			resetHTML(".showScreen", "textContent", "Show Screening");
 			resetHTML(".netToggle", "display", "none");
 			resetHTML(".netLabel", "display", "none");
+			qs("#netToggle5").hidden = true;
+			qs("#posToggle5").checked = true;
+			qs("#negToggle5").checked = true;
+
+			qs("#netToggle4").hidden = true;
+			qs("#negToggle4").checked = true;
+			qs("#posToggle4").checked = true;
 
 			showNetArrows = false;
 		} else if (boxRight1.chargeAmount > 0) {
@@ -1067,13 +1077,22 @@ function animateScreen() {
 					boxLeft.updateMinusLineWeight(-boxRight1.lineWeight);
 					if (scene(4)) {
 						animated.scene4 = true;
+						qs("#netToggle4").hidden = false;
+
+						qs("#posToggle4").checked = false;
+						qs("#negToggle4").checked = false;
 					}
 					if (scene(5)) {
 						animated.scene5 = true;
+						qs("#netToggle5").hidden = false;
 					}
 					showNetArrows = true;
 					showPosArrows = false;
 					showNegArrows = false;
+
+					qs("#posToggle5").checked = false;
+					qs("#negToggle5").checked = false;
+
 					resetHTML(".posToggle", "checked", false);
 					resetHTML(".negToggle", "checked", false);
 					resetHTML(".netToggle", "display", "inline-block");
@@ -1614,16 +1633,19 @@ function drawSets(
 					// right
 					fill(...color.neg, fillAmount);
 					noStroke();
-
-					// straight
+					// straight part - HERE
 					beginShape();
-					vertex(boxRight1.x - 66, boxRight1.y + spacing - 3 + offsetY);
+					// vertex(boxRight1.x - 66, boxRight1.y + spacing - 3 + offsetY);
+					// vertex(boxRight1.x, boxRight1.y + spacing - 3 + offsetY);
+					// vertex(boxRight1.x, boxRight1.y + spacing + 3 + offsetY);
+					// vertex(boxRight1.x - 66, boxRight1.y + spacing + 3 + offsetY);
+
+					vertex(52, boxRight1.y + spacing - 3 + offsetY);
 					vertex(boxRight1.x, boxRight1.y + spacing - 3 + offsetY);
 					vertex(boxRight1.x, boxRight1.y + spacing + 3 + offsetY);
-					vertex(boxRight1.x - 66, boxRight1.y + spacing + 3 + offsetY);
+					vertex(52, boxRight1.y + spacing + 3 + offsetY);
 					endShape(CLOSE);
-
-					// sloping
+					// sloping into arrow
 					beginShape();
 					vertex(boxRight1.x, boxRight1.y + spacing - 3 + offsetY);
 					vertex(boxRight1.x, boxRight1.y + spacing + 3 + offsetY);
@@ -1632,7 +1654,6 @@ function drawSets(
 						boxRight1.y + spacing + offsetY
 					);
 					endShape(CLOSE);
-
 					// draw triangle
 					let x = boxRight1.x + boxRight1.w / 2; // left x
 					let y = boxRight1.y + spacing + offsetY; // left y
@@ -2030,6 +2051,21 @@ function resetScene() {
 	resetHTML(".netToggle", "display", "none");
 	resetHTML(".netLabel", "display", "none");
 	resetHTML(".showScreen", "textContent", "Show Screening");
+
+	qs("#negbox6").textContent = "Add surface";
+	qs("#posToggle4").checked = true;
+	qs("#negToggle4").checked = true;
+	qs("#netToggle4").hidden = true;
+	qs("#posToggle5").checked = true;
+	qs("#negToggle5").checked = true;
+	qs("#netToggle5").hidden = true;
+
+	qs("#posToggle6").checked = true;
+	qs("#negToggle6").checked = true;
+	qs("#posToggle7").checked = true;
+	qs("#negToggle7").checked = true;
+	qs("#posToggle8").checked = true;
+	qs("#negToggle8").checked = true;
 
 	qs("#flow").value = 40;
 	qs("#widthSlider").value = 75;

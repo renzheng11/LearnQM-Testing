@@ -3,6 +3,64 @@ Authors: Ren Zheng, Azad Naeemi
 Contact: renzheng112@gmail.com
 ------------------------------- */
 
+// let highResGrid = [
+// 	{
+// 		// ref from low res to access the high res grid
+// 		r3c2: [
+// 			[
+// 				{ efx: 1.15, efy: 5.4 }, // r1c1 of high res
+// 				{ efx: 2.0, efy: 3.5 }, // r1c2 of high res
+// 				// etc to columnm 5
+// 			], // row 1
+// 			[
+// 				{ efx: 1.15, efy: 5.4 }, // r1c1 of high res
+// 				{ efx: 2.0, efy: 3.5 }, // r1c2 of high res
+// 				// etc to columnm 5
+// 			], // row 1
+// 			[
+// 				{ efx: 1.15, efy: 5.4 }, // r1c1 of high res
+// 				{ efx: 2.0, efy: 3.5 }, // r1c2 of high res
+// 				// etc to columnm 5
+// 			], // row 2
+// 			// ... etc to row 5
+// 		],
+// 		r9c12: [
+// 			[
+// 				{ efx: 1.15, efy: 5.4 }, // r1c1 of high res
+// 				{ efx: 2.0, efy: 3.5 }, // r1c2 of high res
+// 				// etc to columnm 5
+// 			], // row 1
+// 			[
+// 				{ efx: 1.15, efy: 5.4 }, // r1c1 of high res
+// 				{ efx: 2.0, efy: 3.5 }, // r1c2 of high res
+// 				// etc to columnm 5
+// 			], // row 1
+// 			[
+// 				{ efx: 1.15, efy: 5.4 }, // r1c1 of high res
+// 				{ efx: 2.0, efy: 3.5 }, // r1c2 of high res
+// 				// etc to columnm 5
+// 			], // row 2
+// 			// ... etc to row 5
+// 		],
+// 	},
+// ];
+
+// res: 0 - means that EF is consistent in the low res region
+// res: 1 - means that EF is variable in the low res region - then we know to look at high res grid
+// let lowResGrid = [
+// 	[
+// 		{ efx: 1.15, efy: 5.4, ref: "r3c1" }, // r1c1
+// 		{ efx: 2.0, efy: 3.5, ref: "r3c1" }, // r1c2
+// 		// ... etc to column 18
+// 	], // row 1
+// 	[
+// 		{ efx: 5, efy: 5, ref: null }, // r2c1
+// 		{ efx: 5, efy: 5, ref: null }, // r2c2
+// 		// ... etc to column 18
+// 	], // row 2
+// 	// etc to row 9
+// ];
+
 // tools
 function qs(selector) {
 	return document.querySelector(selector);
@@ -118,8 +176,8 @@ const dim = {
 	x: unit * 26,
 	y: unit * 44,
 
-	width: unit * 80,
-	height: unit * 40,
+	width: unit * 80, // 640
+	height: unit * 40, // 320
 
 	// metal + insulator
 	metalWidth: unit * 40,
@@ -415,6 +473,7 @@ function fetchBandDiagramData() {
 // Updating Functions ============================================================
 
 function setup() {
+	accessGrid();
 	sx = windowWidth / scale_x;
 	sy = windowHeight / scale_y;
 	canvas = createCanvas(windowWidth / 2 + 200, windowHeight);
@@ -456,6 +515,34 @@ function scaleToWindow() {
 	}
 }
 
+function accessGrid() {
+	// create test charge
+	let newCharge = new Charge(35, 70, "h", 1000, "i");
+	// newCharge.botz =
+	// botzDistribution[Math.floor(Math.random() * botzDistribution.length)];
+
+	// let chargeLowResRow = newCharge.y / 8;
+	// let chargeLowResCol = newCharge.x / 16;
+
+	let row = newCharge.y / 10; // 7 - 7th row
+	let col = newCharge.x / 10; // 3.5 - round up = 4th row
+	console.log("row x col:", row, col);
+
+	// let chargeEFX = highResGrid[row][col].efx;
+	// let chargeEFY = highResGrid[row][col].efy;
+
+	// update charge efx, efy
+
+	// row 2.1875
+
+	// let chargeHighResCol;
+	// let chargeHighResCol;
+
+	// console.log(highResGrid["r1c1"]);
+
+	// What about at different voltages?
+}
+
 function draw() {
 	scaleToWindow();
 
@@ -475,17 +562,17 @@ function draw() {
 	// test particle
 	noFill();
 	stroke(200);
-	rect(
-		windowWidth / 2 - SQUARE_SIZE / 2,
-		windowHeight / 2 - SQUARE_SIZE / 2,
-		SQUARE_SIZE,
-		SQUARE_SIZE
-	);
+	// rect(
+	// 	windowWidth / 2 - SQUARE_SIZE / 2,
+	// 	windowHeight / 2 - SQUARE_SIZE / 2,
+	// 	SQUARE_SIZE,
+	// 	SQUARE_SIZE
+	// );
 
 	// Update and display particles
 	particles.forEach((particle) => {
-		particle.update();
-		particle.display();
+		// particle.update();
+		// particle.display();
 	});
 }
 

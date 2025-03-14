@@ -53,7 +53,7 @@ class Charge {
 				//hole
 				noFill();
 				stroke(...color.positive, this.opacity); //positive
-				strokeWeight(1);
+				strokeWeight(2);
 			}
 
 			// draw charges in capacitor
@@ -67,11 +67,11 @@ class Charge {
 				if (this.bandOrigin.x == 0 && this.bandOrigin.y == 0) {
 				} else {
 					//  added pairs electron
-					fill(...color.negative, 160);
+					fill(...color.negative, 200);
 					noStroke();
 					// don't draw until it has botz calculated and has snapped to band
 					if (this.bandPosition.y > 10 && this.position.x < xMax + buffer) {
-						ellipse(this.position.x, this.bandPosition.y, 5);
+						ellipse(this.position.x, this.bandPosition.y, 6);
 					}
 					this.bandPosition.y =
 						this.bandOrigin.y - ((this.botz * 8.8 * 2 * 0.1) / 3) * sy; // subtracting bc electron is above band
@@ -80,13 +80,13 @@ class Charge {
 				// draw holes on band diagram
 				//added pairs senario
 				noFill();
-				stroke(...color.positive, 160); //positive
-				strokeWeight(1);
+				stroke(...color.positive, 200); //positive
+				strokeWeight(1.5);
 
 				// don't draw until it has botz calculated and has snapped to band
 
 				if (this.bandPosition.y > 100 && this.position.x < xMax + buffer) {
-					ellipse(this.position.x, this.bandPosition.y, 5);
+					ellipse(this.position.x, this.bandPosition.y, 6);
 				}
 				this.bandPosition.y =
 					this.bandOrigin.y + ((this.botz * 8.8 * 2 * 0.1) / 3) * sy; // adding bc hole is below band
@@ -509,7 +509,7 @@ class Effect {
 		this.chargeType = chargeType;
 		this.showing = true;
 		this.generationOpacity = 135; //appear opacity
-		this.beta = 0;
+		this.opacity = 0;
 		this.recombineOpacity = 255;
 		this.d = 1;
 		this.effectDiameter = 50;
@@ -553,7 +553,7 @@ class Effect {
 			} else if (this.chargeType == "fixpos") {
 				// 4
 				//plus sign add electron
-				stroke(255, this.beta);
+				stroke(255, this.opacity);
 				strokeWeight(5);
 				line(this.x - 10, this.y, this.x + 10, this.y);
 				line(this.x, this.y - 10, this.x, this.y + 10);
@@ -562,7 +562,7 @@ class Effect {
 			} else if (this.chargeType == "fixneg") {
 				// 5
 				//minus sign add electron
-				stroke(255, this.beta);
+				stroke(255, this.opacity);
 				strokeWeight(5);
 				line(this.x - 10, this.y, this.x + 10, this.y);
 				noStroke();
@@ -589,8 +589,8 @@ class Effect {
 			this.generationOpacity -= 15;
 			this.effectDiameter -= 3;
 		} else if (this.chargeType == "fixpos" || this.chargeType == "fixneg") {
-			if (this.beta < 100) {
-				this.beta += 30;
+			if (this.opacity < 60) {
+				this.opacity += 10;
 				// this.d += 4;
 			}
 		}
