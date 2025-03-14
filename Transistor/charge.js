@@ -390,15 +390,12 @@ class Charge {
 
 		let x = this.x - base.x;
 		let y = this.y - base.y;
-		console.log("y, x: ", y, x);
 
 		if (x < 640 && y < 320) {
 			let row = Math.floor(y / 10); // 7 - 7th row
 			let col = Math.floor(x / 10); // 3.5 - round up = 4th row
 
-			console.log("row x col:", row, col);
-
-			console.log("highresgrid", highResGrid);
+			// CHANGE PROFILE - change name of highResGrid
 			Ex = highResGrid[row][col].efx;
 			Ey = highResGrid[row][col].efy;
 		} else {
@@ -414,58 +411,58 @@ class Charge {
 
 		// --- SOURCE electric field ---
 		// check if in x
-		if (
-			this.position.x > base.ef.source.xMin &&
-			this.position.x < base.ef.source.xMax
-		) {
-			// check in y
-			if (this.position.y < base.ef.source.yMax) {
-				// in EF zone
-				let xDistance = Math.abs(this.position.x - base.sourceEndX);
-				// let xDistance = this.position.x - base.x;
-				Ex = xDistance * 160;
-			}
-		}
+		// if (
+		// 	this.position.x > base.ef.source.xMin &&
+		// 	this.position.x < base.ef.source.xMax
+		// ) {
+		// 	// check in y
+		// 	if (this.position.y < base.ef.source.yMax) {
+		// 		// in EF zone
+		// 		let xDistance = Math.abs(this.position.x - base.sourceEndX);
+		// 		// let xDistance = this.position.x - base.x;
+		// 		Ex = xDistance * 160;
+		// 	}
+		// }
 
-		// check if in y
-		else if (
-			this.position.y > base.ef.source.yMin &&
-			this.position.y < base.ef.source.yMax
-		) {
-			// check if in x
-			if (this.position.x < base.ef.source.xMax) {
-				// in EF zone
-				let yDistance = Math.abs(this.position.y - base.sourceEndY);
-				Ey = yDistance * 160;
-			}
-		}
+		// // check if in y
+		// else if (
+		// 	this.position.y > base.ef.source.yMin &&
+		// 	this.position.y < base.ef.source.yMax
+		// ) {
+		// 	// check if in x
+		// 	if (this.position.x < base.ef.source.xMax) {
+		// 		// in EF zone
+		// 		let yDistance = Math.abs(this.position.y - base.sourceEndY);
+		// 		Ey = yDistance * 160;
+		// 	}
+		// }
 
-		// --- DRAIN electric field ---
-		// check if in x
-		if (
-			this.position.x > base.ef.drain.xMin &&
-			this.position.x < base.ef.drain.xMax
-		) {
-			// check in y
-			if (this.position.y < base.ef.drain.yMax) {
-				// in EF zone
-				// let xDistance = this.position.x - base.x;
-				let xDistance = Math.abs(base.drainX - this.position.x);
-				Ex = -xDistance * 160;
-			}
-		}
-		// check if in y
-		else if (
-			this.position.y > base.ef.drain.yMin &&
-			this.position.y < base.ef.drain.yMax
-		) {
-			// check if x
-			if (this.position.x > base.ef.drain.xMin) {
-				// in EF zone
-				let yDistance = Math.abs(this.position.y - base.sourceEndY);
-				Ey = yDistance * 160;
-			}
-		}
+		// // --- DRAIN electric field ---
+		// // check if in x
+		// if (
+		// 	this.position.x > base.ef.drain.xMin &&
+		// 	this.position.x < base.ef.drain.xMax
+		// ) {
+		// 	// check in y
+		// 	if (this.position.y < base.ef.drain.yMax) {
+		// 		// in EF zone
+		// 		// let xDistance = this.position.x - base.x;
+		// 		let xDistance = Math.abs(base.drainX - this.position.x);
+		// 		Ex = -xDistance * 160;
+		// 	}
+		// }
+		// // check if in y
+		// else if (
+		// 	this.position.y > base.ef.drain.yMin &&
+		// 	this.position.y < base.ef.drain.yMax
+		// ) {
+		// 	// check if x
+		// 	if (this.position.x > base.ef.drain.xMin) {
+		// 		// in EF zone
+		// 		let yDistance = Math.abs(this.position.y - base.sourceEndY);
+		// 		Ey = yDistance * 160;
+		// 	}
+		// }
 
 		// NOT IN EF
 		// else {
@@ -477,7 +474,7 @@ class Charge {
 		let randomXdirection = createVector(random(-1, 1), 1);
 		let randomYdirection = createVector(1, random(-1, 1));
 
-		let accelFactor = 2; ////It might be better to make it a global variable that we define. We can do that later.
+		let accelFactor = 6; ////It might be better to make it a global variable that we define. We can do that later.
 		this.accel.x = Ex * accelFactor;
 		this.accel.y = Ey * accelFactor;
 
