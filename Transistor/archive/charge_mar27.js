@@ -273,17 +273,15 @@ class Charge {
 
 	update() {
 		this.accelerate(); // update this.velocity baed on EF
-		//this.velocity.limit(this.maxspeed);
+		this.velocity.limit(this.maxspeed);
 		this.position.add(this.velocity); // Update this.position dimd on its velocity
-		this.x = this.position.x;
-		this.y = this.position.y;
 		this.moveBandDiagram();
 		// this.movingVelocity = 1.6;
 
-		//botzDistribution[Math.floor(Math.random() * botzDistribution.length)]; // UNCOMMENT!
-		//this.botz = this.movingVelocity;
+		botzDistribution[Math.floor(Math.random() * botzDistribution.length)]; // UNCOMMENT!
+		this.botz = this.movingVelocity;
 
-		//this.velocity = this.direction.mult(this.movingVelocity);
+		this.velocity = this.direction.mult(this.movingVelocity);
 
 		////////////////////// avoid going into the bandgap (added by Azad)
 
@@ -385,43 +383,25 @@ class Charge {
 		// READ EF DATA FROM highResGrid.js ==============================================================
 		// subtract base x&y to get dimensions within transistor
 
-		width: 640
-		height: 320
+		// width: 640
+		// height: 320
 		let Ex;
 		let Ey;
 
 		let x = this.x - base.x;
 		let y = this.y - base.y;
 
-		console.log("x, y", x, y);
-		if (x < 640 && x>0 && y < 320 && y>0) {
+		if (x < 640 && y < 320) {
 			let row = Math.floor(y / 10); // 7 - 7th row
 			let col = Math.floor(x / 10); // 3.5 - round up = 4th row
 
-			console.log("row, col", row, col);
 			// CHANGE PROFILE - change name of highResGrid
-			 Ex = highResGrid[row][col].efx;
-			 if (Ex<3000 && Ex>-3000 ){Ex=0}
-			 else{Ex=Ex/100000}
-
-			 Ey = highResGrid[row][col].efy/2;
-			 //console.log("x, y, Ex, Ey", col, row, Ex, Ey);
-			 if(Ey<6000) {Ey=0;}
-			 else{Ey=Ey/100000;}
-			
+			Ex = highResGrid[row][col].efx;
+			Ey = highResGrid[row][col].efy;
 		} else {
 			Ex = 0;
 			Ey = 0;
 		}
-		let col = Math.floor((640-120) / 10);
-		console.log("highres", highResGrid[5][col].efy);
-		
-
-		// if (x > 140 && x < 180 && y < 160) {Ex=0.5;}
-		// if (y > 140 && y < 180 && x < 160) {Ey=0.5;}
-console.log("this.position.x, x", this.position.y, this.y);
-//console.log("base.x, base.y", base.x, base.y);
-//console.log('base.ef.source.xMin', base.ef.source.xMin);
 		// ==================================================================================================
 
 		// console.log("chargeEFX x chargeEFY:", chargeEFX, chargeEFY);
@@ -429,8 +409,8 @@ console.log("this.position.x, x", this.position.y, this.y);
 		// let Ex = 0;
 		// let Ey = 0;
 
-		// // --- SOURCE electric field ---
-		// // check if in x
+		// --- SOURCE electric field ---
+		// check if in x
 		// if (
 		// 	this.position.x > base.ef.source.xMin &&
 		// 	this.position.x < base.ef.source.xMax
@@ -484,8 +464,6 @@ console.log("this.position.x, x", this.position.y, this.y);
 		// 	}
 		// }
 
-		// console.log("x, y, Ex, Ey", Ex, Ey);
-		//console.log("x, y, Ex, Ey", this.position.x, this.position.y, Ex, Ey);
 		// NOT IN EF
 		// else {
 		// 	this.diameter = 10;
@@ -499,8 +477,6 @@ console.log("this.position.x, x", this.position.y, this.y);
 		let accelFactor = 6; ////It might be better to make it a global variable that we define. We can do that later.
 		this.accel.x = Ex * accelFactor;
 		this.accel.y = Ey * accelFactor;
-		//console.log("this", this.accel.x, this.accel.y);
-
 
 		if (this.type == "e") {
 			//if an electron, accel in in the opposite direction of the electric field.

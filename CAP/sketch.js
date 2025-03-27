@@ -21,15 +21,16 @@ let color = {
 	grey: [175, 175, 175],
 	// pos: [125, 241, 148], old
 	// neg: [255, 247, 174], old
-	pos: [200, 122, 121], // red
-	neg: [60, 163, 255], // blue
+	pos: [213, 94, 0], // red
+	neg: [86, 180, 233], // blue
 	// sign:  [65, 46, 46, 1],
 	// pos: [125, 241, 148], // green
 	// neg: [254, 246, 182], // yellow
 	sign: [90, 60, 60],
 	battery: [230, 226, 188],
-	net: [255, 241, 116],
-	scanner: [125, 241, 148],
+	net: [240, 228, 66],
+	// scanner: [125, 241, 148],
+	scanner: [0, 158, 115],
 	neutral: [79, 79, 79],
 };
 // set rows & cols for positive charge grid
