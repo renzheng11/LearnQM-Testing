@@ -1,3 +1,5 @@
+// !!! comments where changes need to be made
+
 class Charge {
 	constructor(x, y, type, id, age) {
 		this.x = x;
@@ -6,7 +8,8 @@ class Charge {
 		this.position = createVector(x, y);
 		this.bandPosition = createVector(x, y);
 		this.bandOrigin = createVector(0, 0);
-		this.diameter = 10;
+		this.diameter = 8;
+		this.recomDiameter = 40;
 		this.maxspeed = 5;
 		this.velocity = createVector(0, 0);
 		this.maxforce = 1;
@@ -157,16 +160,22 @@ class Charge {
 			} else if (this.type == "ge") {
 				// generation effect
 				strokeWeight(1);
-				fill(...color.electron, this.opacity);
-				stroke(...color.electron, this.opacity);
+				// fill(...color.electron, this.opacity);
+				// stroke(...color.electron, this.opacity);
+				fill(...color.generation, this.opacity);
+				stroke(...color.generation, this.opacity);
 				ellipse(this.position.x, this.position.y, this.diameter);
-			} else if (this.type == "re") {
+			} else if (this.type == "re" && this.recomDiameter > 0) {
 				// recombination effect
-				stroke(...color.hole, this.opacity);
-				noFill();
+				// stroke(...color.hole, this.opacity);
+				// fill(...color.hole, this.opacity / 4);
+				stroke(...color.recom, this.opacity);
+				fill(...color.recom, this.opacity / 4);
+				// stroke("fff");
+				// noFill();
 				strokeWeight(1);
 				// ellipse(this.position.x, this.position.y, this.diameter);
-				ellipse(this.position.x, this.position.y, this.diameter);
+				ellipse(this.position.x, this.position.y, this.recomDiameter);
 			}
 			this.drawOnBand();
 		}
@@ -212,11 +221,11 @@ class Charge {
 		} else if (this.type == "th") {
 			this.opacity -= 10;
 		} else if (this.type == "ge") {
-			this.opacity -= 15;
+			this.opacity -= 20;
 			this.diameter += 3;
 		} else if (this.type == "re") {
-			this.opacity -= 10;
-			this.diameter -= 3;
+			this.opacity -= 20;
+			this.recomDiameter -= 3;
 		}
 	}
 
@@ -302,10 +311,28 @@ class Charge {
 			this.velocity.x = -this.velocity.x;
 			this.position.x -= 8;
 		}
+
+		// top
 		if (this.position.y - this.diameter < base.y + buffer) {
-			// top
-			this.velocity.y = -this.velocity.y;
-			this.position.y += 8;
+			// if outside of drain  - bounce of top
+			if (this.position.x < base.drainX) {
+				// bounce off top
+				this.velocity.y = -this.velocity.y;
+				this.position.y += 8;
+			} else if (this.position.x > base.drainX) {
+				// if outer battery on & inner battery voltage is large enough
+				// !!! need to revise innerBatteryVoltage
+				if (outerBatteryOn && innerBatteryVoltage > 3) {
+					// electrons that go out of top of drain goes through
+					// move position to top of source +
+					this.position.x -= base.width - base.sourceWidth;
+					this.velocity.y = -this.velocity.y;
+				} else {
+					// bounce off top of drain
+					this.velocity.y = -this.velocity.y;
+					this.position.y += 8;
+				}
+			}
 		}
 
 		// Move in and out of metal on bottom
@@ -385,46 +412,41 @@ class Charge {
 		// READ EF DATA FROM highResGrid.js ==============================================================
 		// subtract base x&y to get dimensions within transistor
 
-		width: 640
-		height: 320
+		width: 640;
+		height: 320;
 		let Ex;
 		let Ey;
 
 		let x = this.x - base.x;
 		let y = this.y - base.y;
 
-		console.log("x, y", x, y);
-		if (x < 640 && x>0 && y < 320 && y>0) {
+		if (x < 640 && x > 0 && y < 320 && y > 0) {
 			let row = Math.floor(y / 10); // 7 - 7th row
 			let col = Math.floor(x / 10); // 3.5 - round up = 4th row
 
-			console.log("row, col", row, col);
 			// CHANGE PROFILE - change name of highResGrid
-			 Ex = highResGrid[row][col].efx;
-			 if (Ex<3000 && Ex>-3000 ){Ex=0}
-			 else{Ex=Ex/100000}
+			Ex = highResGrid[row][col].efx;
+			if (Ex < 3000 && Ex > -3000) {
+				Ex = 0;
+			} else {
+				Ex = Ex / 100000;
+			}
 
-			 Ey = highResGrid[row][col].efy/2;
-			 //console.log("x, y, Ex, Ey", col, row, Ex, Ey);
-			 if(Ey<6000) {Ey=0;}
-			 else{Ey=Ey/100000;}
-			
+			Ey = highResGrid[row][col].efy / 2;
+			if (Ey < 6000) {
+				Ey = 0;
+			} else {
+				Ey = Ey / 100000;
+			}
 		} else {
 			Ex = 0;
 			Ey = 0;
 		}
-		let col = Math.floor((640-120) / 10);
-		console.log("highres", highResGrid[5][col].efy);
-		
+		let col = Math.floor((640 - 120) / 10);
 
 		// if (x > 140 && x < 180 && y < 160) {Ex=0.5;}
 		// if (y > 140 && y < 180 && x < 160) {Ey=0.5;}
-console.log("this.position.x, x", this.position.y, this.y);
-//console.log("base.x, base.y", base.x, base.y);
-//console.log('base.ef.source.xMin', base.ef.source.xMin);
 		// ==================================================================================================
-
-		// console.log("chargeEFX x chargeEFY:", chargeEFX, chargeEFY);
 
 		// let Ex = 0;
 		// let Ey = 0;
@@ -484,8 +506,6 @@ console.log("this.position.x, x", this.position.y, this.y);
 		// 	}
 		// }
 
-		// console.log("x, y, Ex, Ey", Ex, Ey);
-		//console.log("x, y, Ex, Ey", this.position.x, this.position.y, Ex, Ey);
 		// NOT IN EF
 		// else {
 		// 	this.diameter = 10;
@@ -499,8 +519,6 @@ console.log("this.position.x, x", this.position.y, this.y);
 		let accelFactor = 6; ////It might be better to make it a global variable that we define. We can do that later.
 		this.accel.x = Ex * accelFactor;
 		this.accel.y = Ey * accelFactor;
-		//console.log("this", this.accel.x, this.accel.y);
-
 
 		if (this.type == "e") {
 			//if an electron, accel in in the opposite direction of the electric field.

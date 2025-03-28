@@ -1,10 +1,11 @@
 class wireCharge {
 	constructor(x, y, loop) {
 		this.position = createVector(x, y);
-		this.velocity = createVector(random(4, 12), 0); // Initial random velocity
+		// this.velocity = createVector(random(4, 12), 0); // Initial random velocity
+		this.velocity = createVector(10, 0); // Initial random velocity
 		this.show = true;
 		this.passedDest = [0];
-		this.speed = random(12, 16); // 8, 12, buffer = 8 working
+		this.speed = 20; // at this speed, the charges move consistently on the wires, at lower or hire speeds sometimes it goes outside the wire due to dimensions
 		this.loop = loop;
 		this.gateStop = random(0, 360);
 	}
@@ -44,7 +45,7 @@ class wireCharge {
 
 		if (show) {
 			fill(...color.electron);
-			ellipse(this.position.x, this.position.y, 10);
+			ellipse(this.position.x, this.position.y, 8);
 		}
 	}
 
@@ -83,7 +84,11 @@ class wireCharge {
 		direction.normalize();
 
 		// Scale the direction vector by the ball's speed
-		direction.mult(this.speed);
+		if (this.loop == "outer") {
+			direction.mult(this.speed / 2);
+		} else {
+			direction.mult(this.speed);
+		}
 
 		// Update the position based on the direction vector
 		this.position.add(direction);
@@ -92,10 +97,10 @@ class wireCharge {
 			// outer loop
 			// horizontal
 			if (this.position.y < base.outerY) {
-				this.position.y += 1;
+				// this.position.y += 1;
 			}
 			if (this.position.y > base.outerY) {
-				this.position.y -= 1;
+				// this.position.y -= 1;
 			}
 
 			// vertical
@@ -110,18 +115,18 @@ class wireCharge {
 		} else {
 			// inner loop
 			if (this.position.y < base.innerY) {
-				this.position.y += 1;
+				// this.position.y += 1;
 			}
 			if (this.position.y > base.innerY) {
-				this.position.y -= 1;
+				// this.position.y -= 1;
 			}
 			// if (this.position.x < base.wire.leftMetal.x - 4) {
 			// vertical
 			if (this.position.x < base.wire.leftMetal.x) {
-				this.position.x += 1;
+				// this.position.x += 1;
 			}
 			if (this.position.x > base.wire.leftMetal.x) {
-				this.position.x -= 1;
+				// this.position.x -= 1;
 			}
 		}
 	}

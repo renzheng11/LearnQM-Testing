@@ -35,6 +35,8 @@ let color = {
 	wires: [255, 255, 255],
 	CDColor: [2, 104, 255], // charge density
 	controls: [102, 194, 255],
+	generation: [0, 158, 115],
+	recom: [152, 152, 152],
 };
 
 // [vars] Charges + Electrons + Holes ============================================================
@@ -60,7 +62,7 @@ let generationInterval;
 let generationRate = 4000;
 let recomRate = 4000;
 let recomOn = true;
-let recomDistance = 2; //distance for recom
+let recomDistance = 12; //distance for recom
 let recomEffectsPositions = [];
 let recomCount = 0;
 let recomEffects = [];
@@ -84,8 +86,8 @@ let innerLoop = [];
 let outerLoop = [];
 let innerLoopOn = false; // toggles inner battery electron transfer
 let outerLoopOn = false; // toggles outer battery electron transfer
-let numInnerLoop = 5; // number of charges for inner battery
-let numOuterLoop = 30; // // number of charges for outer battery
+let innerBatteryVoltage = 5; // number of charges for inner battery
+let numOuterLoop = 15; // // number of charges for outer battery
 
 let innerLoopDirection = 0; // left - pos to neg
 let showMetalPosCharges; // show positive charges on gate
@@ -462,13 +464,9 @@ function accessGrid() {
 
 	let row = Math.ceil(newCharge.y / 10); // 7 - 7th row
 	let col = Math.ceil(newCharge.x / 10); // 3.5 - round up = 4th row
-	console.log("row x col:", row, col);
 
-	console.log("highresgrid", highResGrid);
 	let chargeEFX = highResGrid[row][col].efx;
 	let chargeEFY = highResGrid[row][col].efy;
-
-	console.log("chargeEFX x chargeEFY:", chargeEFX, chargeEFY);
 }
 
 function draw() {
@@ -518,7 +516,7 @@ function resetScene() {
 	// outerLoop = [];
 	// innerLoopOn = false;
 	// outerLoopOn = false;
-	// numInnerLoop = 30;
+	// innerBatteryVoltage = 30;
 	// numOuterLoop = 30;
 
 	// generationEffects = [];
@@ -538,15 +536,21 @@ function resetScene() {
 function initWireElectrons() {
 	for (let i = 0; i < numOuterLoop; i++) {
 		let x = base.wire.rightMetal.x;
-		let y = base.wire.rightMetal.y + random(0, 500);
+		// yRange is range of y used to spread out the charges during animation
+		// yRange is divided by numOuterLoop to determine how spread out charges are
+		let yRange = 900;
+		let y = base.wire.rightMetal.y + i * (yRange / numOuterLoop);
+
 		outerLoop.push(new wireCharge(x, y, "outer"));
 	}
 
-	for (let i = 0; i < numInnerLoop; i++) {
-		let x = base.wire.topMetal.x;
-		let y = base.wire.topMetal.y + random(0, 80);
+	for (let i = 0; i < innerBatteryVoltage; i++) {
+		// moving electrons
+		let x = base.wire.innerBatteryRight.x;
+		let y = base.wire.topMetal.y + i * (200 / innerBatteryVoltage);
 		innerLoop.push(new wireCharge(x, y, "inner"));
 
+		// show fixed positive charges
 		x = random(
 			base.x + base.sourceWidth + 16,
 			base.endX - base.sourceWidth - 16
@@ -684,6 +688,29 @@ function regenerate() {
 	}, 100); // scattring time
 }
 
+function mouseClicked() {
+	let x = mouseX - 100;
+	let y = mouseY - 120;
+
+	generationEffects.push(new Charge(x, y, "ge", chargeID));
+	//let xx = findClosestValue(electronLine, a);
+	// let xx = findClosestValue(electronBand, a);
+
+	let newElectron = new Charge(x, y, "e", chargeID, "g");
+	// aa.origin.x = xx;
+	// aa.top = 1;
+	electrons.push(newElectron);
+
+	// let yy = findClosestValue(holeBand, a);
+
+	let newHole = new Charge(x, y, "h", chargeID, "g");
+	// bb.origin.y = yy;
+	// bb.top = 1;
+	holes.push(newHole);
+
+	chargeID += 1;
+}
+
 //generate electron hole pairs based on frequency
 function generateCharges(numCharges) {
 	// reset interval
@@ -805,31 +832,59 @@ function recom(electrons, holes) {
 				// electrons[i].deactivate();
 				// holes[k].deactivate();
 
-				recomEffectsPositions[recomCount] = p5.Vector.div(
-					p5.Vector.add(holes[k].position, electrons[i].position),
-					2
+				recomEffectsPositions.push(
+					p5.Vector.div(
+						p5.Vector.add(holes[k].position, electrons[i].position),
+						2
+					)
 				);
 
 				//effects
 
-				recomEffects[recomCount] = new Charge(
-					recomEffectsPositions[recomCount].x,
-					recomEffectsPositions[recomCount].y,
-					"re",
-					recomCount
+				recomEffects.push(
+					new Charge(
+						recomEffectsPositions[recomCount].x,
+						recomEffectsPositions[recomCount].y,
+						"re",
+						recomCount
+					)
 				);
-				recomTempElectrons[recomCount] = new Charge(
-					electrons[i].position.x,
-					electrons[i].position.y,
-					"te",
-					recomCount
+				recomTempElectrons.push(
+					new Charge(
+						electrons[i].position.x,
+						electrons[i].position.y,
+						"te",
+						recomCount
+					)
 				);
-				recomTempHoles[recomCount] = new Charge(
-					holes[k].position.x,
-					holes[k].position.y,
-					"th",
-					recomCount
+				recomTempHoles.push(
+					new Charge(holes[k].position.x, holes[k].position.y, "th", recomCount)
 				);
+				// recomEffectsPositions[recomCount] = p5.Vector.div(
+				// 	p5.Vector.add(holes[k].position, electrons[i].position),
+				// 	2
+				// );
+
+				// //effects
+
+				// recomEffects[recomCount] = new Charge(
+				// 	recomEffectsPositions[recomCount].x,
+				// 	recomEffectsPositions[recomCount].y,
+				// 	"re",
+				// 	recomCount
+				// );
+				// recomTempElectrons[recomCount] = new Charge(
+				// 	electrons[i].position.x,
+				// 	electrons[i].position.y,
+				// 	"te",
+				// 	recomCount
+				// );
+				// recomTempHoles[recomCount] = new Charge(
+				// 	holes[k].position.x,
+				// 	holes[k].position.y,
+				// 	"th",
+				// 	recomCount
+				// );
 
 				recomCount++;
 
@@ -922,6 +977,14 @@ function animateOuterLoop() {
 	}
 }
 
+function resetInnerLoopPositions() {
+	// reset electron positions again so they appear spread out when they move back to metal
+	for (let i = 0; i < innerBatteryVoltage; i++) {
+		innerLoop[i].position.y =
+			base.wire.leftMetal.y + i * (200 / innerBatteryVoltage);
+	}
+}
+
 function animateInnerLoop() {
 	// let stopPositions = [];
 	// stopPositions.push(createVector(...base.wire.innerBatteryRight));
@@ -974,7 +1037,7 @@ function animateInnerLoop() {
 				}, 1000);
 			}
 		} else {
-			// move back to top metal
+			// when reset button pressed (inverses innerLoopDirection), move back to metal
 			if (
 				electron.position.x < base.wire.innerBattery.x &&
 				electron.position.y > base.wire.innerBatteryLeft.y + 8
@@ -994,6 +1057,7 @@ function animateInnerLoop() {
 					setTimeout(() => {
 						showMetalPosCharges = false;
 						toggleChargeSliders("on");
+						resetInnerLoopPositions();
 					}, 1000);
 				} else {
 					electron.move(
@@ -1062,7 +1126,7 @@ function toggleInnerBattery() {
 		innerLoopOn = true;
 		innerLoopDirection = 1;
 
-		// if run into issues later, use: resetScene();
+		resetInnerLoopPositions();
 	} else if (btn.innerText == "Apply Charge") {
 		btn.innerText = "Reset";
 		innerLoopOn = true;
@@ -1086,16 +1150,17 @@ function toggleChargeSliders(state) {
 }
 
 function updateInnerBatteryCharge(numCharges) {
-	numInnerLoop = numCharges;
-	console.log(numInnerLoop);
+	innerBatteryVoltage = numCharges;
 
 	innerLoop = [];
 	metalPosCharges = [];
-	for (let i = 0; i < numInnerLoop; i++) {
-		let x = base.wire.topMetal.x;
+	for (let i = 0; i < innerBatteryVoltage; i++) {
+		// let x = base.wire.topMetal.x;
+		let x = base.wire.innerBatteryRight.x;
 		let y = base.wire.topMetal.y;
 		innerLoop.push(new wireCharge(x, y, "inner"));
 
+		// metal
 		x = random(base.x + base.sourceWidth, base.endX - base.sourceWidth);
 		y = base.y - base.metalHeight * 1.5;
 		let newCharge = new Charge(x, y, "mp", chargeID, "g");
@@ -1188,11 +1253,11 @@ function updateCharges() {
 	}
 
 	// get rid of recom effect circle when it reaches 0 opacity
-	// for (let i = 0; i < recomEffects.length; i++) {
-	// 	if (recomEffects[i].opacity < 1) {
-	// 		recomEffects.splice(i, 1);
-	// 	}
-	// }
+	for (let i = 0; i < recomEffects.length; i++) {
+		if (recomEffects[i].opacity < 1) {
+			recomEffects.splice(i, 1);
+		}
+	}
 
 	// check for recombination
 	if (recomOn) {
@@ -1248,58 +1313,81 @@ function updateCharges() {
 	// }
 }
 
-function recomArrays(array1, array2, num) {
-	let recomProb = 0.5;
+// function recomArrays(array1, array2, num) {
+// 	let recomProb = 0.5;
 
-	for (let i = 0; i < array1.length; i++) {
-		for (let k = 0; k < array2.length; k++) {
-			// check if electron and hole are close and they are show, not same ID
-			let condition =
-				abs(array1[i].position.x - array2[k].position.x) < recomDistance &&
-				abs(array1[i].position.y - array2[k].position.y) < recomDistance &&
-				array1[i].show == 1 &&
-				array2[k].show == 1 &&
-				random() < recomProb;
+// 	for (let i = 0; i < array1.length; i++) {
+// 		for (let k = 0; k < array2.length; k++) {
+// 			// check if electron and hole are close and they are show, not same ID
+// 			let condition =
+// 				abs(array1[i].position.x - array2[k].position.x) < recomDistance &&
+// 				abs(array1[i].position.y - array2[k].position.y) < recomDistance &&
+// 				array1[i].show == 1 &&
+// 				array2[k].show == 1 &&
+// 				random() < recomProb;
 
-			if (condition) {
-				// stop the electron & hole
-				array1[i].stop();
-				array2[k].stop();
+// 			if (condition) {
+// 				// stop the electron & hole
+// 				array1[i].stop();
+// 				array2[k].stop();
 
-				// set to no show
-				array1[i].hide();
-				array2[k].hide();
+// 				// set to no show
+// 				array1[i].hide();
+// 				array2[k].hide();
 
-				recomPositions[recomCount] = p5.Vector.div(
-					p5.Vector.add(array2[k].position, array1[i].position),
-					2
-				);
+// 				recomPositions.push(
+// 					p5.Vector.div(
+// 						p5.Vector.add(array2[k].position, array1[i].position),
+// 						2
+// 					)
+// 				);
 
-				//effects
-				recomEffects[recomCount] = new Charge(
-					recomPositions[recomCount].x,
-					recomPositions[recomCount].y,
-					"re",
-					chargeID
-				);
-				recomdElectrons[recomCount] = new Charge(
-					array1[i].position.x,
-					array1[i].position.y,
-					"re",
-					chargeID
-				);
-				recomdHoles[recomCount] = new Charge(
-					array2[k].position.x,
-					array2[k].position.y,
-					"re",
-					chargeID
-				);
-				recomCount++;
-				break;
-			}
-		}
-	}
-}
+// 				//effects
+// 				recomEffects.push(
+// 					new Charge(
+// 						recomPositions[recomCount].x,
+// 						recomPositions[recomCount].y,
+// 						"re",
+// 						chargeID
+// 					)
+// 				);
+// 				recomdElectrons.push(
+// 					new Charge(array1[i].position.x, array1[i].position.y, "re", chargeID)
+// 				);
+// 				recomdHoles.push(
+// 					new Charge(array2[k].position.x, array2[k].position.y, "re", chargeID)
+// 				);
+
+// 				// recomPositions[recomCount] = p5.Vector.div(
+// 				// 	p5.Vector.add(array2[k].position, array1[i].position),
+// 				// 	2
+// 				// );
+
+// 				// //effects
+// 				// recomEffects[recomCount] = new Charge(
+// 				// 	recomPositions[recomCount].x,
+// 				// 	recomPositions[recomCount].y,
+// 				// 	"re",
+// 				// 	chargeID
+// 				// );
+// 				// recomdElectrons[recomCount] = new Charge(
+// 				// 	array1[i].position.x,
+// 				// 	array1[i].position.y,
+// 				// 	"re",
+// 				// 	chargeID
+// 				// );
+// 				// recomdHoles[recomCount] = new Charge(
+// 				// 	array2[k].position.x,
+// 				// 	array2[k].position.y,
+// 				// 	"re",
+// 				// 	chargeID
+// 				// );
+// 				// recomCount++;
+// 				break;
+// 			}
+// 		}
+// 	}
+// }
 
 function scatter() {
 	//timebetween scatter
@@ -1623,46 +1711,46 @@ function drawWires() {
 }
 
 // switch graph
-function mouseClicked() {
-	// monitor cd: 96, 717
-	// laptop cd: 83, 617
+// function mouseClicked() {
+// 	// monitor cd: 96, 717
+// 	// laptop cd: 83, 617
 
-	// check cd button
-	if (
-		mouseX / sx > controls.cd.x &&
-		mouseX / sx < controls.cd.x + controls.width &&
-		mouseY / sy > controls.cd.y &&
-		mouseY / sy < controls.cd.y + 40
-	) {
-		currentGraph = "CD";
-	}
-	// check ef button
-	else if (
-		mouseX / sx > controls.ef.x &&
-		mouseX / sx < controls.ef.x + controls.width &&
-		mouseY / sy > controls.ef.y &&
-		mouseY / sy < controls.ef.y + 40
-	) {
-		currentGraph = "EF";
-	}
+// 	// check cd button
+// 	if (
+// 		mouseX / sx > controls.cd.x &&
+// 		mouseX / sx < controls.cd.x + controls.width &&
+// 		mouseY / sy > controls.cd.y &&
+// 		mouseY / sy < controls.cd.y + 40
+// 	) {
+// 		currentGraph = "CD";
+// 	}
+// 	// check ef button
+// 	else if (
+// 		mouseX / sx > controls.ef.x &&
+// 		mouseX / sx < controls.ef.x + controls.width &&
+// 		mouseY / sy > controls.ef.y &&
+// 		mouseY / sy < controls.ef.y + 40
+// 	) {
+// 		currentGraph = "EF";
+// 	}
 
-	// check bd button
-	else if (
-		mouseX / sx > controls.bd.x &&
-		mouseX / sx < controls.bd.x + controls.width &&
-		mouseY / sy > controls.bd.y &&
-		mouseY / sy < controls.bd.y + 40
-	) {
-		currentGraph = "BD";
-	}
-	// let xCondition = 270 * sx - mouseX; // left border of right button
-	// let yCondition = abs(205 * sy - mouseY); // top border of right button
-	// if (xCondition < 100 * sx && xCondition < 0 && yCondition < 16 * sy) {
-	// 	switchGraph = true; // show charge density graph
-	// } else if (abs(164 * sx - mouseX) < 100 * sx && yCondition < 16 * sy) {
-	// 	switchGraph = false; // show electric field graph
-	// }
-}
+// 	// check bd button
+// 	else if (
+// 		mouseX / sx > controls.bd.x &&
+// 		mouseX / sx < controls.bd.x + controls.width &&
+// 		mouseY / sy > controls.bd.y &&
+// 		mouseY / sy < controls.bd.y + 40
+// 	) {
+// 		currentGraph = "BD";
+// 	}
+// 	// let xCondition = 270 * sx - mouseX; // left border of right button
+// 	// let yCondition = abs(205 * sy - mouseY); // top border of right button
+// 	// if (xCondition < 100 * sx && xCondition < 0 && yCondition < 16 * sy) {
+// 	// 	switchGraph = true; // show charge density graph
+// 	// } else if (abs(164 * sx - mouseX) < 100 * sx && yCondition < 16 * sy) {
+// 	// 	switchGraph = false; // show electric field graph
+// 	// }
+// }
 
 function triggerControls(value) {
 	currentGraph = value;
