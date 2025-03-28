@@ -109,6 +109,10 @@
 	font-size: 16px;
 }
 
+.button.disabled {
+	background-color: grey;
+}
+
 .highlight {
 	color: #fff7ae;
 }
@@ -390,4 +394,14 @@ input[type="range"]::-moz-range-progress {
 input[type="range"]::-ms-fill-lower {
 	background: var(--brand);
 	border-radius: 5px;
+}
+datalist {
+	display: flex;
+	justify-content: space-between;
+	color: white;
+	width: 70%;
+}
+
+datalist option {
+	font-size: 0.8rem;
 }

@@ -321,8 +321,14 @@ class Charge {
 				this.position.y += 8;
 			} else if (this.position.x > base.drainX) {
 				// if outer battery on & inner battery voltage is large enough
-				// !!! need to revise innerBatteryVoltage
-				if (outerBatteryOn && innerBatteryVoltage > 3) {
+				// !!! need to revise innerBatteryCharge
+				console.log(innerBatteryCharge);
+				if (
+					outerBatteryOn &&
+					innerBatteryCharge > 3 &&
+					Math.random() * 10 < 5
+				) {
+					console.log("movement open");
 					// electrons that go out of top of drain goes through
 					// move position to top of source +
 					this.position.x -= base.width - base.sourceWidth;

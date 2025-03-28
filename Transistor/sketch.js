@@ -82,15 +82,17 @@ let outerBatteryOn;
 
 // [vars] Transfer charges on wires ============================================================
 
+let stillAnimating = false;
 let innerLoop = [];
 let outerLoop = [];
 let innerLoopOn = false; // toggles inner battery electron transfer
-let outerLoopOn = false; // toggles outer battery electron transfer
-let innerBatteryVoltage = 5; // number of charges for inner battery
+let outerLoopOn = true; // toggles outer battery electron transfer
+let innerLoopAnimated = true;
+let innerBatteryCharge = 5; // number of charges for inner battery
 let numOuterLoop = 15; // // number of charges for outer battery
 
 let innerLoopDirection = 0; // left - pos to neg
-let showMetalPosCharges; // show positive charges on gate
+let showMetalPosCharges = false; // show positive charges on gate
 let metalPosCharges = []; // positive charges on gate when inner battery is on
 
 // Band Diagram ============================================================
@@ -190,7 +192,7 @@ const base = {
 	wire: {
 		leftMetal: {
 			x: dim.x + dim.sourceWidth / 2,
-			y: dim.y - dim.metalHeight + 16,
+			y: dim.y - dim.metalHeight,
 		},
 
 		innerBattery: {
@@ -482,6 +484,11 @@ function draw() {
 		drawGraph();
 		drawBandDiagram();
 		updateWireElectrons();
+		drawMetalPosCharges();
+		// if (innerLoopAnimated) {
+		// 	enableButton();
+
+		// }
 		drawBandDiagram();
 	}
 
@@ -507,6 +514,8 @@ function resetScene() {
 	fixedCharges = [];
 	initCharges();
 	initWireElectrons();
+	resetInnerLoop();
+	outerBatteryOn = true;
 
 	// holes = [];
 	// electrons = [];
@@ -516,7 +525,7 @@ function resetScene() {
 	// outerLoop = [];
 	// innerLoopOn = false;
 	// outerLoopOn = false;
-	// innerBatteryVoltage = 30;
+	// innerBatteryCharge = 30;
 	// numOuterLoop = 30;
 
 	// generationEffects = [];
@@ -543,11 +552,22 @@ function initWireElectrons() {
 
 		outerLoop.push(new wireCharge(x, y, "outer"));
 	}
+}
 
-	for (let i = 0; i < innerBatteryVoltage; i++) {
+function resetInnerLoop(direction) {
+	innerLoop = [];
+	metalPosCharges = [];
+	for (let i = 0; i < innerBatteryCharge; i++) {
 		// moving electrons
-		let x = base.wire.innerBatteryRight.x;
-		let y = base.wire.topMetal.y + i * (200 / innerBatteryVoltage);
+		let x, y;
+		if (direction == 0) {
+			x = base.wire.innerBatteryRight.x;
+			y = base.wire.topMetal.y + i * (200 / innerBatteryCharge);
+		} else {
+			x = base.wire.innerBatteryLeft.x;
+			y = base.wire.topMetal.y + i * (200 / innerBatteryCharge);
+		}
+
 		innerLoop.push(new wireCharge(x, y, "inner"));
 
 		// show fixed positive charges
@@ -688,28 +708,21 @@ function regenerate() {
 	}, 100); // scattring time
 }
 
-function mouseClicked() {
-	let x = mouseX - 100;
-	let y = mouseY - 120;
+// test generation / recombination effects
+// function mouseClicked() {
+// 	let x = mouseX - 100;
+// 	let y = mouseY - 120;
 
-	generationEffects.push(new Charge(x, y, "ge", chargeID));
-	//let xx = findClosestValue(electronLine, a);
-	// let xx = findClosestValue(electronBand, a);
+// 	generationEffects.push(new Charge(x, y, "ge", chargeID));
 
-	let newElectron = new Charge(x, y, "e", chargeID, "g");
-	// aa.origin.x = xx;
-	// aa.top = 1;
-	electrons.push(newElectron);
+// 	let newElectron = new Charge(x, y, "e", chargeID, "g");
+// 	electrons.push(newElectron);
 
-	// let yy = findClosestValue(holeBand, a);
+// 	let newHole = new Charge(x, y, "h", chargeID, "g");
+// 	holes.push(newHole);
 
-	let newHole = new Charge(x, y, "h", chargeID, "g");
-	// bb.origin.y = yy;
-	// bb.top = 1;
-	holes.push(newHole);
-
-	chargeID += 1;
-}
+// 	chargeID += 1;
+// }
 
 //generate electron hole pairs based on frequency
 function generateCharges(numCharges) {
@@ -979,9 +992,8 @@ function animateOuterLoop() {
 
 function resetInnerLoopPositions() {
 	// reset electron positions again so they appear spread out when they move back to metal
-	for (let i = 0; i < innerBatteryVoltage; i++) {
-		innerLoop[i].position.y =
-			base.wire.leftMetal.y + i * (200 / innerBatteryVoltage);
+	for (let i = 0; i < innerBatteryCharge; i++) {
+		innerLoop[i].position.y = base.wire.leftMetal.y + i * 40;
 	}
 }
 
@@ -1029,12 +1041,17 @@ function animateInnerLoop() {
 				electron.position.y < base.wire.leftMetal.y
 			) {
 				// down (3)
-				electron.move(
-					createVector(base.wire.leftMetal.x, base.wire.leftMetal.y)
-				);
+				electron.move(createVector(base.wire.leftMetal.x, base.y));
 				setTimeout(() => {
-					showMetalPosCharges = true;
-				}, 1000);
+					if (i == innerLoop.length - 1) {
+						showMetalPosCharges = true;
+						innerLoopAnimated = true;
+						resetInnerLoopPositions();
+					}
+				}, innerLoop.length * 40);
+				// setTimeout(() => {
+				// 	enableButton();
+				// }, innerLoop.length * 40 + 5000);
 			}
 		} else {
 			// when reset button pressed (inverses innerLoopDirection), move back to metal
@@ -1051,14 +1068,18 @@ function animateInnerLoop() {
 			} else if (electron.position.x < base.wire.innerBatteryRight.x + 8) {
 				if (electron.position.x > base.wire.innerBatteryRight.x - 8) {
 					// if on right line
-					electron.move(
-						createVector(base.wire.topMetal.x, base.wire.topMetal.y)
-					); // down
+					electron.move(createVector(base.wire.topMetal.x, base.y)); // down
 					setTimeout(() => {
-						showMetalPosCharges = false;
-						toggleChargeSliders("on");
-						resetInnerLoopPositions();
-					}, 1000);
+						if (i == innerLoop.length - 1) {
+							showMetalPosCharges = false;
+							toggleChargeSliders("on");
+							resetInnerLoopPositions();
+							innerLoopAnimated = true;
+						}
+					}, 1200);
+					// 	setTimeout(() => {
+					// 	enableButton();
+					// }, innerLoop.length * 40 + 5000);
 				} else {
 					electron.move(
 						createVector(
@@ -1105,7 +1126,9 @@ function animateInnerLoop() {
 	}
 
 	// drawMetalPosCharges();
+}
 
+function drawMetalPosCharges() {
 	// draw pos charges in top metal
 	if (showMetalPosCharges) {
 		for (let i = 0; i < metalPosCharges.length; i++) {
@@ -1118,22 +1141,40 @@ function toggleOuterBattery() {
 	outerLoopOn = !outerLoopOn;
 }
 
-function toggleInnerBattery() {
+function disableButton() {
+	let btn = document.querySelector(`.chargeButton${sceneCount}`);
+	btn.classList.add("disabled");
+	btn.disabled = true;
+}
+
+function enableButton() {
+	let btn = document.querySelector(`.chargeButton${sceneCount}`);
+	btn.classList.remove("disabled");
+	btn.disabled = false;
+}
+
+function applyCharge() {
 	const btn = document.querySelector(`.chargeButton${sceneCount}`);
 
 	if (btn.innerText == "Reset") {
 		btn.innerText = "Apply Charge";
-		innerLoopOn = true;
+		innerLoopAnimated = false;
 		innerLoopDirection = 1;
-
 		resetInnerLoopPositions();
+		resetInnerLoop(innerLoopDirection);
+		disableButton();
 	} else if (btn.innerText == "Apply Charge") {
 		btn.innerText = "Reset";
-		innerLoopOn = true;
+		innerLoopAnimated = false;
 		innerLoopDirection = 0;
-
 		toggleChargeSliders("off");
+		resetInnerLoop(innerLoopDirection);
+		disableButton();
 	}
+
+	// setTimeout(() => {
+	// 	enableButton();
+	// }, innerLoop.length * 40 + 5000);
 }
 
 function toggleChargeSliders(state) {
@@ -1150,14 +1191,13 @@ function toggleChargeSliders(state) {
 }
 
 function updateInnerBatteryCharge(numCharges) {
-	innerBatteryVoltage = numCharges;
-
+	innerBatteryCharge = numCharges;
 	innerLoop = [];
 	metalPosCharges = [];
-	for (let i = 0; i < innerBatteryVoltage; i++) {
-		// let x = base.wire.topMetal.x;
+	for (let i = 0; i < innerBatteryCharge; i++) {
 		let x = base.wire.innerBatteryRight.x;
-		let y = base.wire.topMetal.y;
+		// let y = base.wire.topMetal.y;
+		let y = base.wire.leftMetal.y + i * 50;
 		innerLoop.push(new wireCharge(x, y, "inner"));
 
 		// metal
@@ -1167,13 +1207,31 @@ function updateInnerBatteryCharge(numCharges) {
 		metalPosCharges.push(newCharge);
 		chargeID++;
 	}
+
+	// resetInnerLoopPositions();
 }
 function updateWireElectrons() {
+	console.log("innerloopanimated");
 	if (outerLoopOn) {
 		animateOuterLoop();
 	}
-	if (innerLoopOn) {
+	if (!innerLoopAnimated) {
 		animateInnerLoop();
+	}
+
+	stillAnimating = false;
+	// enable button if no electrons are animating (all below the topmetal)
+	for (let i = 0; i < innerLoop.length; i++) {
+		const electron = innerLoop[i];
+		if (electron.position.y < base.wire.leftMetal.y - 10) {
+			stillAnimating = true;
+		}
+	}
+
+	// console.log("stillAnimating", stillAnimating);
+
+	if (!stillAnimating) {
+		enableButton();
 	}
 }
 
@@ -1709,48 +1767,6 @@ function drawWires() {
 	vertex(base.endX - base.sourceWidth / 2, base.y - base.metalHeight); // drain metal
 	endShape(); // battery
 }
-
-// switch graph
-// function mouseClicked() {
-// 	// monitor cd: 96, 717
-// 	// laptop cd: 83, 617
-
-// 	// check cd button
-// 	if (
-// 		mouseX / sx > controls.cd.x &&
-// 		mouseX / sx < controls.cd.x + controls.width &&
-// 		mouseY / sy > controls.cd.y &&
-// 		mouseY / sy < controls.cd.y + 40
-// 	) {
-// 		currentGraph = "CD";
-// 	}
-// 	// check ef button
-// 	else if (
-// 		mouseX / sx > controls.ef.x &&
-// 		mouseX / sx < controls.ef.x + controls.width &&
-// 		mouseY / sy > controls.ef.y &&
-// 		mouseY / sy < controls.ef.y + 40
-// 	) {
-// 		currentGraph = "EF";
-// 	}
-
-// 	// check bd button
-// 	else if (
-// 		mouseX / sx > controls.bd.x &&
-// 		mouseX / sx < controls.bd.x + controls.width &&
-// 		mouseY / sy > controls.bd.y &&
-// 		mouseY / sy < controls.bd.y + 40
-// 	) {
-// 		currentGraph = "BD";
-// 	}
-// 	// let xCondition = 270 * sx - mouseX; // left border of right button
-// 	// let yCondition = abs(205 * sy - mouseY); // top border of right button
-// 	// if (xCondition < 100 * sx && xCondition < 0 && yCondition < 16 * sy) {
-// 	// 	switchGraph = true; // show charge density graph
-// 	// } else if (abs(164 * sx - mouseX) < 100 * sx && yCondition < 16 * sy) {
-// 	// 	switchGraph = false; // show electric field graph
-// 	// }
-// }
 
 function triggerControls(value) {
 	currentGraph = value;
