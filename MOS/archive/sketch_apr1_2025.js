@@ -1334,23 +1334,8 @@ function scattering() {
 
 	scatteringCount -= 1;
 
-	// function moveCharges(chargeArray, band) {
-	// 	for (let i = 0; i < chargeArray.length; i++) {
-	// 		chargeArray[i].botz =
-	// 			getRandomBotz[Math.floor(Math.random() * getRandomBotz.length)];
-	// 		let closestToBand = findClosestValue(band, chargeArray[i].position.x);
-	// 		chargeArray[i].bandOrigin.y = closestToBand;
-	// 		chargeArray[i].movingVelocity = chargeArray[i].botz;
-	// 		chargeArray[i].direction = createVector(random(-1, 1), random(-1, 1));
-	// 		chargeArray[i].velocity = p5.Vector.mult(
-	// 			chargeArray[i].direction,
-	// 			chargeArray[i].movingVelocity
-	// 		);
-	// 	}
-	// }
 	function moveCharges(chargeArray, band) {
 		for (let i = 0; i < chargeArray.length; i++) {
-			if (chargeArray[i].notScatter == false){
 			chargeArray[i].botz =
 				getRandomBotz[Math.floor(Math.random() * getRandomBotz.length)];
 			let closestToBand = findClosestValue(band, chargeArray[i].position.x);
@@ -1362,10 +1347,7 @@ function scattering() {
 				chargeArray[i].movingVelocity
 			);
 		}
-		}
 	}
-
-
 
 	if (scatteringCount == 0) {
 		moveCharges(initElectrons, electronBand);
@@ -1605,18 +1587,16 @@ function updateAppliedVoltage(a) {
 		if (dopingConcen_new == 5e13) {
 			recomDistance = 15;
 			if (appliedVoltage / 20 == 0.4) {
-				AccelerationFactor = 4;
-				recomDistance = 15;
+				AccelerationFactor = 2;
 			}
 
-			if (appliedVoltage / 20 == 0.8) {
+			if (appliedVoltage / 20 == 0 / 8) {
 				AccelerationFactor = 1.5;
-				recomDistance = 15;
 			}
 
 			if (appliedVoltage / 20 == 1.2) {
-				AccelerationFactor = 1.5;
-				recomDistance = 30;
+				AccelerationFactor = 0.8;
+				recomDistance = 21;
 			}
 
 			if (appliedVoltage / 20 > 1.4) {
@@ -1628,23 +1608,19 @@ function updateAppliedVoltage(a) {
 		if (dopingConcen_new > 5e13) {
 			recomDistance = 12;
 			if (appliedVoltage / 20 == 0.4) {
-				AccelerationFactor = 4;
-				recomDistance = 15;
+				AccelerationFactor = 2;
 			}
 
 			if (appliedVoltage / 20 == 0.8) {
 				AccelerationFactor = 1.5;
-				recomDistance = 15;
 			}
 
 			if (appliedVoltage / 20 == 1.2) {
-				AccelerationFactor = 1.5;
-				recomDistance = 27;
+				AccelerationFactor = 0.8;
 			}
 
 			if (appliedVoltage / 20 > 1.4) {
-				AccelerationFactor = 3;
-				recomDistance = 15;
+				AccelerationFactor = 1.5;
 			}
 		}
 	} else if (scene(2)) {
@@ -1730,181 +1706,6 @@ function checkHoleCount() {
 		}
 		console.log("leftHoleCount", leftHoleCount);
 
-			// Check the number of electrons in the inversion layer 
-
-			let leftElectronSurfMax = 10;
-			let shootingEnergy = 50;
-			if (appliedVoltage / 20 == 2.0) {
-				if (dopingConcen > 10000000000000) {leftElectronSurfMax = 40; shootingEnergy = 60;}
-				else {leftElectronSurfMax = 30; shootingEnergy = 60;}
-			}
-
-			if (appliedVoltage / 20 == 1.6) {
-				if (dopingConcen > 10000000000000) {leftElectronSurfMax = 30; shootingEnergy = 50;}
-				else {leftElectronSurfMax = 20; shootingEnergy = 55;}
-			}
-
-			if (appliedVoltage / 20 == 1.2) {
-				if (dopingConcen > 10000000000000) {leftElectronSurfMax = 7; shootingEnergy = 40;}
-				else {leftElectronSurfMax = 5; shootingEnergy = 45;}
-				
-			}
-
-			if (appliedVoltage / 20 == 0.8) {
-				if (dopingConcen > 10000000000000) {leftElectronSurfMax = 4; shootingEnergy = 20;}
-				else {leftElectronSurfMax = 3; shootingEnergy = 30;}
-				
-			}
-
-			if (appliedVoltage / 20 == 0.4) {
-				if (dopingConcen > 10000000000000) {leftElectronSurfMax = 2; shootingEnergy = 10;}
-				else {leftElectronSurfMax = 1; shootingEnergy = 30;}
-				
-			}
-
-
-	let leftElectronSurfCount = 0;
-	for (let i = 0; i < initElectrons.length; i++) {
-		if (initElectrons[i].position.x < holeRegion.x-30) {
-			leftElectronSurfCount++;
-			//if (dopingConcen > 10000000000000) {
-			if (leftElectronSurfCount > leftElectronSurfMax) {
-				let closestToBand = findClosestValue(electronBand, initElectrons[i].position.x);
-					initElectrons[i].botz = shootingEnergy;
-					//initElectrons[i].maxspeed = 20; 
-					initElectrons[i].notScatter = true;
-					initElectrons[i].bandOrigin.y = closestToBand;
-					initElectrons[i].movingVelocity = 1000*initElectrons[i].botz;
-					initElectrons[i].direction = createVector(1, 0);
-					initElectrons[i].velocity = p5.Vector.mult(
-						initElectrons[i].direction,
-						initElectrons[i].movingVelocity,
-					
-					)
-					//console.log(initElectrons[i].velocity);
-				}
-			//} 
-			// else {
-			// 	if (leftElectronSurfCount > 30) {
-			// 		let closestToBand = findClosestValue(electronBand, initElectrons[i].position.x);
-			// 		initElectrons[i].botz = 50;
-			// 		initElectrons[i].notScatter = true;
-			// 		initElectrons[i].bandOrigin.y = closestToBand;
-			// 		initElectrons[i].movingVelocity = 1000*initElectrons[i].botz;
-			// 		initElectrons[i].direction = createVector(1, 0);
-			// 		initElectrons[i].velocity = p5.Vector.mult(
-			// 			initElectrons[i].direction,
-			// 			initElectrons[i].movingVelocity,
-			// 			)
-			// 		}
-			// }
-		} 
-	}
-	for (let i = 0; i < genElectrons.length; i++) {
-		if (genElectrons[i].position.x < holeRegion.x-30) {
-			leftElectronSurfCount++;
-			//if (dopingConcen > 10000000000000) {
-				if (leftElectronSurfCount > leftElectronSurfMax) {
-					let closestToBand = findClosestValue(electronBand, genElectrons[i].position.x);
-					genElectrons[i].botz = shootingEnergy;
-					genElectrons[i].notScatter = true;
-					genElectrons[i].bandOrigin.y = closestToBand;
-					genElectrons[i].movingVelocity = 1000*genElectrons[i].botz;
-					genElectrons[i].direction = createVector(1, 0);
-					genElectrons[i].velocity = p5.Vector.mult(
-						genElectrons[i].direction,
-						genElectrons[i].movingVelocity,
-					)
-					
-				}
-			//} 
-			// else {
-			// 	if (leftElectronSurfCount > 30) {
-			// 		let closestToBand = findClosestValue(electronBand, genElectrons[i].position.x);
-			// 		genElectrons[i].botz = 50;
-			// 		genElectrons[i].notScatter = true;
-			// 		genElectrons[i].bandOrigin.y = closestToBand;
-			// 		genElectrons[i].movingVelocity = 1000*genElectrons[i].botz;
-			// 		genElectrons[i].direction = createVector(1, 0);
-			// 		genElectrons[i].velocity = p5.Vector.mult(
-			// 			genElectrons[i].direction,
-			// 			genElectrons[i].movingVelocity,
-			// 		)
-			// 	}
-			// }
-		}
-	}
-		
-	console.log('leftElectronSurfCount', leftElectronSurfCount);
-
-	let leftHoleSurfMax = 10;
-	if (appliedVoltage / 20 == -2.0) {
-		if (dopingConcen > 10000000000000) {leftHoleSurfMax = 50}
-		else {leftHoleSurfMax = 35}
-	}
-
-	if (appliedVoltage / 20 == -1.6) {
-		if (dopingConcen > 10000000000000) {leftHoleSurfMax = 40}
-		else {leftHoleSurfMax = 30}
-	}
-
-	if (appliedVoltage / 20 == -1.2) {
-		if (dopingConcen > 10000000000000) {leftHoleSurfMax = 30}
-		else {leftHoleSurfMax = 25}
-	}
-
-	if (appliedVoltage / 20 == -0.8) {
-		if (dopingConcen > 10000000000000) {leftHoleSurfMax = 20}
-		else {leftHoleSurfMax = 10}
-	}
-
-	if (appliedVoltage / 20 == -0.4) {
-		if (dopingConcen > 10000000000000) {leftHoleSurfMax = 10}
-		else {leftHoleSurfMax = 5}
-	}
-
-
-///////Check the number of holes near the surface		
-	let leftHoleSurfCount = 0;
-	for (let i = 0; i < initHoles.length; i++) {
-		if (initHoles[i].position.x < holeRegion.x-30) {
-			leftHoleSurfCount++;
-			
-			if (leftHoleSurfCount > leftHoleSurfMax) {
-				let closestToBand = findClosestValue(holeBand, initHoles[i].position.x);
-					initHoles[i].botz = 20;
-					//initHoles[i].notScatter = true;
-					initHoles[i].bandOrigin.y = closestToBand;
-					initHoles[i].movingVelocity = 1000*initHoles[i].botz;
-					initHoles[i].direction = createVector(1, 0);
-					initHoles[i].velocity = p5.Vector.mult(
-						initHoles[i].direction,
-						initHoles[i].movingVelocity			
-					)
-				}
-		} 
-	}
-	for (let i = 0; i < genHoles.length; i++) {
-		if (genHoles[i].position.x < holeRegion.x-30) {
-			leftHoleSurfCount++;
-				if (leftHoleSurfCount > leftHoleSurfMax) {
-					let closestToBand = findClosestValue(holeBand, genHoles[i].position.x);
-					genHoles[i].botz = 20;
-					//genHoles[i].notScatter = true;
-					genHoles[i].bandOrigin.y = closestToBand;
-					genHoles[i].movingVelocity = 1000*genHoles[i].botz;
-					genHoles[i].direction = createVector(1, 0);
-					genHoles[i].velocity = p5.Vector.mult(
-						genHoles[i].direction,
-						genHoles[i].movingVelocity,
-					)
-					//console.log(genElectrons[i].velocity);
-				}
-		}
-	}
-	
-		
-		
 		// count num holes in right region (90%) -> if it dips below regular normal of holes - insert holes from right
 		let holeCount = 0;
 		for (let i = 0; i < initHoles.length; i++) {

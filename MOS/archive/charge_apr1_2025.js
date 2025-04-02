@@ -33,7 +33,6 @@ class Charge {
 		this.near_index = 100;
 		this.top = 0;
 		this.factor = 1;
-		this.notScatter = false; //Used for inversion layer carriers that need to be sent into the bulk region
 
 		this.transitionTime = 100; // for example, transition over 60 frames
 		this.elapsedTime = 0; // initialize this somewhere in your object
@@ -86,7 +85,7 @@ class Charge {
 
 				// don't draw until it has botz calculated and has snapped to band
 
-				if (this.bandPosition.y > 20 && this.position.x < xMax + buffer) {
+				if (this.bandPosition.y > 100 && this.position.x < xMax + buffer) {
 					ellipse(this.position.x, this.bandPosition.y, 6);
 				}
 				this.bandPosition.y =
@@ -113,8 +112,8 @@ class Charge {
 		}
 
 		// left
-		if (this.position.x < (xMin-4) * sx) {
-			this.position.x += buffer-3;
+		if (this.position.x < xMin * sx) {
+			this.position.x += buffer;
 			this.velocity.x = Math.abs(this.velocity.x);
 		}
 
@@ -437,10 +436,8 @@ class Charge {
 		// 	}
 		// }
 
-		if (this.notScatter == false){
 		this.acceleration = createVector(-newAcceleration, 0);
 		this.velocity = p5.Vector.add(this.acceleration, this.velocity);
-		}
 		this.checkBoundaries();
 
 		// if (this.position.y < yMin * sy) {
