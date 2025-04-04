@@ -1,4 +1,4 @@
-let highResGrid = [
+let highResGridOg = [
 	// Row 1
 	[
 		{ efx: -73.0, efy: -334.0 }, //c1

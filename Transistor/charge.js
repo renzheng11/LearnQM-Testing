@@ -320,15 +320,9 @@ class Charge {
 				this.velocity.y = -this.velocity.y;
 				this.position.y += 8;
 			} else if (this.position.x > base.drainX) {
-				// if outer battery on & inner battery voltage is large enough
-				// !!! need to revise innerBatteryCharge
-				console.log(innerBatteryCharge);
-				if (
-					outerBatteryOn &&
-					innerBatteryCharge > 3 &&
-					Math.random() * 10 < 5
-				) {
-					console.log("movement open");
+				// if vd on & vg voltage is large enough
+				// !!! need to revise vgCharge
+				if (vdOn && vgCharge > 3 && Math.random() * 10 < 5) {
 					// electrons that go out of top of drain goes through
 					// move position to top of source +
 					this.position.x -= base.width - base.sourceWidth;
@@ -415,7 +409,7 @@ class Charge {
 		//Need to Read the electric field at (this.position.x,this.position.y)
 		//The electric feild that we read has x and y components. Let's call them Ex and Ey. For now I just give them values.
 
-		// READ EF DATA FROM highResGrid.js ==============================================================
+		// READ EF DATA FROM current efGrid profile ==============================================================
 		// subtract base x&y to get dimensions within transistor
 
 		width: 640;
@@ -430,15 +424,15 @@ class Charge {
 			let row = Math.floor(y / 10); // 7 - 7th row
 			let col = Math.floor(x / 10); // 3.5 - round up = 4th row
 
-			// CHANGE PROFILE - change name of highResGrid
-			Ex = highResGrid[row][col].efx;
+			// CHANGE PROFILE - change name of efGrid
+			Ex = efGrid[row][col].efx;
 			if (Ex < 3000 && Ex > -3000) {
 				Ex = 0;
 			} else {
 				Ex = Ex / 100000;
 			}
 
-			Ey = highResGrid[row][col].efy / 2;
+			Ey = efGrid[row][col].efy / 2;
 			if (Ey < 6000) {
 				Ey = 0;
 			} else {

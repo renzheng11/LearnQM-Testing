@@ -49,6 +49,60 @@
 			src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML"
 		></script>
 
+		<!-- band data -->
+		<script defer src="./band_diagram/xPositionData.js"></script>
+		<script defer src="./band_diagram/vd00_vg00.js"></script>
+		<script defer src="./band_diagram/vd02_vg25.js"></script>
+		<script defer src="./band_diagram/vd16_vg25.js"></script>
+		<script defer src="./band_diagram/vd45_vg25.js"></script>
+		<script defer src="./band_diagram/vd02_vg03.js"></script>
+		<script defer src="./band_diagram/vd02_vg09.js"></script>
+		<script defer src="./band_diagram/vd02_vg30.js"></script>
+
+		<!-- profiles -->
+		<!-- profile vd0.0 vg0.0 -->
+		<script
+			defer
+			src="./voltage_profiles/case0_Vd0Vg0/high_res_grid_64x32_direct.js"
+		></script>
+
+		<!-- profile vd 0.2 vg 0.3 -->
+		<script
+			defer
+			src="./voltage_profiles/case1_Vd0.2Vg0.3/high_res_grid_64x32_direct.js"
+		></script>
+
+		<!-- profile vd 0.2 vg 0.9 -->
+		<script
+			defer
+			src="./voltage_profiles/case2_Vd0.2Vg0.9/high_res_grid_64x32_direct.js"
+		></script>
+
+		<!-- profile vd 0.2 vg 3.0-->
+		<script
+			defer
+			src="./voltage_profiles/case3_Vd0.2Vg3.0/high_res_grid_64x32_direct.js"
+		></script>
+
+		<!-- profile vd 0.2 vg 2.5 -->
+		<script
+			defer
+			src="./voltage_profiles/case4_Vd0.2Vg2.5/high_res_grid_64x32_direct.js"
+		></script>
+
+		<!-- profile vg 1.6 vg 2.5 -->
+		<script
+			defer
+			src="./voltage_profiles/case5_Vd1.6Vg2.5/high_res_grid_64x32_direct.js"
+		></script>
+
+		<!-- profile vd 4.5 vg 2.5 -->
+		<script
+			defer
+			src="./voltage_profiles/case6_Vd4.5Vg2.5/high_res_grid_64x32_direct.js"
+		></script>
+
+		<!-- other scripts -->
 		<script defer src="./highResGrid.js"></script>
 		<script defer src="./tools.js"></script>
 		<script defer src="./scroll.js"></script>
@@ -129,40 +183,91 @@
 					<h1>Scene 2</h1>
 					<p>Try applying a charge</p>
 
+					<!-- Vg -->
 					<input
-						class="chargeSlider"
+						class="vgSlider"
 						type="range"
 						type="range"
 						min="0"
-						max="20"
-						value="0"
-						step="2"
-						onchange="updateInnerBatteryCharge(this.value)"
+						max="4"
+						value="1"
+						step="1"
+						onchange="updateVG(this.value)"
 					/>
 
 					<datalist>
 						<option value="0" label="0"></option>
-						<option value="20" label="20"></option>
+						<option value="1" label="0.3"></option>
+						<option value="2" label="0.9"></option>
+						<option value="3" label="2.5"></option>
+						<option value="4" label="3.0"></option>
 					</datalist>
-					<label for="chargeSlider" class="labels">(µC/cm<sup>2</sup>)</label>
-					<br /><br />
+					<label for="vgSlider" class="labels">Vg (V)</label>
+
 					<button
 						class="button chargeButton2"
 						type="button"
 						onclick="applyCharge()"
 					>
-						Apply Charge
+						Apply Charge to Vg
 					</button>
 
+					<br /><br />
+					<br /><br />
+
+					<!-- Vd -->
+					<input
+						class="vdSlider"
+						type="range"
+						type="range"
+						min="0"
+						max="3"
+						value="1"
+						step="1"
+						onchange="updateVD(this.value)"
+					/>
+
+					<datalist>
+						<option value="0" label="0"></option>
+						<option value="1" label="0.2"></option>
+						<option value="2" label="1.6"></option>
+						<option value="3" label="4.5"></option>
+					</datalist>
+					<label for="vdSlider" class="labels">Vd (mA)</label>
+					<br /><br />
+					<!-- Profiles-->
+					<input
+						class="profileSlider"
+						type="range"
+						type="range"
+						min="0"
+						max="6"
+						value="0"
+						step="1"
+						onchange="updateProfileTemp(this.value)"
+					/>
+
+					<datalist>
+						<option value="0" label="0"></option>
+						<option value="1" label="1"></option>
+						<option value="2" label="2"></option>
+						<option value="3" label="3"></option>
+						<option value="4" label="4"></option>
+						<option value="5" label="5"></option>
+						<option value="6" label="6"></option>
+					</datalist>
+					<label for="profileSlider" class="labels">Profile (Vd & Vg)</label>
+					<br /><br />
+
 					<div class="controls">
-						<button
+						<!-- <button
 							class="button control"
 							value="ob"
 							type="button"
 							onclick="toggleOuterBattery(this.value)"
 						>
 							Toggle Outer Battery
-						</button>
+						</button> -->
 						<!-- <button
 							class="button control"
 							value="cd"

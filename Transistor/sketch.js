@@ -3,6 +3,42 @@ Authors: Ren Zheng, Azad Naeemi
 Contact: renzheng112@gmail.com
 ------------------------------- */
 
+// current profiles
+
+// profiles
+// vd 0.0 / vg 0.0
+// vd 0.2 / vg 0.3
+// vd 0.2 / vg 0.9
+// vd 0.2 / vg 3.0
+// vd 0.2 / vg 2.5
+// vd 1.6 / vg 2.5
+// vd 4.5 / vg 2.5
+
+// band - vary_VD
+// vd 0.0 / vg 0.0
+// vd 0.2 / vg 2.5
+// vd 1.6 / vg 2.5
+// vd 4.5 / vg 2.5
+
+// band - vary_VG
+// vd 0.0 / vg 0.0
+// vd 0.2 / vg 0.3
+// vd 0.2 / vg 0.9
+// vd 0.2 / vg 3.0
+
+// possible vd profiles
+0.0;
+0.2;
+1.6;
+4.5;
+
+// possible vg profiles
+0.0;
+0.3;
+0.9;
+2.5;
+3.0;
+
 // tools
 function qs(selector) {
 	return document.querySelector(selector);
@@ -76,24 +112,28 @@ let batteryNegOff;
 let batteryPosOn;
 let batteryNegOn;
 
-// on / off
-let innerBatteryOn;
-let outerBatteryOn;
-
 // [vars] Transfer charges on wires ============================================================
 
-let stillAnimating = false;
-let innerLoop = [];
-let outerLoop = [];
-let innerLoopOn = false; // toggles inner battery electron transfer
-let outerLoopOn = true; // toggles outer battery electron transfer
-let innerLoopAnimated = true;
-let innerBatteryCharge = 5; // number of charges for inner battery
-let numOuterLoop = 15; // // number of charges for outer battery
+// on / off
+let vgOn;
+let vdOn;
 
-let innerLoopDirection = 0; // left - pos to neg
+let vgCharge; // actual vg charge amount in V
+let vdCharge; // actual vd charge amount in mA
+
+let vgChargeVisual = 5; // number of charges for animation for vg wire - visual representation
+let vdChargeVisual = 15; // number of charges for animation for vd wire - visual representation
+
+let stillAnimating = false;
+let vgLoop = []; // contains electrons for animation
+let vdLoop = []; // contains electrons for animation
+let vgLoopOn = false; // toggles vg battery electron transfer
+let vdLoopOn = true; // toggles vd battery electron transfer
+let vgLoopAnimated = true;
+
+let vgLoopDirection = 0; // left - pos to neg
 let showMetalPosCharges = false; // show positive charges on gate
-let metalPosCharges = []; // positive charges on gate when inner battery is on
+let metalPosCharges = []; // positive charges on gate when vg battery is on
 
 // Band Diagram ============================================================
 let bandScale = 1; // change the verticle distribution scale of band diagram
@@ -111,8 +151,12 @@ let holeBand = []; // graph green line
 let bandLength = 134;
 let FermiVoltage = 0; //used to plot Ef
 
+// Data for electric field ============================================================
+let efGrid = efGrid_vd00_vg00;
+
 // [vars] Graphing ============================================================
 let currentGraph = "ef";
+let EFData = [];
 
 // [vars] Dimensions ============================================================
 // base dimensions
@@ -134,8 +178,8 @@ const dim = {
 
 	batteryHeight: 20,
 
-	innerY: unit * 26, // inner wire
-	outerY: unit * 20, // outer wire
+	vgY: unit * 26, // inner wire
+	vdY: unit * 20, // outer wire
 };
 
 const controls = {
@@ -154,8 +198,8 @@ const base = {
 	endX: dim.x + dim.width,
 	endY: dim.y + dim.height,
 
-	innerY: dim.innerY,
-	outerY: dim.outerY,
+	vgY: dim.vgY,
+	vdY: dim.vdY,
 
 	width: dim.width,
 	height: dim.height,
@@ -195,34 +239,34 @@ const base = {
 			y: dim.y - dim.metalHeight,
 		},
 
-		innerBattery: {
+		vg: {
 			x: dim.x + dim.width / 2 - 32,
-			y: dim.innerY - 16,
-		},
+			y: dim.vgY - 16,
+		}, // gate - inner battery
 
-		outerBattery: {
+		vd: {
 			x: dim.x + dim.width / 2 - 32,
-			y: dim.outerY - 16,
-		},
+			y: dim.vdY - 16,
+		}, // drain - outer battery
 
-		innerBatteryLeft: { x: dim.x + dim.sourceWidth / 2, y: dim.innerY },
-		innerBatteryRight: { x: dim.x + 420, y: dim.innerY },
+		vgLeft: { x: dim.x + dim.sourceWidth / 2, y: dim.vgY },
+		vgRight: { x: dim.x + 420, y: dim.vgY },
 		topMetal: { x: dim.x + 420, y: dim.y - dim.metalHeight * 2 + 16 },
-		outerBatteryLeft: { x: dim.x + dim.sourceWidth / 2, y: dim.outerY },
-		outerBatteryRight: {
+		vdLeft: { x: dim.x + dim.sourceWidth / 2, y: dim.vdY },
+		vdRight: {
 			x: dim.x + dim.width - dim.sourceWidth / 2,
-			y: dim.outerY,
+			y: dim.vdY,
 		},
 		rightMetal: {
 			x: dim.x + dim.width - dim.sourceWidth / 2,
 			y: dim.y - dim.metalHeight,
 		},
 
-		// innerBatteryLeft: [dim.x + dim.sourceWidth / 2, dim.innerY], // corner
-		// innerBatteryRight: [dim.x + 420, dim.innerY], // corner
+		// vgLeft: [dim.x + dim.sourceWidth / 2, dim.vgY], // corner
+		// vgRight: [dim.x + 420, dim.vgY], // corner
 		// topMetal: [dim.x + 420, dim.y - dim.metalHeight * 2 + 16],
-		// outerBatteryLeft: [dim.x + dim.sourceWidth / 2, dim.outerY],
-		// outerBatteryRight: [dim.x + dim.width - dim.sourceWidth / 2, dim.outerY],
+		// vdLeft: [dim.x + dim.sourceWidth / 2, dim.vdY],
+		// vdRight: [dim.x + dim.width - dim.sourceWidth / 2, dim.vdY],
 		// rightMetal: [
 		// 	dim.x + dim.width - dim.sourceWidth / 2,
 		// 	dim.y - dim.metalHeight,
@@ -290,129 +334,129 @@ function scaleWindow() {
 // Data from EXCEL ============================================================
 
 //// get the excel sheet data for when donor density = 10^17
-let numberArray1_neg_2_0;
-let numberArray1_neg_1_8;
-let numberArray1_neg_1_6;
-let numberArray1_neg_1_4;
-let numberArray1_neg_1_2;
-let numberArray1_neg_1_0;
-let numberArray1_neg_0_8;
-let numberArray1_neg_0_6;
-let numberArray1_neg_0_4;
-let numberArray1_neg_0_2;
-let numberArray1_0;
-let numberArray1_pos_0_2;
-let numberArray1_pos_0_4;
-let numberArray1_pos_0_6;
-let numberArray1_pos_0_8;
-let numberArray1_pos_1_0;
-let numberArray1_pos_1_2;
-let numberArray1_pos_1_4;
-let numberArray1_pos_1_6;
-let numberArray1_pos_1_8;
-let numberArray1_pos_2_0;
-let xPositionData;
+// let numberArray1_neg_2_0;
+// let numberArray1_neg_1_8;
+// let numberArray1_neg_1_6;
+// let numberArray1_neg_1_4;
+// let numberArray1_neg_1_2;
+// let numberArray1_neg_1_0;
+// let numberArray1_neg_0_8;
+// let numberArray1_neg_0_6;
+// let numberArray1_neg_0_4;
+// let numberArray1_neg_0_2;
+// let numberArray1_0;
+// let numberArray1_pos_0_2;
+// let numberArray1_pos_0_4;
+// let numberArray1_pos_0_6;
+// let numberArray1_pos_0_8;
+// let numberArray1_pos_1_0;
+// let numberArray1_pos_1_2;
+// let numberArray1_pos_1_4;
+// let numberArray1_pos_1_6;
+// let numberArray1_pos_1_8;
+// let numberArray1_pos_2_0;
+// let xPositionData;
 
-let numberArray2_neg_2_0;
-let numberArray2_neg_1_8;
-let numberArray2_neg_1_6;
-let numberArray2_neg_1_4;
-let numberArray2_neg_1_2;
-let numberArray2_neg_1_0;
-let numberArray2_neg_0_8;
-let numberArray2_neg_0_6;
-let numberArray2_neg_0_4;
-let numberArray2_neg_0_2;
-let numberArray2_0;
-let numberArray2_pos_0_2;
-let numberArray2_pos_0_4;
-let numberArray2_pos_0_6;
-let numberArray2_pos_0_8;
-let numberArray2_pos_1_0;
-let numberArray2_pos_1_2;
-let numberArray2_pos_1_4;
-let numberArray2_pos_1_6;
-let numberArray2_pos_1_8;
-let numberArray2_pos_2_0;
-let x_values_2;
+// let numberArray2_neg_2_0;
+// let numberArray2_neg_1_8;
+// let numberArray2_neg_1_6;
+// let numberArray2_neg_1_4;
+// let numberArray2_neg_1_2;
+// let numberArray2_neg_1_0;
+// let numberArray2_neg_0_8;
+// let numberArray2_neg_0_6;
+// let numberArray2_neg_0_4;
+// let numberArray2_neg_0_2;
+// let numberArray2_0;
+// let numberArray2_pos_0_2;
+// let numberArray2_pos_0_4;
+// let numberArray2_pos_0_6;
+// let numberArray2_pos_0_8;
+// let numberArray2_pos_1_0;
+// let numberArray2_pos_1_2;
+// let numberArray2_pos_1_4;
+// let numberArray2_pos_1_6;
+// let numberArray2_pos_1_8;
+// let numberArray2_pos_2_0;
+// let x_values_2;
 
-let current_array = []; //current array displayibg
-let current_array_temp = []; //used to calculaate current_array in Scene 2
+let bandData = band_vd00_vg00; //current array displayibg
+let bandData_temp = []; //used to calculaate bandData in Scene 2
 let charge_density_temp_data = []; //charge density temp data store
 let E_field_temp_data = []; //electric field temp data
 let x_counter; //used to read electric field at a given point in Accelerate function
 let tesx; //used to read electric field at a given point in Accelerate function
 
-fetchBandDiagramData(); // DO NOT REMOVE this call, included in multiple places to prevent load failures
+// fetchBandDiagramData(); // DO NOT REMOVE this call, included in multiple places to prevent load failures
 
-function fetchBandDiagramData() {
-	fetch("v_data_1.json")
-		.then((response) => response.json())
-		.then((jsonData) => {
-			// Assuming jsonData is an array and we're interested in specific object properties
-			//using https://tableconvert.com/excel-to-json to convert excel to json
-			//when density = 10^17
-			numberArray1_neg_2_0 = jsonData[0]["0"].map(Number); // Data for one condition
-			numberArray1_neg_1_8 = jsonData[1]["1"].map(Number); // Data for another condition
-			numberArray1_neg_1_6 = jsonData[2]["2"].map(Number); //
-			numberArray1_neg_1_4 = jsonData[3]["3"].map(Number); //
-			numberArray1_neg_1_2 = jsonData[4]["4"].map(Number); //
-			numberArray1_neg_1_0 = jsonData[5]["5"].map(Number); //
-			numberArray1_neg_0_8 = jsonData[6]["6"].map(Number); //
-			numberArray1_neg_0_6 = jsonData[7]["7"].map(Number); //
-			numberArray1_neg_0_4 = jsonData[8]["8"].map(Number); //
-			numberArray1_neg_0_2 = jsonData[9]["9"].map(Number); //
-			numberArray1_0 = jsonData[10]["10"].map(Number); //
-			numberArray1_pos_0_2 = jsonData[11]["11"].map(Number); //
-			numberArray1_pos_0_4 = jsonData[12]["12"].map(Number); //
-			numberArray1_pos_0_6 = jsonData[13]["13"].map(Number); //
-			numberArray1_pos_0_8 = jsonData[14]["14"].map(Number); //
-			numberArray1_pos_1_0 = jsonData[15]["15"].map(Number); //
-			numberArray1_pos_1_2 = jsonData[16]["16"].map(Number); //
-			numberArray1_pos_1_4 = jsonData[17]["17"].map(Number); //
-			numberArray1_pos_1_6 = jsonData[18]["18"].map(Number); //
-			numberArray1_pos_1_8 = jsonData[19]["19"].map(Number); //
-			numberArray1_pos_2_0 = jsonData[20]["20"].map(Number); //
-			xPositionData = jsonData[21]["21"].map(Number); //
+// function fetchBandDiagramData() {
+// 	fetch("v_data_1.json")
+// 		.then((response) => response.json())
+// 		.then((jsonData) => {
+// 			// Assuming jsonData is an array and we're interested in specific object properties
+// 			//using https://tableconvert.com/excel-to-json to convert excel to json
+// 			//when density = 10^17
+// 			numberArray1_neg_2_0 = jsonData[0]["0"].map(Number); // Data for one condition
+// 			numberArray1_neg_1_8 = jsonData[1]["1"].map(Number); // Data for another condition
+// 			numberArray1_neg_1_6 = jsonData[2]["2"].map(Number); //
+// 			numberArray1_neg_1_4 = jsonData[3]["3"].map(Number); //
+// 			numberArray1_neg_1_2 = jsonData[4]["4"].map(Number); //
+// 			numberArray1_neg_1_0 = jsonData[5]["5"].map(Number); //
+// 			numberArray1_neg_0_8 = jsonData[6]["6"].map(Number); //
+// 			numberArray1_neg_0_6 = jsonData[7]["7"].map(Number); //
+// 			numberArray1_neg_0_4 = jsonData[8]["8"].map(Number); //
+// 			numberArray1_neg_0_2 = jsonData[9]["9"].map(Number); //
+// 			numberArray1_0 = jsonData[10]["10"].map(Number); //
+// 			numberArray1_pos_0_2 = jsonData[11]["11"].map(Number); //
+// 			numberArray1_pos_0_4 = jsonData[12]["12"].map(Number); //
+// 			numberArray1_pos_0_6 = jsonData[13]["13"].map(Number); //
+// 			numberArray1_pos_0_8 = jsonData[14]["14"].map(Number); //
+// 			numberArray1_pos_1_0 = jsonData[15]["15"].map(Number); //
+// 			numberArray1_pos_1_2 = jsonData[16]["16"].map(Number); //
+// 			numberArray1_pos_1_4 = jsonData[17]["17"].map(Number); //
+// 			numberArray1_pos_1_6 = jsonData[18]["18"].map(Number); //
+// 			numberArray1_pos_1_8 = jsonData[19]["19"].map(Number); //
+// 			numberArray1_pos_2_0 = jsonData[20]["20"].map(Number); //
+// 			xPositionData = jsonData[21]["21"].map(Number); //
 
-			// Output the array to verify
-		})
-		.catch((error) => console.error("Error loading the JSON data:", error));
+// 			// Output the array to verify
+// 		})
+// 		.catch((error) => console.error("Error loading the JSON data:", error));
 
-	fetch("v_data_2.json")
-		.then((response) => response.json())
-		.then((jsonData) => {
-			// Assuming jsonData is an array and we're interested in specific object properties
-			//using https://tableconvert.com/excel-to-json to convert excel to json
-			//when density = 10^17
-			numberArray2_neg_2_0 = jsonData[0]["0"].map(Number); // Data for one condition
-			numberArray2_neg_1_8 = jsonData[1]["1"].map(Number); // Data for another condition
-			numberArray2_neg_1_6 = jsonData[2]["2"].map(Number); //
-			numberArray2_neg_1_4 = jsonData[3]["3"].map(Number); //
-			numberArray2_neg_1_2 = jsonData[4]["4"].map(Number); //
-			numberArray2_neg_1_0 = jsonData[5]["5"].map(Number); //
-			numberArray2_neg_0_8 = jsonData[6]["6"].map(Number); //
-			numberArray2_neg_0_6 = jsonData[7]["7"].map(Number); //
-			numberArray2_neg_0_4 = jsonData[8]["8"].map(Number); //
-			numberArray2_neg_0_2 = jsonData[9]["9"].map(Number); //
-			numberArray2_0 = jsonData[10]["10"].map(Number); //
-			numberArray2_pos_0_2 = jsonData[11]["11"].map(Number); //
-			numberArray2_pos_0_4 = jsonData[12]["12"].map(Number); //
-			numberArray2_pos_0_6 = jsonData[13]["13"].map(Number); //
-			numberArray2_pos_0_8 = jsonData[14]["14"].map(Number); //
-			numberArray2_pos_1_0 = jsonData[15]["15"].map(Number); //
-			numberArray2_pos_1_2 = jsonData[16]["16"].map(Number); //
-			numberArray2_pos_1_4 = jsonData[17]["17"].map(Number); //
-			numberArray2_pos_1_6 = jsonData[18]["18"].map(Number); //
-			numberArray2_pos_1_8 = jsonData[19]["19"].map(Number); //
-			numberArray2_pos_2_0 = jsonData[20]["20"].map(Number); //
-			// x_values_2 = jsonData[21]["21"].map(Number); //
+// 	fetch("v_data_2.json")
+// 		.then((response) => response.json())
+// 		.then((jsonData) => {
+// 			// Assuming jsonData is an array and we're interested in specific object properties
+// 			//using https://tableconvert.com/excel-to-json to convert excel to json
+// 			//when density = 10^17
+// 			numberArray2_neg_2_0 = jsonData[0]["0"].map(Number); // Data for one condition
+// 			numberArray2_neg_1_8 = jsonData[1]["1"].map(Number); // Data for another condition
+// 			numberArray2_neg_1_6 = jsonData[2]["2"].map(Number); //
+// 			numberArray2_neg_1_4 = jsonData[3]["3"].map(Number); //
+// 			numberArray2_neg_1_2 = jsonData[4]["4"].map(Number); //
+// 			numberArray2_neg_1_0 = jsonData[5]["5"].map(Number); //
+// 			numberArray2_neg_0_8 = jsonData[6]["6"].map(Number); //
+// 			numberArray2_neg_0_6 = jsonData[7]["7"].map(Number); //
+// 			numberArray2_neg_0_4 = jsonData[8]["8"].map(Number); //
+// 			numberArray2_neg_0_2 = jsonData[9]["9"].map(Number); //
+// 			numberArray2_0 = jsonData[10]["10"].map(Number); //
+// 			numberArray2_pos_0_2 = jsonData[11]["11"].map(Number); //
+// 			numberArray2_pos_0_4 = jsonData[12]["12"].map(Number); //
+// 			numberArray2_pos_0_6 = jsonData[13]["13"].map(Number); //
+// 			numberArray2_pos_0_8 = jsonData[14]["14"].map(Number); //
+// 			numberArray2_pos_1_0 = jsonData[15]["15"].map(Number); //
+// 			numberArray2_pos_1_2 = jsonData[16]["16"].map(Number); //
+// 			numberArray2_pos_1_4 = jsonData[17]["17"].map(Number); //
+// 			numberArray2_pos_1_6 = jsonData[18]["18"].map(Number); //
+// 			numberArray2_pos_1_8 = jsonData[19]["19"].map(Number); //
+// 			numberArray2_pos_2_0 = jsonData[20]["20"].map(Number); //
+// 			// x_values_2 = jsonData[21]["21"].map(Number); //
 
-			// Output the array to verify
-			// clg(numberArray1_pos_2_0);
-		})
-		.catch((error) => console.error("Error loading the JSON data:", error));
-}
+// 			// Output the array to verify
+// 			// clg(numberArray1_pos_2_0);
+// 		})
+// 		.catch((error) => console.error("Error loading the JSON data:", error));
+// }
 // Initial Function Calls ============================================================
 
 // Updating Functions ============================================================
@@ -460,16 +504,16 @@ function scaleToWindow() {
 	}
 }
 
-function accessGrid() {
-	// create test charge
-	let newCharge = new Charge(35, 70, "h", 1000, "i");
+// function accessGrid() {
+// 	// create test charge
+// 	let newCharge = new Charge(35, 70, "h", 1000, "i");
 
-	let row = Math.ceil(newCharge.y / 10); // 7 - 7th row
-	let col = Math.ceil(newCharge.x / 10); // 3.5 - round up = 4th row
+// 	let row = Math.ceil(newCharge.y / 10); // 7 - 7th row
+// 	let col = Math.ceil(newCharge.x / 10); // 3.5 - round up = 4th row
 
-	let chargeEFX = highResGrid[row][col].efx;
-	let chargeEFY = highResGrid[row][col].efy;
-}
+// 	let chargeEFX = efGrid[row][col].efx;
+// 	let chargeEFY = efGrid[row][col].efy;
+// }
 
 function draw() {
 	scaleToWindow();
@@ -481,11 +525,11 @@ function draw() {
 		drawBase();
 		updateCharges();
 		drawWires();
-		drawGraph();
 		drawBandDiagram();
+		drawGraph();
 		updateWireElectrons();
 		drawMetalPosCharges();
-		// if (innerLoopAnimated) {
+		// if (vgLoopAnimated) {
 		// 	enableButton();
 
 		// }
@@ -513,20 +557,33 @@ function resetScene() {
 	background(...color.bg);
 	fixedCharges = [];
 	initCharges();
-	initWireElectrons();
-	resetInnerLoop();
-	outerBatteryOn = true;
+	resetVDLoop();
+	resetvgLoop();
+	vdOn = true;
+	vg = 0.3;
+	vd = 0.2;
+	updateProfile(vd, vg);
+
+	// reset sliders
+	let vdSlider = document.querySelector(`.vdSlider`);
+	vdSlider.value = 1;
+
+	let vgSlider = document.querySelector(`.vgSlider`);
+	vgSlider.value = 0;
+
+	let profileSlider = document.querySelector(`.profileSlider`);
+	profileSlider.value = 1;
 
 	// holes = [];
 	// electrons = [];
 	// chargeID = 0;
 
-	// innerLoop = [];
-	// outerLoop = [];
-	// innerLoopOn = false;
-	// outerLoopOn = false;
-	// innerBatteryCharge = 30;
-	// numOuterLoop = 30;
+	// vgLoop = [];
+	// vdLoop = [];
+	// vgLoopOn = false;
+	// vdLoopOn = false;
+	// vgChargeVisual = 30;
+	// vdChargeVisual = 30;
 
 	// generationEffects = [];
 
@@ -542,33 +599,22 @@ function resetScene() {
 }
 
 // Updating Functions ============================================================
-function initWireElectrons() {
-	for (let i = 0; i < numOuterLoop; i++) {
-		let x = base.wire.rightMetal.x;
-		// yRange is range of y used to spread out the charges during animation
-		// yRange is divided by numOuterLoop to determine how spread out charges are
-		let yRange = 900;
-		let y = base.wire.rightMetal.y + i * (yRange / numOuterLoop);
 
-		outerLoop.push(new wireCharge(x, y, "outer"));
-	}
-}
-
-function resetInnerLoop(direction) {
-	innerLoop = [];
+function resetvgLoop(direction) {
+	vgLoop = [];
 	metalPosCharges = [];
-	for (let i = 0; i < innerBatteryCharge; i++) {
+	for (let i = 0; i < vgChargeVisual; i++) {
 		// moving electrons
 		let x, y;
 		if (direction == 0) {
-			x = base.wire.innerBatteryRight.x;
-			y = base.wire.topMetal.y + i * (200 / innerBatteryCharge);
+			x = base.wire.vgRight.x;
+			y = base.wire.topMetal.y + i * (200 / vgChargeVisual);
 		} else {
-			x = base.wire.innerBatteryLeft.x;
-			y = base.wire.topMetal.y + i * (200 / innerBatteryCharge);
+			x = base.wire.vgLeft.x;
+			y = base.wire.topMetal.y + i * (200 / vgChargeVisual);
 		}
 
-		innerLoop.push(new wireCharge(x, y, "inner"));
+		vgLoop.push(new wireCharge(x, y, "vg"));
 
 		// show fixed positive charges
 		x = random(
@@ -928,21 +974,17 @@ function checkDest(electron, dest) {
 	}
 }
 
-function animateOuterLoop() {
+function animateVDLoop() {
 	let stopPositions = [];
-	stopPositions.push(
-		createVector(base.wire.outerBatteryRight.x, base.wire.outerBatteryRight.y)
-	);
-	stopPositions.push(
-		createVector(base.wire.outerBatteryLeft.x, base.wire.outerBatteryLeft.y)
-	);
+	stopPositions.push(createVector(base.wire.vdRight.x, base.wire.vdRight.y));
+	stopPositions.push(createVector(base.wire.vdLeft.x, base.wire.vdLeft.y));
 	stopPositions.push(
 		createVector(base.wire.leftMetal.x, base.wire.leftMetal.y)
 	);
 	let stops = [1, 2, 3]; // based on stopPositions
 
-	for (let i = 0; i < outerLoop.length; i++) {
-		let electron = outerLoop[i];
+	for (let i = 0; i < vdLoop.length; i++) {
+		let electron = vdLoop[i];
 		electron.draw();
 
 		let atDest1 = checkDest(electron, stopPositions[0], false);
@@ -990,136 +1032,116 @@ function animateOuterLoop() {
 	}
 }
 
-function resetInnerLoopPositions() {
+function resetvgLoopPositions() {
 	// reset electron positions again so they appear spread out when they move back to metal
-	for (let i = 0; i < innerBatteryCharge; i++) {
-		innerLoop[i].position.y = base.wire.leftMetal.y + i * 40;
+	for (let i = 0; i < vgChargeVisual; i++) {
+		vgLoop[i].position.y = base.wire.leftMetal.y + i * 40;
 	}
 }
 
-function animateInnerLoop() {
+function animateVGLoop() {
 	// let stopPositions = [];
-	// stopPositions.push(createVector(...base.wire.innerBatteryRight));
-	// stopPositions.push(createVector(...base.wire.innerBatteryLeft));
+	// stopPositions.push(createVector(...base.wire.vgRight));
+	// stopPositions.push(createVector(...base.wire.vgLeft));
 	// stopPositions.push(createVector(...base.wire.leftMetal));
 
 	// let stops = [1, 2, 3]; // based on stopPositions
 
 	let positions = [];
 
-	for (let i = 0; i < innerLoop.length; i++) {
-		let electron = innerLoop[i];
+	for (let i = 0; i < vgLoop.length; i++) {
+		let electron = vgLoop[i];
 		electron.draw();
 
 		// let atDest1 = checkDest(electron, stopPositions[0], false);
 		// let atDest2 = checkDest(electron, stopPositions[1], false);
 		// let atDest3 = checkDest(electron, stopPositions[2], false);
 
-		if (innerLoopDirection == 0) {
+		if (vgLoopDirection == 0) {
 			// move to left metal
 			if (
-				electron.position.x > base.wire.innerBattery.x + 8 &&
-				electron.position.y > base.wire.innerBatteryRight.y + 0
+				electron.position.x > base.wire.vg.x + 8 &&
+				electron.position.y > base.wire.vgRight.y + 0
 			) {
 				// up (1)
-				electron.move(
-					createVector(
-						base.wire.innerBatteryRight.x,
-						base.wire.innerBatteryRight.y
-					)
-				);
-			} else if (electron.position.x > base.wire.outerBatteryLeft.x + 8) {
+				electron.move(createVector(base.wire.vgRight.x, base.wire.vgRight.y));
+			} else if (electron.position.x > base.wire.vdLeft.x + 8) {
 				// left (2)
-				electron.move(
-					createVector(
-						base.wire.innerBatteryLeft.x,
-						base.wire.innerBatteryLeft.y
-					)
-				);
+				electron.move(createVector(base.wire.vgLeft.x, base.wire.vgLeft.y));
 			} else if (
-				electron.position.x < base.wire.outerBatteryLeft.x + 8 &&
+				electron.position.x < base.wire.vdLeft.x + 8 &&
 				electron.position.y < base.wire.leftMetal.y
 			) {
 				// down (3)
 				electron.move(createVector(base.wire.leftMetal.x, base.y));
 				setTimeout(() => {
-					if (i == innerLoop.length - 1) {
+					if (i == vgLoop.length - 1) {
 						showMetalPosCharges = true;
-						innerLoopAnimated = true;
-						resetInnerLoopPositions();
+						vgLoopAnimated = true;
+						resetvgLoopPositions();
 					}
-				}, innerLoop.length * 40);
+				}, vgLoop.length * 40);
 				// setTimeout(() => {
 				// 	enableButton();
-				// }, innerLoop.length * 40 + 5000);
+				// }, vgLoop.length * 40 + 5000);
 			}
 		} else {
-			// when reset button pressed (inverses innerLoopDirection), move back to metal
+			// when reset button pressed (inverses vgLoopDirection), move back to metal
 			if (
-				electron.position.x < base.wire.innerBattery.x &&
-				electron.position.y > base.wire.innerBatteryLeft.y + 8
+				electron.position.x < base.wire.vg.x &&
+				electron.position.y > base.wire.vgLeft.y + 8
 			) {
-				electron.move(
-					createVector(
-						base.wire.innerBatteryLeft.x,
-						base.wire.innerBatteryLeft.y
-					)
-				); // up
-			} else if (electron.position.x < base.wire.innerBatteryRight.x + 8) {
-				if (electron.position.x > base.wire.innerBatteryRight.x - 8) {
+				electron.move(createVector(base.wire.vgLeft.x, base.wire.vgLeft.y)); // up
+			} else if (electron.position.x < base.wire.vgRight.x + 8) {
+				if (electron.position.x > base.wire.vgRight.x - 8) {
 					// if on right line
 					electron.move(createVector(base.wire.topMetal.x, base.y)); // down
 					setTimeout(() => {
-						if (i == innerLoop.length - 1) {
+						if (i == vgLoop.length - 1) {
 							showMetalPosCharges = false;
 							toggleChargeSliders("on");
-							resetInnerLoopPositions();
-							innerLoopAnimated = true;
+							resetvgLoopPositions();
+							vgLoopAnimated = true;
 						}
 					}, 1200);
 					// 	setTimeout(() => {
 					// 	enableButton();
-					// }, innerLoop.length * 40 + 5000);
+					// }, vgLoop.length * 40 + 5000);
 				} else {
-					electron.move(
-						createVector(
-							base.wire.innerBatteryRight.x,
-							base.wire.innerBatteryRight.y
-						)
-					); // right
+					electron.move(createVector(base.wire.vgRight.x, base.wire.vgRight.y)); // right
 				}
 			}
 
 			// check if done
 			// if (electron.position.y > base.wire.topMetal.y - 8) {
-			// 	// innerLoop.splice(i);
-			// 	innerLoop[i].hide();
+			// 	// vgLoop.splice(i);
+			// 	vgLoop[i].hide();
 			// }
 
 			// if (
-			// 	electron.position.x < base.wire.innerBattery.x &&
-			// 	electron.position.y > base.wire.innerBatteryRight.y
+			// 	electron.position.x < base.wire.vg.x &&
+			// 	electron.position.y > base.wire.vgRight.y
 			// ) {
-			// 	electron.move(createVector(...base.wire.innerBatteryLeft));
-			// } else if (electron.position.x < base.wire.outerBatteryLeft.x) {
-			// 	electron.move(createVector(...base.wire.innerBatteryRight));
+			// 	electron.move(createVector(...base.wire.vgLeft));
+			// } else if (electron.position.x < base.wire.vdLeft.x) {
+			// 	electron.move(createVector(...base.wire.vgRight));
 			// } else if (
-			// 	electron.position.x > base.wire.innerBattery.x &&
+			// 	electron.position.x > base.wire.vg.x &&
 			// 	electron.position.y < base.wire.leftMetal.y
 			// ) {
 			// 	electron.move(createVector(...base.wire.topMetal));
 			// }
 			// if (
-			// 	electron.position.x < base.wire.outerBatteryLeft.x + 8 &&
+			// 	electron.position.x < base.wire.vdLeft.x + 8 &&
 			// 	electron.position.y < base.wire.leftMetal.y
 			// ) {
-			// 	electron.move(createVector(...base.wire.innerBatteryLeft));
+			// 	electron.move(createVector(...base.wire.vgLeft));
 			// } else if (
-			// 	electron.position.x < base.wire.innerBatteryRight.x &&
-			// 	electron.position.y < base.wire.innerBatteryRight.y
+			// 	electron.position.x < base.wire.vgRight.x &&
+			// 	electron.position.y < base.wire.vgRight.y
 			// ) {
-			// 	electron.move(createVector(...base.wire.innerBatteryRight));
-			// } else if (electron.position.x > base.wire.innerBatteryRight.x - 16) {
+			// 	electron.move(createVector(...base.wire.vgRight));
+			// } else if (electron.position.x > base.wire.vgRight.x - 16) {
 			// 	electron.move(createVector(...base.wire.topMetal));
 			// }
 		}
@@ -1137,8 +1159,8 @@ function drawMetalPosCharges() {
 	}
 }
 
-function toggleOuterBattery() {
-	outerLoopOn = !outerLoopOn;
+function togglevd() {
+	vdLoopOn = !vdLoopOn;
 }
 
 function disableButton() {
@@ -1158,23 +1180,23 @@ function applyCharge() {
 
 	if (btn.innerText == "Reset") {
 		btn.innerText = "Apply Charge";
-		innerLoopAnimated = false;
-		innerLoopDirection = 1;
-		resetInnerLoopPositions();
-		resetInnerLoop(innerLoopDirection);
+		vgLoopAnimated = false;
+		vgLoopDirection = 1;
+		resetvgLoopPositions();
+		resetvgLoop(vgLoopDirection);
 		disableButton();
 	} else if (btn.innerText == "Apply Charge") {
 		btn.innerText = "Reset";
-		innerLoopAnimated = false;
-		innerLoopDirection = 0;
+		vgLoopAnimated = false;
+		vgLoopDirection = 0;
 		toggleChargeSliders("off");
-		resetInnerLoop(innerLoopDirection);
+		resetvgLoop(vgLoopDirection);
 		disableButton();
 	}
 
 	// setTimeout(() => {
 	// 	enableButton();
-	// }, innerLoop.length * 40 + 5000);
+	// }, vgLoop.length * 40 + 5000);
 }
 
 function toggleChargeSliders(state) {
@@ -1190,15 +1212,121 @@ function toggleChargeSliders(state) {
 	}
 }
 
-function updateInnerBatteryCharge(numCharges) {
-	innerBatteryCharge = numCharges;
-	innerLoop = [];
+function updateProfileTemp(value) {
+	if (value == 0) {
+		updateProfile(0, 0);
+	} else if (value == 1) {
+		updateProfile(0.2, 0.3);
+	} else if (value == 2) {
+		updateProfile(0.2, 0.9);
+	} else if (value == 3) {
+		updateProfile(0.2, 3.0);
+	} else if (value == 4) {
+		updateProfile(0.2, 2.5);
+	} else if (value == 5) {
+		updateProfile(1.6, 2.5);
+	} else if (value == 6) {
+		updateProfile(4.5, 2.5);
+	}
+}
+
+function setBand(band) {
+	bandData = [];
+	for (let i = 0; i < band.length - 1; i++) {
+		bandData[i] = band[i].cband;
+	}
+}
+
+function updateProfile(vd, vg) {
+	vdCharge = vd;
+	vgCharge = vg;
+	if (vd == 0 && vg == 0) {
+		efGrid = efGrid_vd00_vg00;
+		setBand(band_vd00_vg00);
+	} else if (vd == 0.2 && vg == 0.3) {
+		efGrid = efGrid_vd02_vg03;
+		setBand(band_vd02_vg03);
+	} else if (vd == 0.2 && vg == 0.9) {
+		efGrid = efGrid_vd02_vg09;
+		setBand(band_vd02_vg09);
+	} else if (vd == 0.2 && vg == 3.0) {
+		efGrid = efGrid_vd02_vg30;
+		setBand(band_vd02_vg30);
+	} else if (vd == 0.2 && vg == 2.5) {
+		efGrid = efGrid_vd02_vg25;
+		setBand(band_vd02_vg25);
+	} else if (vd == 1.6 && vg == 2.5) {
+		efGrid = efGrid_vd16_vg25;
+		setBand(band_vd16_vg25);
+	} else if (vd == 4.5 && vg == 2.5) {
+		efGrid = efGrid_vd45_vg25;
+		setBand(band_vd45_vg25);
+	}
+
+	// currently: if profile is not included, nothing happens - stays on last selected valid profile
+
+	// current profiles
+	// vd 0.0 / vg 0.0
+	// vd 0.2 / vg 0.3
+	// vd 0.2 / vg 0.9
+	// vd 0.2 / vg 3.0
+	// vd 0.2 / vg 2.5
+	// vd 1.6 / vg 2.5
+	// vd 4.5 / vg 2.5
+
+	// possible vd profiles
+	0.0;
+	0.2;
+	1.6;
+	4.5;
+
+	// possible vg profiles
+	0.0;
+	0.3;
+	0.9;
+	2.5;
+	3.0;
+}
+
+function updateVD(value) {
+	let vdChargeMap = [0.0, 0.2, 1.6, 4.5];
+	vdCharge = vdChargeMap[value];
+	updateProfile(vgCharge, vdCharge);
+	let vdChargeVisualMap = [0, 10, 20, 30];
+	vdChargeVisual = vdChargeVisualMap[value];
+	resetVDLoop();
+}
+
+function resetVDLoop() {
+	// currently clears out and animates from beginning
+	// able to make more continuous when Vd slider is changed?
+	vdLoop = [];
+	for (let i = 0; i < vdChargeVisual; i++) {
+		let x = base.wire.rightMetal.x;
+		// yRange is range of y used to spread out the charges during animation
+		// yRange is divided by vdChargeVisual to determine how spread out charges are
+		let yRange = 900;
+		let y = base.wire.rightMetal.y + i * (yRange / vdChargeVisual);
+
+		vdLoop.push(new wireCharge(x, y, "vd"));
+	}
+}
+
+function updateVG(value) {
+	// value is from 0-3V - map to a charge amount to visually represent
+
+	let vgChargeMap = [0.0, 0.3, 0.9, 2.5, 3.0];
+	vgCharge = vgChargeMap[value];
+	updateProfile(vgCharge, vdCharge);
+
+	let vgChargeVisualMap = [0, 5, 10, 20];
+	vgChargeVisual = vgChargeVisualMap[value];
+	vgLoop = [];
 	metalPosCharges = [];
-	for (let i = 0; i < innerBatteryCharge; i++) {
-		let x = base.wire.innerBatteryRight.x;
-		// let y = base.wire.topMetal.y;
+	for (let i = 0; i < vgChargeVisual; i++) {
+		let x = base.wire.vgRight.x;
 		let y = base.wire.leftMetal.y + i * 50;
-		innerLoop.push(new wireCharge(x, y, "inner"));
+		vgLoop.push(new wireCharge(x, y, "vd"));
 
 		// metal
 		x = random(base.x + base.sourceWidth, base.endX - base.sourceWidth);
@@ -1208,27 +1336,24 @@ function updateInnerBatteryCharge(numCharges) {
 		chargeID++;
 	}
 
-	// resetInnerLoopPositions();
+	// resetvgLoopPositions();
 }
 function updateWireElectrons() {
-	console.log("innerloopanimated");
-	if (outerLoopOn) {
-		animateOuterLoop();
+	if (vdCharge > 0) {
+		animateVDLoop();
 	}
-	if (!innerLoopAnimated) {
-		animateInnerLoop();
+	if (!vgLoopAnimated) {
+		animateVGLoop();
 	}
 
 	stillAnimating = false;
 	// enable button if no electrons are animating (all below the topmetal)
-	for (let i = 0; i < innerLoop.length; i++) {
-		const electron = innerLoop[i];
+	for (let i = 0; i < vgLoop.length; i++) {
+		const electron = vgLoop[i];
 		if (electron.position.y < base.wire.leftMetal.y - 10) {
 			stillAnimating = true;
 		}
 	}
-
-	// console.log("stillAnimating", stillAnimating);
 
 	if (!stillAnimating) {
 		enableButton();
@@ -1556,22 +1681,11 @@ function drawFullDepletionRegion() {
 	endShape(CLOSE);
 }
 
-function drawChannel() {
-	// source + drain + channel depletion region
-	strokeWeight(1.2);
-	stroke(...color.yellow, 210);
-	fill(...color.yellow, 20);
-	canvas.drawingContext.setLineDash([7, 3]);
-
-	rect(base.x, base.y, base.width, base.depletionPadding, base.smallRadius);
-}
-
 function drawBase() {
 	// style depletion regions
 
 	// drawSourceBaseDepletionRegion();
 	// drawFullDepletionRegion();
-	// drawChannel();
 
 	// style bases
 	fill(...color.bg);
@@ -1656,11 +1770,17 @@ function drawBase() {
 	image(
 		leftGroundImg,
 		base.leftGroundX + 8,
-		base.innerY - 16,
+		base.vgY - 16,
 		leftGroundImg.width * 0.8,
 		leftGroundImg.height * 0.8
 	);
 
+	// vg vd
+
+	textSize(20);
+	text(`vd: ${vdCharge}, vg: ${vgCharge}`, 750, 30);
+
+	textSize(16);
 	// labels
 	styleText();
 	textAlign(CENTER);
@@ -1692,42 +1812,42 @@ function drawBase() {
 }
 
 function drawWires() {
-	if (innerLoopDirection == 0) {
-		// inner battery on
+	if (vgLoopDirection == 0) {
+		// vg battery on
 		image(
 			batteryNegOn,
-			base.wire.innerBattery.x,
-			base.wire.innerBattery.y,
+			base.wire.vg.x,
+			base.wire.vg.y,
 			batteryNegOn.width / 1.5,
 			batteryNegOn.height / 1.5
 		);
 	} else {
-		// inner battery off
+		// vg battery off
 		image(
 			batteryNegOff,
-			base.wire.innerBattery.x,
-			base.wire.innerBattery.y,
+			base.wire.vg.x,
+			base.wire.vg.y,
 			batteryNegOff.width / 1.5,
 			batteryNegOff.height / 1.5
 		);
 	}
 
-	// outer battery
-	if (outerLoopOn) {
-		// outer battery on
+	// vd battery
+	if (vdCharge > 0) {
+		// vd battery on
 		image(
 			batteryNegOn,
-			base.wire.outerBattery.x,
-			base.wire.outerBattery.y,
+			base.wire.vd.x,
+			base.wire.vd.y,
 			batteryNegOn.width / 1.5,
 			batteryNegOn.height / 1.5
 		);
 	} else {
-		// outer battery off
+		// vd battery off
 		image(
 			batteryNegOff,
-			base.wire.outerBattery.x,
-			base.wire.outerBattery.y,
+			base.wire.vd.x,
+			base.wire.vd.y,
 			batteryNegOff.width / 1.5,
 			batteryNegOff.height / 1.5
 		);
@@ -1739,31 +1859,31 @@ function drawWires() {
 	let wireOffsetX = 20;
 
 	let wireGap = 8; // * 2 = 16
-	// wire from source metal to inner battery
+	// wire from source metal to vg battery
 	beginShape();
 	vertex(base.x + base.sourceWidth / 2, base.y - base.metalHeight); // source
-	vertex(base.x + base.sourceWidth / 2, base.innerY); // top left corner
-	vertex(base.wire.innerBattery.x, base.innerY);
+	vertex(base.x + base.sourceWidth / 2, base.vgY); // top left corner
+	vertex(base.wire.vg.x, base.vgY);
 	endShape(); // battery
 
-	// wire from inner battery to gate metal
+	// wire from vg battery to gate metal
 	beginShape();
-	vertex(base.wire.innerBattery.x + base.batteryWidth, base.innerY);
-	vertex(base.wire.innerBatteryRight.x, base.innerY);
-	vertex(base.wire.innerBatteryRight.x, base.y - base.metalHeight * 2);
+	vertex(base.wire.vg.x + base.batteryWidth, base.vgY);
+	vertex(base.wire.vgRight.x, base.vgY);
+	vertex(base.wire.vgRight.x, base.y - base.metalHeight * 2);
 	endShape(); // battery
 
-	// wire from source to outer battery
+	// wire from source to vd battery
 	beginShape();
 	vertex(base.x + base.sourceWidth / 2, base.y - base.metalHeight); // source
-	vertex(base.x + base.sourceWidth / 2, base.outerY); // top left corner
-	vertex(base.wire.outerBattery.x, base.outerY);
-	endShape(); // outer battery
+	vertex(base.x + base.sourceWidth / 2, base.vdY); // top left corner
+	vertex(base.wire.vd.x, base.vdY);
+	endShape(); // vd battery
 
-	// wire from outer battery to drain metal
+	// wire from vd battery to drain metal
 	beginShape();
-	vertex(base.wire.outerBattery.x + base.batteryWidth, base.outerY); // outer battery
-	vertex(base.endX - base.sourceWidth / 2, base.outerY); // corner
+	vertex(base.wire.vd.x + base.batteryWidth, base.vdY); // vd battery
+	vertex(base.endX - base.sourceWidth / 2, base.vdY); // corner
 	vertex(base.endX - base.sourceWidth / 2, base.y - base.metalHeight); // drain metal
 	endShape(); // battery
 }
@@ -1821,21 +1941,10 @@ function drawControls() {
 	text("Electric Field", controls.ef.x + 40, controls.ef.y + 16);
 }
 
-// function drawBandDiagram() {
-// 	if (currentGraph == "bd") {
-// 		stroke(...color.electron);
-// 		line(60, 30, 60, 600);
-
-// 		stroke(...color.hole);
-// 		line(120, 30, 120, 600);
-// 	}
-// }
-
 function drawGraph() {
-	if (currentGraph == "cd" || currentGraph == "ef") {
-		drawAxes();
-		drawLineOver();
-	}
+	drawAxes();
+	drawLineOver();
+	drawEFData();
 	function drawLineOver() {
 		noFill();
 		stroke(...color.graph, 180);
@@ -1915,102 +2024,49 @@ function drawGraph() {
 			text("5 \u00B5m", base.x - offset + 160, base.y - base.metalHeight - 16);
 		}
 	}
+
+	function drawEFData() {
+		// console.log("in drawEFData", EFData);
+		//////////////////////////////////////////////////// draw E-field graph on second graph when switch is On, and draw charge density graph when not clicked switch
+		noStroke();
+
+		fill(218, 112, 214, 100);
+		// if (electronBand_data_v1.length > 0) {
+		// if (appliedVoltage > 0 || appliedVoltage < 0) {
+		beginShape();
+
+		vertex(250 * sx, (385 / 2 + 98) * sy);
+
+		// draw electric field graph
+		// Add all points as curve vertices
+		for (let i = 0; i < EFData.length; i++) {
+			let x = EFData[i].x;
+			let y =
+				10 * (EFData[i].y / Math.pow(10, 6)) * (40 / 1530) * 500 * sy +
+				(385 / 2 + 98) * sy;
+			// let y =
+			// 	(EFData[i].y / Math.pow(10, 4)) * 2 +
+			// 	(385 / 2 + 96.25) * sy;
+
+			vertex(x, y);
+		}
+		vertex(
+			EFData[bandData.length - 2].x,
+			EFData[bandData.length - 2].y / Math.pow(10, 6) + (385 / 2 + 98) * sy
+		);
+
+		endShape();
+	}
 }
 
 function drawBandDiagram() {
-	// draw band threshold
-	line(
-		base.x,
-		base.y + base.bandThreshold,
-		base.endX,
-		base.y + base.bandThreshold
-	);
-
-	// draw bands
-	let dopingCon = 99763115748444.14; // need to set up
-	let appliedVoltage = 2; // need to set up
-	if (dopingCon == 99763115748444.14) {
-		//10^17 case
-		if (appliedVoltage == 2) {
-			current_array_temp = numberArray1_neg_2_0;
-		} else if (appliedVoltage == 1.6) {
-			current_array_temp = numberArray1_neg_1_6;
-		} else if (appliedVoltage == 1.2) {
-			current_array_temp = numberArray1_neg_1_2;
-		} else if (appliedVoltage == 0.8) {
-			current_array_temp = numberArray1_neg_0_8;
-		} else if (appliedVoltage == 0.4) {
-			current_array_temp = numberArray1_neg_0_4;
-		} else if (appliedVoltage == 0) {
-			current_array_temp = numberArray1_0;
-		} else if (appliedVoltage == -0.4) {
-			current_array_temp = numberArray1_pos_0_4;
-		} else if (appliedVoltage == -0.8) {
-			current_array_temp = numberArray1_pos_0_8;
-		} else if (appliedVoltage == -1.2) {
-			current_array_temp = numberArray1_pos_1_2;
-		} else if (appliedVoltage == -1.6) {
-			current_array_temp = numberArray1_pos_1_6;
-		} else if (appliedVoltage == -2) {
-			current_array_temp = numberArray1_pos_2_0;
-		}
-		for (let i = 0; i < bandLength - 1; i++) {
-			current_array[i] = current_array_temp[i] * -1;
-		}
-	}
-	// else if (dopingCon == 5e13) {
-	// 	if (appliedVoltage / 20 == 2) {
-	// 		current_array_temp = numberArray2_neg_2_0;
-	// 	} else if (appliedVoltage / 20 == 1.6) {
-	// 		current_array_temp = numberArray2_neg_1_6;
-	// 	} else if (appliedVoltage / 20 == 1.2) {
-	// 		current_array_temp = numberArray2_neg_1_2;
-	// 	} else if (appliedVoltage / 20 == 0.8) {
-	// 		current_array_temp = numberArray2_neg_0_8;
-	// 	} else if (appliedVoltage / 20 == 0.4) {
-	// 		current_array_temp = numberArray2_neg_0_4;
-	// 	} else if (appliedVoltage / 20 == 0) {
-	// 		current_array_temp = numberArray2_0;
-	// 	} else if (appliedVoltage / 20 == -0.4) {
-	// 		current_array_temp = numberArray2_pos_0_4;
-	// 	} else if (appliedVoltage / 20 == -0.8) {
-	// 		current_array_temp = numberArray2_pos_0_8;
-	// 	} else if (appliedVoltage / 20 == -1.2) {
-	// 		current_array_temp = numberArray2_pos_1_2;
-	// 	} else if (appliedVoltage / 20 == -1.6) {
-	// 		current_array_temp = numberArray2_pos_1_6;
-	// 	} else if (appliedVoltage / 20 == -2) {
-	// 		current_array_temp = numberArray2_pos_2_0;
-	// 	}
-
-	// 	// populate current_array with current_array_temp
-	// 	for (let i = 0; i < bandLength - 1; i++) {
-	// 		current_array[i] = current_array_temp[i] * -1;
-	// 	}
-	// }
-
-	// calculate electric field
-	// if (electronBand_data_v1.length > 0) {
-	// 	//test case for v_data_1.json
-
-	// 	for (let i = 0; i < bandLength - 1; i++) {
-	// 		let y1 =
-	// 			((current_array[i + 1] - current_array[i]) /
-	// 				(xPositionData[i + 1] - xPositionData[i])) *
-	// 			Math.pow(10, 7);
-	// 		E_field_temp_data[i] = { x: electronBand_data_v1[i].x, y: y1 };
-	// 	}
-
-	// 	for (let i = 0; i < bandLength - 1; i++) {
-	// 		let y1 =
-	// 			((current_array[i + 1] - current_array[i]) /
-	// 				(xPositionData[i + 1] - xPositionData[i])) *
-	// 			Math.pow(10, 7);
-	// 		E_field_temp_data[i] = { x: electronBand_data_v1[i].x, y: y1 };
-	// 	}
-	// }
-
-	//draw negative curve
+	// draw band threshold - where hole charges show up on band
+	// line(
+	// 	base.x,
+	// 	base.y + base.bandThreshold,
+	// 	base.endX,
+	// 	base.y + base.bandThreshold
+	// );
 
 	beginShape();
 
@@ -2058,13 +2114,10 @@ function drawBandDiagram() {
 		let b = y1 - a * x1;
 		let y = a * xPositionData[k] + b;
 
-		// vertex drawn from current_array
-		curveVertex(base.x + y, base.bandY + current_array[k] * 40 - 100);
+		// vertex drawn from bandData
+		curveVertex(base.x + y, base.bandY + bandData[k] * 40 - 100);
 
-		electronBand[k] = [
-			base.x + y,
-			base.bandY + current_array[k] * (40 / 1.2) - 100,
-		];
+		electronBand[k] = [base.x + y, base.bandY + bandData[k] * (40 / 1.2) - 100];
 
 		//}
 	}
@@ -2084,11 +2137,19 @@ function drawBandDiagram() {
 		let b = y1 - a * x1;
 		let x = a * xPositionData[k] + b;
 
-		curveVertex(base.x + x, -30 + base.bandY + current_array[k] * 40 - 30);
-
-		holeBand[k] = [base.x + x, base.bandY + current_array[k] * (40 / 1.2) - 60];
+		curveVertex(base.x + x, -30 + base.bandY + bandData[k] * 40 - 30);
+		holeBand[k] = [base.x + x, base.bandY + bandData[k] * (40 / 1.2) - 60];
 	}
 	endShape();
 	noStroke();
 	strokeWeight(1);
+
+	// calculate electric field
+	for (let i = 0; i < bandLength - 1; i++) {
+		let y =
+			((bandData[i + 1] - bandData[i]) /
+				(xPositionData[i + 1] - xPositionData[i])) *
+			Math.pow(10, 7);
+		EFData[i] = { x: electronBand[i][0], y: y };
+	}
 }

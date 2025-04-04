@@ -15,7 +15,7 @@ class wireCharge {
 		let show = false;
 
 		// outer loop - only show if above top metals (metal is treated as visual black box)
-		if (this.loop == "outer") {
+		if (this.loop == "vd") {
 			if (this.position.y < base.y - base.metalHeight) {
 				show = true;
 			}
@@ -25,7 +25,7 @@ class wireCharge {
 		// initial y is randomized below metal so they appear to be flowing out separately.. don't show if position is below metal/insulator
 		// if (this.loop == 0) {
 		// if on right side (where top metal is higher)
-		if (this.loop == "inner") {
+		if (this.loop == "vg") {
 			show = true;
 			// insulator
 			if (
@@ -84,7 +84,7 @@ class wireCharge {
 		direction.normalize();
 
 		// Scale the direction vector by the ball's speed
-		if (this.loop == "outer") {
+		if (this.loop == "vd") {
 			direction.mult(this.speed / 2);
 		} else {
 			direction.mult(this.speed);
@@ -93,13 +93,13 @@ class wireCharge {
 		// Update the position based on the direction vector
 		this.position.add(direction);
 
-		if (this.loop == "outer") {
+		if (this.loop == "vd") {
 			// outer loop
 			// horizontal
-			if (this.position.y < base.outerY) {
+			if (this.position.y < base.vdY) {
 				// this.position.y += 1;
 			}
-			if (this.position.y > base.outerY) {
+			if (this.position.y > base.vdY) {
 				// this.position.y -= 1;
 			}
 
@@ -114,10 +114,10 @@ class wireCharge {
 			// }
 		} else {
 			// inner loop
-			if (this.position.y < base.innerY) {
+			if (this.position.y < base.vgY) {
 				// this.position.y += 1;
 			}
-			if (this.position.y > base.innerY) {
+			if (this.position.y > base.vgY) {
 				// this.position.y -= 1;
 			}
 			// if (this.position.x < base.wire.leftMetal.x - 4) {
