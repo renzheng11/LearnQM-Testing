@@ -371,7 +371,6 @@ input[type="range"]::-webkit-slider-thumb {
 	background: var(--brand);
 	border-radius: 50%;
 	cursor: pointer;
-	/* margin-top: -5px; */
 	position: relative;
 	box-shadow: none;
 }
@@ -395,6 +394,58 @@ input[type="range"]::-ms-fill-lower {
 	background: var(--brand);
 	border-radius: 5px;
 }
+
+/* slider disabled */
+input[type="range"] {
+	-webkit-appearance: none;
+	width: 240px;
+	height: 6px;
+	background: var(--bgGrey);
+	border-radius: 5px;
+	outline: none;
+	transition: background 0.3s;
+	position: relative;
+}
+
+input[type="range"]:disabled::-webkit-slider-runnable-track {
+	width: 240px;
+	height: 6px;
+	border-radius: 5px;
+	background: var(--bgGrey);
+}
+
+input[type="range"]:disabled::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	appearance: none;
+	width: 20px;
+	height: 20px;
+	background: var(--bgGrey);
+	border-radius: 50%;
+	cursor: pointer;
+	position: relative;
+	box-shadow: none;
+}
+
+input[type="range"]:disabled::-moz-range-thumb {
+	width: 20px;
+	height: 20px;
+	background: var(--bgGrey);
+	border-radius: 50%;
+	cursor: pointer;
+	box-shadow: none;
+}
+
+input[type="range"]:disabled::-moz-range-progress {
+	background: var(--bgGrey);
+	height: 6px;
+	border-radius: 5px;
+}
+
+input[type="range"]:disabled::-ms-fill-lower {
+	background: var(--bgGrey);
+	border-radius: 5px;
+}
+
 datalist {
 	display: flex;
 	justify-content: space-between;

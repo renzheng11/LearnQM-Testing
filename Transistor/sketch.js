@@ -121,8 +121,8 @@ let vdOn;
 let vgCharge; // actual vg charge amount in V
 let vdCharge; // actual vd charge amount in mA
 
-let vgChargeVisual = 5; // number of charges for animation for vg wire - visual representation
-let vdChargeVisual = 15; // number of charges for animation for vd wire - visual representation
+let vgChargeVisual = 0; // number of charges for animation for vg wire - visual representation
+let vdChargeVisual = 10; // number of charges for animation for vd wire - visual representation
 
 let stillAnimating = false;
 let vgLoop = []; // contains electrons for animation
@@ -178,7 +178,7 @@ const dim = {
 
 	batteryHeight: 20,
 
-	vgY: unit * 26, // inner wire
+	vgY: unit * 26, // inner wire // height from top of base = 208
 	vdY: unit * 20, // outer wire
 };
 
@@ -331,133 +331,7 @@ function scaleWindow() {
 	sy = windowHeight / scale_y;
 }
 
-// Data from EXCEL ============================================================
-
-//// get the excel sheet data for when donor density = 10^17
-// let numberArray1_neg_2_0;
-// let numberArray1_neg_1_8;
-// let numberArray1_neg_1_6;
-// let numberArray1_neg_1_4;
-// let numberArray1_neg_1_2;
-// let numberArray1_neg_1_0;
-// let numberArray1_neg_0_8;
-// let numberArray1_neg_0_6;
-// let numberArray1_neg_0_4;
-// let numberArray1_neg_0_2;
-// let numberArray1_0;
-// let numberArray1_pos_0_2;
-// let numberArray1_pos_0_4;
-// let numberArray1_pos_0_6;
-// let numberArray1_pos_0_8;
-// let numberArray1_pos_1_0;
-// let numberArray1_pos_1_2;
-// let numberArray1_pos_1_4;
-// let numberArray1_pos_1_6;
-// let numberArray1_pos_1_8;
-// let numberArray1_pos_2_0;
-// let xPositionData;
-
-// let numberArray2_neg_2_0;
-// let numberArray2_neg_1_8;
-// let numberArray2_neg_1_6;
-// let numberArray2_neg_1_4;
-// let numberArray2_neg_1_2;
-// let numberArray2_neg_1_0;
-// let numberArray2_neg_0_8;
-// let numberArray2_neg_0_6;
-// let numberArray2_neg_0_4;
-// let numberArray2_neg_0_2;
-// let numberArray2_0;
-// let numberArray2_pos_0_2;
-// let numberArray2_pos_0_4;
-// let numberArray2_pos_0_6;
-// let numberArray2_pos_0_8;
-// let numberArray2_pos_1_0;
-// let numberArray2_pos_1_2;
-// let numberArray2_pos_1_4;
-// let numberArray2_pos_1_6;
-// let numberArray2_pos_1_8;
-// let numberArray2_pos_2_0;
-// let x_values_2;
-
 let bandData = band_vd00_vg00; //current array displayibg
-let bandData_temp = []; //used to calculaate bandData in Scene 2
-let charge_density_temp_data = []; //charge density temp data store
-let E_field_temp_data = []; //electric field temp data
-let x_counter; //used to read electric field at a given point in Accelerate function
-let tesx; //used to read electric field at a given point in Accelerate function
-
-// fetchBandDiagramData(); // DO NOT REMOVE this call, included in multiple places to prevent load failures
-
-// function fetchBandDiagramData() {
-// 	fetch("v_data_1.json")
-// 		.then((response) => response.json())
-// 		.then((jsonData) => {
-// 			// Assuming jsonData is an array and we're interested in specific object properties
-// 			//using https://tableconvert.com/excel-to-json to convert excel to json
-// 			//when density = 10^17
-// 			numberArray1_neg_2_0 = jsonData[0]["0"].map(Number); // Data for one condition
-// 			numberArray1_neg_1_8 = jsonData[1]["1"].map(Number); // Data for another condition
-// 			numberArray1_neg_1_6 = jsonData[2]["2"].map(Number); //
-// 			numberArray1_neg_1_4 = jsonData[3]["3"].map(Number); //
-// 			numberArray1_neg_1_2 = jsonData[4]["4"].map(Number); //
-// 			numberArray1_neg_1_0 = jsonData[5]["5"].map(Number); //
-// 			numberArray1_neg_0_8 = jsonData[6]["6"].map(Number); //
-// 			numberArray1_neg_0_6 = jsonData[7]["7"].map(Number); //
-// 			numberArray1_neg_0_4 = jsonData[8]["8"].map(Number); //
-// 			numberArray1_neg_0_2 = jsonData[9]["9"].map(Number); //
-// 			numberArray1_0 = jsonData[10]["10"].map(Number); //
-// 			numberArray1_pos_0_2 = jsonData[11]["11"].map(Number); //
-// 			numberArray1_pos_0_4 = jsonData[12]["12"].map(Number); //
-// 			numberArray1_pos_0_6 = jsonData[13]["13"].map(Number); //
-// 			numberArray1_pos_0_8 = jsonData[14]["14"].map(Number); //
-// 			numberArray1_pos_1_0 = jsonData[15]["15"].map(Number); //
-// 			numberArray1_pos_1_2 = jsonData[16]["16"].map(Number); //
-// 			numberArray1_pos_1_4 = jsonData[17]["17"].map(Number); //
-// 			numberArray1_pos_1_6 = jsonData[18]["18"].map(Number); //
-// 			numberArray1_pos_1_8 = jsonData[19]["19"].map(Number); //
-// 			numberArray1_pos_2_0 = jsonData[20]["20"].map(Number); //
-// 			xPositionData = jsonData[21]["21"].map(Number); //
-
-// 			// Output the array to verify
-// 		})
-// 		.catch((error) => console.error("Error loading the JSON data:", error));
-
-// 	fetch("v_data_2.json")
-// 		.then((response) => response.json())
-// 		.then((jsonData) => {
-// 			// Assuming jsonData is an array and we're interested in specific object properties
-// 			//using https://tableconvert.com/excel-to-json to convert excel to json
-// 			//when density = 10^17
-// 			numberArray2_neg_2_0 = jsonData[0]["0"].map(Number); // Data for one condition
-// 			numberArray2_neg_1_8 = jsonData[1]["1"].map(Number); // Data for another condition
-// 			numberArray2_neg_1_6 = jsonData[2]["2"].map(Number); //
-// 			numberArray2_neg_1_4 = jsonData[3]["3"].map(Number); //
-// 			numberArray2_neg_1_2 = jsonData[4]["4"].map(Number); //
-// 			numberArray2_neg_1_0 = jsonData[5]["5"].map(Number); //
-// 			numberArray2_neg_0_8 = jsonData[6]["6"].map(Number); //
-// 			numberArray2_neg_0_6 = jsonData[7]["7"].map(Number); //
-// 			numberArray2_neg_0_4 = jsonData[8]["8"].map(Number); //
-// 			numberArray2_neg_0_2 = jsonData[9]["9"].map(Number); //
-// 			numberArray2_0 = jsonData[10]["10"].map(Number); //
-// 			numberArray2_pos_0_2 = jsonData[11]["11"].map(Number); //
-// 			numberArray2_pos_0_4 = jsonData[12]["12"].map(Number); //
-// 			numberArray2_pos_0_6 = jsonData[13]["13"].map(Number); //
-// 			numberArray2_pos_0_8 = jsonData[14]["14"].map(Number); //
-// 			numberArray2_pos_1_0 = jsonData[15]["15"].map(Number); //
-// 			numberArray2_pos_1_2 = jsonData[16]["16"].map(Number); //
-// 			numberArray2_pos_1_4 = jsonData[17]["17"].map(Number); //
-// 			numberArray2_pos_1_6 = jsonData[18]["18"].map(Number); //
-// 			numberArray2_pos_1_8 = jsonData[19]["19"].map(Number); //
-// 			numberArray2_pos_2_0 = jsonData[20]["20"].map(Number); //
-// 			// x_values_2 = jsonData[21]["21"].map(Number); //
-
-// 			// Output the array to verify
-// 			// clg(numberArray1_pos_2_0);
-// 		})
-// 		.catch((error) => console.error("Error loading the JSON data:", error));
-// }
-// Initial Function Calls ============================================================
 
 // Updating Functions ============================================================
 
@@ -530,7 +404,7 @@ function draw() {
 		updateWireElectrons();
 		drawMetalPosCharges();
 		// if (vgLoopAnimated) {
-		// 	enableButton();
+		// 	enableControls();
 
 		// }
 		drawBandDiagram();
@@ -606,12 +480,13 @@ function resetvgLoop(direction) {
 	for (let i = 0; i < vgChargeVisual; i++) {
 		// moving electrons
 		let x, y;
+		let distance = 20;
 		if (direction == 0) {
 			x = base.wire.vgRight.x;
-			y = base.wire.topMetal.y + i * (200 / vgChargeVisual);
+			y = base.wire.topMetal.y + i * distance;
 		} else {
 			x = base.wire.vgLeft.x;
-			y = base.wire.topMetal.y + i * (200 / vgChargeVisual);
+			y = base.wire.topMetal.y + i * distance;
 		}
 
 		vgLoop.push(new wireCharge(x, y, "vg"));
@@ -1034,12 +909,14 @@ function animateVDLoop() {
 
 function resetvgLoopPositions() {
 	// reset electron positions again so they appear spread out when they move back to metal
-	for (let i = 0; i < vgChargeVisual; i++) {
-		vgLoop[i].position.y = base.wire.leftMetal.y + i * 40;
+	for (let i = 0; i < vgLoop.length - 1; i++) {
+		vgLoop[i].position.y = base.wire.leftMetal.y + i * 1;
 	}
 }
 
 function animateVGLoop() {
+	console.log("in animatevgloop");
+	console.log(vgLoop);
 	// let stopPositions = [];
 	// stopPositions.push(createVector(...base.wire.vgRight));
 	// stopPositions.push(createVector(...base.wire.vgLeft));
@@ -1074,15 +951,19 @@ function animateVGLoop() {
 			) {
 				// down (3)
 				electron.move(createVector(base.wire.leftMetal.x, base.y));
+
+				// time out length will depend on how many charges animating - not using same multiplier
+				// timeoutLength = [40, 50, 60, 70];
+
 				setTimeout(() => {
 					if (i == vgLoop.length - 1) {
 						showMetalPosCharges = true;
 						vgLoopAnimated = true;
 						resetvgLoopPositions();
 					}
-				}, vgLoop.length * 40);
+				}, vgLoop.length * 60);
 				// setTimeout(() => {
-				// 	enableButton();
+				// 	enableControls();
 				// }, vgLoop.length * 40 + 5000);
 			}
 		} else {
@@ -1105,7 +986,7 @@ function animateVGLoop() {
 						}
 					}, 1200);
 					// 	setTimeout(() => {
-					// 	enableButton();
+					// 	enableControls();
 					// }, vgLoop.length * 40 + 5000);
 				} else {
 					electron.move(createVector(base.wire.vgRight.x, base.wire.vgRight.y)); // right
@@ -1163,39 +1044,51 @@ function togglevd() {
 	vdLoopOn = !vdLoopOn;
 }
 
-function disableButton() {
+function disableApplyCharge() {
 	let btn = document.querySelector(`.chargeButton${sceneCount}`);
 	btn.classList.add("disabled");
 	btn.disabled = true;
 }
 
-function enableButton() {
+function disableVGSlider() {
+	let slider = document.querySelector(`.vgSlider`);
+	slider.disabled = true;
+}
+
+function enableApplyCharge() {
 	let btn = document.querySelector(`.chargeButton${sceneCount}`);
 	btn.classList.remove("disabled");
 	btn.disabled = false;
 }
 
+function enableVGSlider() {
+	let slider = document.querySelector(`.vgSlider`);
+	slider.disabled = false;
+}
 function applyCharge() {
 	const btn = document.querySelector(`.chargeButton${sceneCount}`);
 
 	if (btn.innerText == "Reset") {
-		btn.innerText = "Apply Charge";
+		btn.innerText = "Apply Charge to Vg";
 		vgLoopAnimated = false;
 		vgLoopDirection = 1;
 		resetvgLoopPositions();
 		resetvgLoop(vgLoopDirection);
-		disableButton();
-	} else if (btn.innerText == "Apply Charge") {
+		disableApplyCharge();
+		// enableVGSlider();
+	} else if (btn.innerText == "Apply Charge to Vg") {
 		btn.innerText = "Reset";
 		vgLoopAnimated = false;
 		vgLoopDirection = 0;
 		toggleChargeSliders("off");
 		resetvgLoop(vgLoopDirection);
-		disableButton();
+		console.log("resetted vgLoop");
+		disableApplyCharge();
+		disableVGSlider();
 	}
 
 	// setTimeout(() => {
-	// 	enableButton();
+	// 	enableControls();
 	// }, vgLoop.length * 40 + 5000);
 }
 
@@ -1264,28 +1157,6 @@ function updateProfile(vd, vg) {
 	}
 
 	// currently: if profile is not included, nothing happens - stays on last selected valid profile
-
-	// current profiles
-	// vd 0.0 / vg 0.0
-	// vd 0.2 / vg 0.3
-	// vd 0.2 / vg 0.9
-	// vd 0.2 / vg 3.0
-	// vd 0.2 / vg 2.5
-	// vd 1.6 / vg 2.5
-	// vd 4.5 / vg 2.5
-
-	// possible vd profiles
-	0.0;
-	0.2;
-	1.6;
-	4.5;
-
-	// possible vg profiles
-	0.0;
-	0.3;
-	0.9;
-	2.5;
-	3.0;
 }
 
 function updateVD(value) {
@@ -1319,7 +1190,7 @@ function updateVG(value) {
 	vgCharge = vgChargeMap[value];
 	updateProfile(vgCharge, vdCharge);
 
-	let vgChargeVisualMap = [0, 5, 10, 20];
+	let vgChargeVisualMap = [0, 5, 10, 15, 20];
 	vgChargeVisual = vgChargeVisualMap[value];
 	vgLoop = [];
 	metalPosCharges = [];
@@ -1356,7 +1227,15 @@ function updateWireElectrons() {
 	}
 
 	if (!stillAnimating) {
-		enableButton();
+		enableApplyCharge();
+	}
+
+	if (
+		!stillAnimating &&
+		document.querySelector(`.chargeButton${sceneCount}`).innerText ==
+			"Apply Charge to Vg"
+	) {
+		enableVGSlider();
 	}
 }
 
@@ -2026,7 +1905,6 @@ function drawGraph() {
 	}
 
 	function drawEFData() {
-		// console.log("in drawEFData", EFData);
 		//////////////////////////////////////////////////// draw E-field graph on second graph when switch is On, and draw charge density graph when not clicked switch
 		noStroke();
 
@@ -2115,6 +1993,7 @@ function drawBandDiagram() {
 		let y = a * xPositionData[k] + b;
 
 		// vertex drawn from bandData
+		// curveVertex(base.x + y, base.bandY + bandData[k] * 40 - 100);
 		curveVertex(base.x + y, base.bandY + bandData[k] * 40 - 100);
 
 		electronBand[k] = [base.x + y, base.bandY + bandData[k] * (40 / 1.2) - 100];
