@@ -134,55 +134,61 @@
 			<div class="row row1" id="scene0"></div>
 			<div class="row row1" id="scene1">
 				<div class="col-lg-4">
-					<h1>Scene 1</h1>
+					<h1>Scene 1 [VD]</h1>
 
-					<p>Prompt</p>
-					<button class="button xxButton" type="button" onclick="">
-						Button
+					<p>
+						Try applying a charge to VD Sunt deserunt officia tempor
+						reprehenderit minim aliqua quis nulla ut incididunt irure veniam
+						aliqua anim amet. Occaecat dolor ea ullamco id tempor commodo dolor
+						eiusmod enim nulla nostrud voluptate. Pariatur aliqua voluptate ad.
+						Esse fugiat ut anim nulla proident. Ea velit nostrud nulla do
+						voluptate reprehenderit ad nulla.
+					</p>
+
+					<br /><br />
+					<!-- Vd -->
+					<input
+						class="vdSlider"
+						type="range"
+						type="range"
+						min="0"
+						max="3"
+						value="1"
+						step="1"
+						onchange="updateVD(this.value)"
+					/>
+
+					<datalist>
+						<option value="0" label="0"></option>
+						<option value="1" label="0.2"></option>
+						<option value="2" label="1.6"></option>
+						<option value="3" label="4.5"></option>
+					</datalist>
+					<label for="vdSlider" class="labels">Vd (mA)</label>
+
+					<br /><br />
+					<button
+						class="button resetButton"
+						type="button"
+						onclick="resetScene()"
+					>
+						Reset
 					</button>
-
-					<div class="controls">
-						<button
-							class="button control"
-							value="ob"
-							type="button"
-							onclick="toggleBattery(this.value)"
-						>
-							Toggle Outer Battery
-						</button>
-						<!-- <button
-							class="button control"
-							value="cd"
-							type="button"
-							onclick="triggerControls(this.value)"
-						>
-							Plot Charge Density
-						</button>
-						<button
-							class="button control"
-							value="ef"
-							type="button"
-							onclick="triggerControls(this.value)"
-						>
-							Plot Electric Field
-						</button>
-						<button
-							class="button control"
-							value="bd"
-							type="button"
-							onclick="triggerControls(this.value)"
-						>
-							Plot Band Diagram
-						</button> -->
-					</div>
 				</div>
 			</div>
 
 			<div class="row row2" id="scene2">
 				<div class="col-lg-4">
-					<h1>Scene 2</h1>
-					<p>Try applying a charge</p>
-
+					<h1>Scene 2 [VG]</h1>
+					<p>
+						Try applying a charge Sunt deserunt officia tempor reprehenderit
+						minim aliqua quis nulla ut incididunt irure veniam aliqua anim amet.
+						Occaecat dolor ea ullamco id tempor commodo dolor eiusmod enim nulla
+						nostrud voluptate. Pariatur aliqua voluptate ad. Esse fugiat ut anim
+						nulla proident. Ea velit nostrud nulla do voluptate reprehenderit ad
+						nulla.
+					</p>
+					<br /><br />
 					<!-- Vg -->
 					<input
 						class="vgSlider"
@@ -204,16 +210,64 @@
 					</datalist>
 					<label for="vgSlider" class="labels">Vg (V)</label>
 
-					<button
-						class="button chargeButton2"
+					<!-- <button
+						class="button chargeButton"
 						type="button"
 						onclick="applyCharge()"
 					>
 						Apply Charge to Vg
+					</button> -->
+					<br /><br />
+					<button
+						class="button resetButton"
+						type="button"
+						onclick="resetScene()"
+					>
+						Reset
 					</button>
+				</div>
+			</div>
 
+			<div class="row row3" id="scene3">
+				<div class="col-lg-4">
+					<h1>Scene 3 [VD & VG]</h1>
+					<p>
+						Try applying a charge Sunt deserunt officia tempor reprehenderit
+						minim aliqua quis nulla ut incididunt irure veniam aliqua anim amet.
+						Occaecat dolor ea ullamco id tempor commodo dolor eiusmod enim nulla
+						nostrud voluptate. Pariatur aliqua voluptate ad. Esse fugiat ut anim
+						nulla proident. Ea velit nostrud nulla do voluptate reprehenderit ad
+						nulla.
+					</p>
 					<br /><br />
-					<br /><br />
+					<!-- Vg -->
+					<input
+						class="vgSlider"
+						type="range"
+						type="range"
+						min="0"
+						max="4"
+						value="1"
+						step="1"
+						onchange="updateVG(this.value)"
+					/>
+
+					<datalist>
+						<option value="0" label="0"></option>
+						<option value="1" label="0.3"></option>
+						<option value="2" label="0.9"></option>
+						<option value="3" label="2.5"></option>
+						<option value="4" label="3.0"></option>
+					</datalist>
+					<label for="vgSlider" class="labels">Vg (V)</label>
+					<!-- 
+					<button
+						class="button chargeButton"
+						type="button"
+						onclick="applyCharge()"
+					>
+						Apply Charge to Vg
+					</button> -->
 
 					<!-- Vd -->
 					<input
@@ -258,95 +312,22 @@
 					</datalist>
 					<label for="profileSlider" class="labels">Profile (Vd & Vg)</label>
 					<br /><br />
-
-					<div class="controls">
-						<!-- <button
-							class="button control"
-							value="ob"
-							type="button"
-							onclick="toggleOuterBattery(this.value)"
-						>
-							Toggle Outer Battery
-						</button> -->
-						<!-- <button
-							class="button control"
-							value="cd"
-							type="button"
-							onclick="triggerControls(this.value)"
-						>
-							Plot Charge Density
-						</button>
-						<button
-							class="button control"
-							value="ef"
-							type="button"
-							onclick="triggerControls(this.value)"
-						>
-							Plot Electric Field
-						</button>
-						<button
-							class="button control"
-							value="bd"
-							type="button"
-							onclick="triggerControls(this.value)"
-						>
-							Plot Band Diagram
-						</button> -->
-					</div>
-				</div>
-			</div>
-
-			<div class="row row3" id="scene3">
-				<div class="col-lg-4">
-					<h1>Scene 3</h1>
-					<p>Paragraph</p>
-
-					<input class="xxSlider" type="range" list="tickmarks" onchange="" />
-
-					<datalist>
-						<option value="0" label="x"></option>
-						<option value="100" label="x"></option>
-					</datalist>
-					<label for="xxSlider" class="labels"
-						>Charge Q (µC/cm<sup>2</sup>)</label
+					<button
+						class="button resetButton"
+						type="button"
+						onclick="resetScene()"
 					>
-					<br /><br />
-
-					<br /><br />
-					<button class="button xxButton" type="button" onclick="">
-						Apply Charge
+						Reset
 					</button>
 				</div>
 			</div>
-			<div class="row row4" id="scene4">
-				<div class="col-lg-4">
-					<h1>Scene 4</h1>
 
-					<p>
-						paragraph
-
-						<br /><br />
-
-						<input class="xxSlider" type="range" list="tickmarks" onchange="" />
-
-						<datalist>
-							<option value="0" label="x"></option>
-							<option value="100" label="x"></option>
-						</datalist>
-						<label for="xxSlider" class="labels"> Label </label>
-						<br /><br />
-						<br /><br />
-
-						<button class="button xxButton" type="button" onclick="">
-							Button
-						</button>
-					</p>
-				</div>
-			</div>
-			<div class="row row5" id="scene5">
+			<div class="row row5" id="scene4">
 				<div class="col-lg-4">
 					<h1>Scene 5</h1>
-					<p>Paragraph</p>
+					<p>
+						Does not appear - Filler scene to allow previous scenes to scroll
+					</p>
 
 					<button class="button chargeButton5" type="button" onclick="">
 						Button

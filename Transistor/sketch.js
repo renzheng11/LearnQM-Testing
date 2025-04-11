@@ -79,8 +79,6 @@ let color = {
 let fixedCharges = []; // fixed positive + negative charges
 let electrons = [];
 let holes = [];
-let electronCount;
-let holeCount;
 let chargeID = 0;
 let botzDistribution = [];
 
@@ -121,8 +119,15 @@ let vdOn;
 let vgCharge; // actual vg charge amount in V
 let vdCharge; // actual vd charge amount in mA
 
-let vgChargeVisual = 0; // number of charges for animation for vg wire - visual representation
-let vdChargeVisual = 10; // number of charges for animation for vd wire - visual representation
+let prevVGChargeScreen; // keep track of last vg charge before current slider change
+
+let vgChargeScreen = 0; // number of charges for animation for vg wire - visual representation
+let vdChargeScreen = 10; // number of charges for animation for vd wire - visual representation
+
+let beforechange = 0;
+
+let addToMetalCharges = 0;
+let removeFromMetalCharges = 0;
 
 let stillAnimating = false;
 let vgLoop = []; // contains electrons for animation
@@ -148,7 +153,6 @@ let holeBand = []; // graph green line
 // let holeBand_data_v1 = []; //for json data v_data_1.json store green line data
 // let electronBand_data_v1 = []; //for json data v_data_1.json store negative line data
 
-let bandLength = 134;
 let FermiVoltage = 0; //used to plot Ef
 
 // Data for electric field ============================================================
@@ -345,12 +349,8 @@ function setup() {
 	frameRate(10);
 	scaleWindow();
 
-	updateBotz();
-
 	// reset all variables
 	resetScene();
-
-	regenerate();
 
 	batteryPosOff = loadImage("batteryPosOff.png");
 	batteryNegOff = loadImage("batteryNegOff.png");
@@ -362,10 +362,10 @@ function setup() {
 	// test particles
 
 	// Initialize particles
-	for (let i = 0; i < PARTICLE_COUNT; i++) {
-		const spacing = (i / PARTICLE_COUNT) * (4 * SQUARE_SIZE);
-		particles[i] = new Particle(SQUARE_SIZE, spacing, PARTICLE_SPEED);
-	}
+	// for (let i = 0; i < PARTICLE_COUNT; i++) {
+	// 	const spacing = (i / PARTICLE_COUNT) * (4 * SQUARE_SIZE);
+	// 	particles[i] = new Particle(SQUARE_SIZE, spacing, PARTICLE_SPEED);
+	// }
 }
 
 function scaleToWindow() {
@@ -390,94 +390,122 @@ function scaleToWindow() {
 // }
 
 function draw() {
-	scaleToWindow();
+	if (sceneCount >= 1) {
+		scaleToWindow();
 
-	scale(sx);
-	background(...color.bg);
+		scale(sx);
+		background(...color.bg);
 
-	if (sceneCount > 0) {
-		drawBase();
-		updateCharges();
-		drawWires();
-		drawBandDiagram();
-		drawGraph();
-		updateWireElectrons();
-		drawMetalPosCharges();
-		// if (vgLoopAnimated) {
-		// 	enableControls();
+		if (sceneCount > 0) {
+			drawBase();
+			updateCharges();
+			drawWires();
+			drawBandDiagram();
+			drawGraph();
+			updateWireElectrons();
+			drawMetalPosCharges();
+			// if (vgLoopAnimated) {
+			// 	enableControls();
 
-		// }
-		drawBandDiagram();
+			// }
+			drawBandDiagram();
+		}
+
+		// test particle
+		noFill();
+		stroke(200);
+		// rect(
+		// 	windowWidth / 2 - SQUARE_SIZE / 2,
+		// 	windowHeight / 2 - SQUARE_SIZE / 2,
+		// 	SQUARE_SIZE,
+		// 	SQUARE_SIZE
+		// );
+
+		// Update and display particles
+		particles.forEach((particle) => {
+			// particle.update();
+			// particle.display();
+		});
 	}
+}
 
-	// test particle
-	noFill();
-	stroke(200);
-	// rect(
-	// 	windowWidth / 2 - SQUARE_SIZE / 2,
-	// 	windowHeight / 2 - SQUARE_SIZE / 2,
-	// 	SQUARE_SIZE,
-	// 	SQUARE_SIZE
-	// );
-
-	// Update and display particles
-	particles.forEach((particle) => {
-		// particle.update();
-		// particle.display();
-	});
+function setScatter() {
+	scatterInterval = setInterval(function () {
+		scatter();
+	}, 100); // scattring time
 }
 
 function resetScene() {
 	background(...color.bg);
+	updateBotz();
+	setScatter();
 	fixedCharges = [];
+	holes = [];
+	electrons = [];
 	initCharges();
-	resetVDLoop();
-	resetvgLoop();
+	regenerate();
+	if (sceneCount != 2) {
+		resetVDLoop();
+	}
+
+	if (sceneCount != 1) {
+		resetVGLoop();
+	}
+	metalPosCharges = [];
+	showMetalPosCharges = false;
 	vdOn = true;
-	vg = 0.3;
-	vd = 0.2;
-	updateProfile(vd, vg);
+	// vg = 0.3;
+	vgCharge = 0;
+	// vd = 0.2;
+	vdCharge = 0;
+
+	vgChargeScreen = 0;
+	prevVGChargeScreen = 0;
+	beforechange = 0;
+	updateProfile(vdCharge, vgCharge);
 
 	// reset sliders
 	let vdSlider = document.querySelector(`.vdSlider`);
-	vdSlider.value = 1;
+	vdSlider.value = 0;
 
 	let vgSlider = document.querySelector(`.vgSlider`);
 	vgSlider.value = 0;
+	toggleChargeSliders("on");
 
 	let profileSlider = document.querySelector(`.profileSlider`);
 	profileSlider.value = 1;
 
 	// holes = [];
 	// electrons = [];
-	// chargeID = 0;
+	chargeID = 0;
 
-	// vgLoop = [];
-	// vdLoop = [];
-	// vgLoopOn = false;
-	// vdLoopOn = false;
-	// vgChargeVisual = 30;
-	// vdChargeVisual = 30;
+	vgLoop = [];
+	vdLoop = [];
+	vgLoopOn = false;
+	vdLoopOn = false;
+	// vgChargeScreen = 30;
+	// vdChargeScreen = 30;
 
-	// generationEffects = [];
+	generationEffects = [];
 
-	// recomdElectrons = [];
-	// recomdHoles = [];
-	// recomPositions = [];
+	recomdElectrons = [];
+	recomdHoles = [];
+	recomPositions = [];
 
-	// recomEffectsPositions = [];
-	// recomCount = 0;
-	// recomEffects = [];
-	// recomTempElectrons = [];
-	// recomTempHoles = [];
+	recomEffectsPositions = [];
+	recomCount = 0;
+	recomEffects = [];
+	recomTempElectrons = [];
+	recomTempHoles = [];
 }
 
 // Updating Functions ============================================================
 
-function resetvgLoop(direction) {
+function resetVGLoop(direction) {
+	prevVGCharge = 0;
 	vgLoop = [];
-	metalPosCharges = [];
-	for (let i = 0; i < vgChargeVisual; i++) {
+	// metalPosCharges = [];
+	for (let i = 0; i < vgChargeScreen; i++) {
 		// moving electrons
 		let x, y;
 		let distance = 20;
@@ -490,26 +518,16 @@ function resetvgLoop(direction) {
 		}
 
 		vgLoop.push(new wireCharge(x, y, "vg"));
-
-		// show fixed positive charges
-		x = random(
-			base.x + base.sourceWidth + 16,
-			base.endX - base.sourceWidth - 16
-		);
-		y = base.y - base.metalHeight * 1.3;
-		let newCharge = new Charge(x, y, "mp", chargeID, "g");
-		metalPosCharges.push(newCharge);
-		chargeID++;
 	}
 }
 
 function initCharges() {
-	let fixedPosChargesLeft = 20;
-	let fixedPosChargesRight = 20;
-	let fixedNegCharges = 60;
-
-	holeCount = 60;
-	electronCount = 20; // source and drain each
+	// holes = [];
+	// electrons = [];
+	let holeCount = 200;
+	let fixedNegCharges = holeCount / 2;
+	let electronCount = 100; // source and drain each
+	let fixedPosCharges = electronCount / 2;
 	// holeCount = 20;
 	// electronCount = 10;
 
@@ -518,14 +536,14 @@ function initCharges() {
 	// 	Math.pow(100, (Math.log10(Math.round(addedDopants / 5)) - 8) / 2) / 1000;
 
 	// source fixed positive charges
-	for (let i = 0; i < fixedPosChargesLeft; i++) {
+	for (let i = 0; i < fixedPosCharges; i++) {
 		let x = random(base.x + buffer, base.sourceEndX - buffer);
 		let y = random(base.y + buffer, base.sourceEndY - buffer);
 		fixedCharges.push(new Charge(x, y, "fp", chargeID));
 	}
 
 	// drain fixed positive charges
-	for (let i = 0; i < fixedPosChargesRight; i++) {
+	for (let i = 0; i < fixedPosCharges; i++) {
 		let x = random(base.drainX + buffer, base.drainEndX - buffer);
 		let y = random(base.y + buffer, base.drainEndY - buffer);
 		fixedCharges.push(new Charge(x, y, "fp", chargeID));
@@ -623,10 +641,6 @@ function regenerate() {
 	// count_pn = setInterval(function () {
 	// 	count_pn_f();
 	// }, interval_pn);
-
-	scatterInterval = setInterval(function () {
-		scatter();
-	}, 100); // scattring time
 }
 
 // test generation / recombination effects
@@ -907,7 +921,7 @@ function animateVDLoop() {
 	}
 }
 
-function resetvgLoopPositions() {
+function resetVGLoopPositions() {
 	// reset electron positions again so they appear spread out when they move back to metal
 	for (let i = 0; i < vgLoop.length - 1; i++) {
 		vgLoop[i].position.y = base.wire.leftMetal.y + i * 1;
@@ -915,8 +929,6 @@ function resetvgLoopPositions() {
 }
 
 function animateVGLoop() {
-	console.log("in animatevgloop");
-	console.log(vgLoop);
 	// let stopPositions = [];
 	// stopPositions.push(createVector(...base.wire.vgRight));
 	// stopPositions.push(createVector(...base.wire.vgLeft));
@@ -952,22 +964,10 @@ function animateVGLoop() {
 				// down (3)
 				electron.move(createVector(base.wire.leftMetal.x, base.y));
 
-				// time out length will depend on how many charges animating - not using same multiplier
-				// timeoutLength = [40, 50, 60, 70];
-
-				setTimeout(() => {
-					if (i == vgLoop.length - 1) {
-						showMetalPosCharges = true;
-						vgLoopAnimated = true;
-						resetvgLoopPositions();
-					}
-				}, vgLoop.length * 60);
-				// setTimeout(() => {
-				// 	enableControls();
-				// }, vgLoop.length * 40 + 5000);
+				onFowardAnimationFinish(i);
 			}
 		} else {
-			// when reset button pressed (inverses vgLoopDirection), move back to metal
+			// when vg changed to less amount or 0, move BACK to metal
 			if (
 				electron.position.x < base.wire.vg.x &&
 				electron.position.y > base.wire.vgLeft.y + 8
@@ -977,17 +977,7 @@ function animateVGLoop() {
 				if (electron.position.x > base.wire.vgRight.x - 8) {
 					// if on right line
 					electron.move(createVector(base.wire.topMetal.x, base.y)); // down
-					setTimeout(() => {
-						if (i == vgLoop.length - 1) {
-							showMetalPosCharges = false;
-							toggleChargeSliders("on");
-							resetvgLoopPositions();
-							vgLoopAnimated = true;
-						}
-					}, 1200);
-					// 	setTimeout(() => {
-					// 	enableControls();
-					// }, vgLoop.length * 40 + 5000);
+					onBackAnimationFinish(i);
 				} else {
 					electron.move(createVector(base.wire.vgRight.x, base.wire.vgRight.y)); // right
 				}
@@ -1028,7 +1018,45 @@ function animateVGLoop() {
 		}
 	}
 
+	function onBackAnimationFinish(i) {
+		setTimeout(() => {
+			if (i == vgLoop.length - 1) {
+				// remove from metal charges the difference in charge amount
+				for (let i = 0; i < removeFromMetalCharges; i++) {
+					console.log("popping i");
+					metalPosCharges.pop();
+					removeFromMetalCharges -= 1;
+				}
+
+				toggleChargeSliders("on");
+				resetVGLoopPositions();
+				vgLoopAnimated = true;
+			}
+		}, 1200);
+		// 	setTimeout(() => {
+		// 	enableControls();
+		// }, vgLoop.length * 40 + 5000);
+	}
 	// drawMetalPosCharges();
+
+	function onFowardAnimationFinish(i) {
+		// time out length will depend on how many charges animating - not using same multiplier
+		// timeoutLength = [40, 50, 60, 70];
+
+		setTimeout(() => {
+			if (i == vgLoop.length - 1) {
+				showMetalPosCharges = true;
+				vgLoopAnimated = true;
+				resetVGLoopPositions();
+				toggleChargeSliders("on");
+
+				// add metal charge difference
+			}
+		}, vgLoop.length * 60);
+		// setTimeout(() => {
+		// 	enableControls();
+		// }, vgLoop.length * 40 + 5000);
+	}
 }
 
 function drawMetalPosCharges() {
@@ -1045,7 +1073,7 @@ function togglevd() {
 }
 
 function disableApplyCharge() {
-	let btn = document.querySelector(`.chargeButton${sceneCount}`);
+	let btn = document.querySelector(`.chargeButton`);
 	btn.classList.add("disabled");
 	btn.disabled = true;
 }
@@ -1056,7 +1084,7 @@ function disableVGSlider() {
 }
 
 function enableApplyCharge() {
-	let btn = document.querySelector(`.chargeButton${sceneCount}`);
+	let btn = document.querySelector(`.chargeButton`);
 	btn.classList.remove("disabled");
 	btn.disabled = false;
 }
@@ -1065,35 +1093,9 @@ function enableVGSlider() {
 	let slider = document.querySelector(`.vgSlider`);
 	slider.disabled = false;
 }
-function applyCharge() {
-	const btn = document.querySelector(`.chargeButton${sceneCount}`);
-
-	if (btn.innerText == "Reset") {
-		btn.innerText = "Apply Charge to Vg";
-		vgLoopAnimated = false;
-		vgLoopDirection = 1;
-		resetvgLoopPositions();
-		resetvgLoop(vgLoopDirection);
-		disableApplyCharge();
-		// enableVGSlider();
-	} else if (btn.innerText == "Apply Charge to Vg") {
-		btn.innerText = "Reset";
-		vgLoopAnimated = false;
-		vgLoopDirection = 0;
-		toggleChargeSliders("off");
-		resetvgLoop(vgLoopDirection);
-		console.log("resetted vgLoop");
-		disableApplyCharge();
-		disableVGSlider();
-	}
-
-	// setTimeout(() => {
-	// 	enableControls();
-	// }, vgLoop.length * 40 + 5000);
-}
 
 function toggleChargeSliders(state) {
-	const chargeSliders = document.querySelectorAll(".chargeSlider");
+	const chargeSliders = document.querySelectorAll(".vgSlider");
 	if (state == "on") {
 		chargeSliders.forEach((slider) => {
 			slider.disabled = false;
@@ -1162,9 +1164,9 @@ function updateProfile(vd, vg) {
 function updateVD(value) {
 	let vdChargeMap = [0.0, 0.2, 1.6, 4.5];
 	vdCharge = vdChargeMap[value];
-	updateProfile(vgCharge, vdCharge);
-	let vdChargeVisualMap = [0, 10, 20, 30];
-	vdChargeVisual = vdChargeVisualMap[value];
+	updateProfile(vdCharge, vgCharge);
+	let vdChargeScreenMap = [0, 10, 20, 30];
+	vdChargeScreen = vdChargeScreenMap[value];
 	resetVDLoop();
 }
 
@@ -1172,29 +1174,21 @@ function resetVDLoop() {
 	// currently clears out and animates from beginning
 	// able to make more continuous when Vd slider is changed?
 	vdLoop = [];
-	for (let i = 0; i < vdChargeVisual; i++) {
+	for (let i = 0; i < vdChargeScreen; i++) {
 		let x = base.wire.rightMetal.x;
 		// yRange is range of y used to spread out the charges during animation
-		// yRange is divided by vdChargeVisual to determine how spread out charges are
+		// yRange is divided by vdChargeScreen to determine how spread out charges are
 		let yRange = 900;
-		let y = base.wire.rightMetal.y + i * (yRange / vdChargeVisual);
+		let y = base.wire.rightMetal.y + i * (yRange / vdChargeScreen);
 
 		vdLoop.push(new wireCharge(x, y, "vd"));
 	}
 }
 
-function updateVG(value) {
-	// value is from 0-3V - map to a charge amount to visually represent
-
-	let vgChargeMap = [0.0, 0.3, 0.9, 2.5, 3.0];
-	vgCharge = vgChargeMap[value];
-	updateProfile(vgCharge, vdCharge);
-
-	let vgChargeVisualMap = [0, 5, 10, 15, 20];
-	vgChargeVisual = vgChargeVisualMap[value];
-	vgLoop = [];
+function resetMetalCharges() {
+	// console.log("in resetmetalcharges");
 	metalPosCharges = [];
-	for (let i = 0; i < vgChargeVisual; i++) {
+	for (let i = 0; i < vgChargeScreen; i++) {
 		let x = base.wire.vgRight.x;
 		let y = base.wire.leftMetal.y + i * 50;
 		vgLoop.push(new wireCharge(x, y, "vd"));
@@ -1206,12 +1200,84 @@ function updateVG(value) {
 		metalPosCharges.push(newCharge);
 		chargeID++;
 	}
+}
 
-	// resetvgLoopPositions();
+function updateVG(value) {
+	addToMetalCharges = 0;
+	removeFromMetalCharges = 0;
+	// value is from 0-3V - map to actual vg amount
+	// prevVGChargeScreen = vgChargeScreen;
+	prevVGChargeScreen = beforechange;
+
+	let valueToChargeMap = [0.0, 0.3, 0.9, 2.5, 3.0];
+	vgCharge = valueToChargeMap[value];
+	updateProfile(vdCharge, vgCharge);
+
+	vgChargeScreen = getVGChargeScreen(vgCharge);
+
+	vgLoop = [];
+
+	// applyCharge();
+
+	vgLoopAnimated = false;
+
+	beforechange = vgChargeScreen;
+
+	if (prevVGChargeScreen == 0) {
+		// console.log("prev 0 now > 0");
+		// previously 0, now > 0
+		//1 on paper
+		vgLoopDirection = 0;
+		resetMetalCharges();
+	} else if (prevVGChargeScreen > 0 && beforechange == 0) {
+		// previously > 0, now 0
+		// console.log("// previously > 0, now 0");
+		vgLoopDirection = 1;
+		vgChargeScreen = prevVGChargeScreen; //whatever previous was
+		removeFromMetalCharges = vgChargeScreen;
+	} else if (prevVGChargeScreen < beforechange) {
+		// console.log("// previously smaller, now larger");
+		// previously smaller, now larger
+		vgLoopDirection = 0;
+		vgChargeScreen = vgChargeScreen - prevVGChargeScreen;
+
+		addToMetalCharges = vgChargeScreen;
+	} else if (prevVGChargeScreen > beforechange) {
+		// console.log("// previously larger, now smaller");
+		// previously larger, now smaller
+		vgLoopDirection = 1;
+		vgChargeScreen = prevVGChargeScreen - vgChargeScreen;
+
+		// remove some move metal
+		removeFromMetalCharges = vgChargeScreen;
+		// console.log("removefrommetalcharges", removeFromMetalCharges);
+	}
+	toggleChargeSliders("off");
+	resetVGLoop(vgLoopDirection);
+	// console.log("resetted vgLoop");
+	// disableApplyCharge();
+	disableVGSlider();
+
+	// resetVGLoopPositions();
+
+	function getVGChargeScreen(vgChargeActual) {
+		// maps actual vg amount to vg to # electrons animated on the screen
+		let chargeMap = {
+			0.0: 0,
+			0.3: 5,
+			0.9: 10,
+			2.5: 15,
+			3.0: 20,
+		};
+
+		return chargeMap[vgChargeActual];
+	}
 }
 function updateWireElectrons() {
-	if (vdCharge > 0) {
-		animateVDLoop();
+	if (sceneCount != 2) {
+		if (vdCharge > 0) {
+			animateVDLoop();
+		}
 	}
 	if (!vgLoopAnimated) {
 		animateVGLoop();
@@ -1226,17 +1292,17 @@ function updateWireElectrons() {
 		}
 	}
 
-	if (!stillAnimating) {
-		enableApplyCharge();
-	}
+	// if (sceneCount == 2 && !stillAnimating) {
+	// 	enableApplyCharge();
+	// }
 
-	if (
-		!stillAnimating &&
-		document.querySelector(`.chargeButton${sceneCount}`).innerText ==
-			"Apply Charge to Vg"
-	) {
-		enableVGSlider();
-	}
+	// if (
+	// 	sceneCount == 2 &&
+	// 	!stillAnimating &&
+	// 	document.querySelector(`.chargeButton`).innerText == "Apply Charge to Vg"
+	// ) {
+	// 	enableVGSlider();
+	// }
 }
 
 // used by charges in charge.js
@@ -1656,8 +1722,8 @@ function drawBase() {
 
 	// vg vd
 
-	textSize(20);
-	text(`vd: ${vdCharge}, vg: ${vgCharge}`, 750, 30);
+	textSize(16);
+	text(`vd: ${vdCharge}, vg: ${vgCharge}`, 800, 20);
 
 	textSize(16);
 	// labels
@@ -1691,80 +1757,92 @@ function drawBase() {
 }
 
 function drawWires() {
-	if (vgLoopDirection == 0) {
-		// vg battery on
-		image(
-			batteryNegOn,
-			base.wire.vg.x,
-			base.wire.vg.y,
-			batteryNegOn.width / 1.5,
-			batteryNegOn.height / 1.5
-		);
-	} else {
-		// vg battery off
-		image(
-			batteryNegOff,
-			base.wire.vg.x,
-			base.wire.vg.y,
-			batteryNegOff.width / 1.5,
-			batteryNegOff.height / 1.5
-		);
+	if (sceneCount != 1) {
+		drawVG();
 	}
 
-	// vd battery
-	if (vdCharge > 0) {
-		// vd battery on
-		image(
-			batteryNegOn,
-			base.wire.vd.x,
-			base.wire.vd.y,
-			batteryNegOn.width / 1.5,
-			batteryNegOn.height / 1.5
-		);
-	} else {
-		// vd battery off
-		image(
-			batteryNegOff,
-			base.wire.vd.x,
-			base.wire.vd.y,
-			batteryNegOff.width / 1.5,
-			batteryNegOff.height / 1.5
-		);
+	if (sceneCount != 2) {
+		drawVD();
 	}
 
-	stroke(...color.wires);
-	noFill();
-	// wires
-	let wireOffsetX = 20;
+	function drawVD() {
+		// vd battery
+		if (vdCharge > 0) {
+			// vd battery on
+			image(
+				batteryNegOn,
+				base.wire.vd.x,
+				base.wire.vd.y,
+				batteryNegOn.width / 1.5,
+				batteryNegOn.height / 1.5
+			);
+		} else {
+			// vd battery off
+			image(
+				batteryNegOff,
+				base.wire.vd.x,
+				base.wire.vd.y,
+				batteryNegOff.width / 1.5,
+				batteryNegOff.height / 1.5
+			);
+		}
 
-	let wireGap = 8; // * 2 = 16
-	// wire from source metal to vg battery
-	beginShape();
-	vertex(base.x + base.sourceWidth / 2, base.y - base.metalHeight); // source
-	vertex(base.x + base.sourceWidth / 2, base.vgY); // top left corner
-	vertex(base.wire.vg.x, base.vgY);
-	endShape(); // battery
+		stroke(...color.wires);
+		noFill();
+		// wire from source to vd battery
+		beginShape();
+		vertex(base.x + base.sourceWidth / 2, base.y - base.metalHeight); // source
+		vertex(base.x + base.sourceWidth / 2, base.vdY); // top left corner
+		vertex(base.wire.vd.x, base.vdY);
+		endShape(); // vd battery
 
-	// wire from vg battery to gate metal
-	beginShape();
-	vertex(base.wire.vg.x + base.batteryWidth, base.vgY);
-	vertex(base.wire.vgRight.x, base.vgY);
-	vertex(base.wire.vgRight.x, base.y - base.metalHeight * 2);
-	endShape(); // battery
+		// wire from vd battery to drain metal
+		beginShape();
+		vertex(base.wire.vd.x + base.batteryWidth, base.vdY); // vd battery
+		vertex(base.endX - base.sourceWidth / 2, base.vdY); // corner
+		vertex(base.endX - base.sourceWidth / 2, base.y - base.metalHeight); // drain metal
+		endShape(); // battery
+	}
 
-	// wire from source to vd battery
-	beginShape();
-	vertex(base.x + base.sourceWidth / 2, base.y - base.metalHeight); // source
-	vertex(base.x + base.sourceWidth / 2, base.vdY); // top left corner
-	vertex(base.wire.vd.x, base.vdY);
-	endShape(); // vd battery
+	function drawVG() {
+		if (vgCharge > 0) {
+			// vg battery on
+			image(
+				batteryNegOn,
+				base.wire.vg.x,
+				base.wire.vg.y,
+				batteryNegOn.width / 1.5,
+				batteryNegOn.height / 1.5
+			);
+		} else {
+			// vg battery off
+			image(
+				batteryNegOff,
+				base.wire.vg.x,
+				base.wire.vg.y,
+				batteryNegOff.width / 1.5,
+				batteryNegOff.height / 1.5
+			);
+		}
 
-	// wire from vd battery to drain metal
-	beginShape();
-	vertex(base.wire.vd.x + base.batteryWidth, base.vdY); // vd battery
-	vertex(base.endX - base.sourceWidth / 2, base.vdY); // corner
-	vertex(base.endX - base.sourceWidth / 2, base.y - base.metalHeight); // drain metal
-	endShape(); // battery
+		// wires
+
+		stroke(...color.wires);
+		noFill();
+		// wire from source metal to vg battery
+		beginShape();
+		vertex(base.x + base.sourceWidth / 2, base.y - base.metalHeight); // source
+		vertex(base.x + base.sourceWidth / 2, base.vgY); // top left corner
+		vertex(base.wire.vg.x, base.vgY);
+		endShape(); // battery
+
+		// wire from vg battery to gate metal
+		beginShape();
+		vertex(base.wire.vg.x + base.batteryWidth, base.vgY);
+		vertex(base.wire.vgRight.x, base.vgY);
+		vertex(base.wire.vgRight.x, base.y - base.metalHeight * 2);
+		endShape(); // battery
+	}
 }
 
 function triggerControls(value) {
@@ -1917,21 +1995,21 @@ function drawGraph() {
 
 		// draw electric field graph
 		// Add all points as curve vertices
-		for (let i = 0; i < EFData.length; i++) {
-			let x = EFData[i].x;
-			let y =
-				10 * (EFData[i].y / Math.pow(10, 6)) * (40 / 1530) * 500 * sy +
-				(385 / 2 + 98) * sy;
-			// let y =
-			// 	(EFData[i].y / Math.pow(10, 4)) * 2 +
-			// 	(385 / 2 + 96.25) * sy;
+		// for (let i = 0; i < EFData.length; i++) {
+		// 	let x = EFData[i].x;
+		// 	let y =
+		// 		10 * (EFData[i].y / Math.pow(10, 6)) * (40 / 1530) * 500 * sy +
+		// 		(385 / 2 + 98) * sy;
+		// 	// let y =
+		// 	// 	(EFData[i].y / Math.pow(10, 4)) * 2 +
+		// 	// 	(385 / 2 + 96.25) * sy;
 
-			vertex(x, y);
-		}
-		vertex(
-			EFData[bandData.length - 2].x,
-			EFData[bandData.length - 2].y / Math.pow(10, 6) + (385 / 2 + 98) * sy
-		);
+		// 	vertex(x, y);
+		// }
+		// vertex(
+		// 	EFData[bandData.length - 2].x,
+		// 	EFData[bandData.length - 2].y / Math.pow(10, 6) + (385 / 2 + 98) * sy
+		// );
 
 		endShape();
 	}
@@ -1982,21 +2060,28 @@ function drawBandDiagram() {
 	stroke(...color.electron);
 	strokeWeight(1.5);
 
+	let bandLength = 62;
+
 	// populate
 	for (var k = 0; k < bandLength; k++) {
-		let x1 = 17;
-		let x2 = 349;
-		let y1 = 0;
-		let y2 = 679;
-		let a = (y2 - y1) / (x2 - x1);
-		let b = y1 - a * x1;
-		let y = a * xPositionData[k] + b;
+		// let x1 = 17;
+		// let x2 = 349;
+		// let y1 = 0;
+		// let y2 = 679;
+		// let a = (y2 - y1) / (x2 - x1);
+		// let b = y1 - a * x1;
+		// let y = a * bandData[k] + b;
 
 		// vertex drawn from bandData
 		// curveVertex(base.x + y, base.bandY + bandData[k] * 40 - 100);
-		curveVertex(base.x + y, base.bandY + bandData[k] * 40 - 100);
+		// curveVertex(base.x + y, base.bandY + bandData[k] * 40 - 100);
 
-		electronBand[k] = [base.x + y, base.bandY + bandData[k] * (40 / 1.2) - 100];
+		let vertexX = base.x + (base.width / bandLength) * k;
+		let vertexY = base.bandY - bandData[k] * 40 - 100;
+		curveVertex(vertexX, vertexY);
+
+		// electronBand[k] = [base.x + y, base.bandY + bandData[k] * (40 / 1.2) - 100];
+		electronBand[k] = [vertexX, vertexY];
 
 		//}
 	}
@@ -2016,8 +2101,16 @@ function drawBandDiagram() {
 		let b = y1 - a * x1;
 		let x = a * xPositionData[k] + b;
 
-		curveVertex(base.x + x, -30 + base.bandY + bandData[k] * 40 - 30);
-		holeBand[k] = [base.x + x, base.bandY + bandData[k] * (40 / 1.2) - 60];
+		let ver;
+
+		let vertexX = base.x + (base.width / bandLength) * k;
+		let vertexY = base.bandY - bandData[k] * 40;
+		let bandGap = -60;
+
+		curveVertex(vertexX, vertexY + bandGap);
+		holeBand[k] = [vertexX, vertexY + bandGap];
+		// curveVertex(base.x + x, -30 + base.bandY + bandData[k] * 40 - 30);
+		// holeBand[k] = [base.x + x, base.bandY + bandData[k] * (40 / 1.2) - 60];
 	}
 	endShape();
 	noStroke();

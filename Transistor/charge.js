@@ -130,7 +130,7 @@ class Charge {
 				ellipse(this.position.x, this.position.y, this.diameter);
 			} else if (this.type == "fp") {
 				//plus sign add electron
-				stroke(255, 120);
+				stroke(255, 60);
 				strokeWeight(5);
 				line(this.x - 10, this.y, this.x + 10, this.y);
 				line(this.x, this.y - 10, this.x, this.y + 10);
@@ -151,7 +151,7 @@ class Charge {
 				// circle(this.x, this.y, 20);
 			} else if (this.type == "fn") {
 				//plus sign add electron
-				stroke(255, 120);
+				stroke(255, 60);
 				strokeWeight(5);
 				line(this.x - 10, this.y, this.x + 10, this.y);
 				// line(this.x, this.y - 10, this.x, this.y + 10);
@@ -322,7 +322,8 @@ class Charge {
 			} else if (this.position.x > base.drainX) {
 				// if vd on & vg voltage is large enough
 				// !!! need to revise vgCharge
-				if (vdOn && vgCharge > 3 && Math.random() * 10 < 5) {
+				if (vdOn && vdCharge > 0 && Math.random() * 10 < 5) {
+					// if (vdOn && vgCharge > 3 && Math.random() * 10 < 5) {
 					// electrons that go out of top of drain goes through
 					// move position to top of source +
 					this.position.x -= base.width - base.sourceWidth;

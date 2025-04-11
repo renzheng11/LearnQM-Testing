@@ -85,7 +85,7 @@ class wireCharge {
 
 		// Scale the direction vector by the ball's speed
 		if (this.loop == "vd") {
-			direction.mult(10); // mult(speed)
+			direction.mult(15); // mult(speed)
 		} else {
 			direction.mult(20); // if above 10, will go above wire (height is divisble by 10?)
 		}
