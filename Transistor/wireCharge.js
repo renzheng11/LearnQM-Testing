@@ -80,6 +80,8 @@ class wireCharge {
 
 	move(destination) {
 		// Calculate the vector pointing from the current position to the destination
+		let leftoverX = destination.x - this.position.x;
+		let leftoverY = destination.y - this.position.y;
 		let direction = createVector(
 			destination.x - this.position.x,
 			destination.y - this.position.y
@@ -90,7 +92,13 @@ class wireCharge {
 
 		// Scale the direction vector by the ball's speed
 		if (this.loop == "vd") {
-			direction.mult(20); // mult(speed)
+			// if (leftoverX) {
+			// 	direction.mult(Math.abs(leftoverX)); // mult(speed)
+			// } else if (leftoverY) {
+			// 	direction.mult(Math.abs(leftoverY)); // mult(speed)
+			// } else {
+			direction.mult(this.speed);
+			// }
 		} else {
 			direction.mult(this.speed); // if above 10, will go above wire (height is divisble by 10?)
 		}
