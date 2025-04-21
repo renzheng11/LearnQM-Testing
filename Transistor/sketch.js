@@ -66,7 +66,8 @@ let color = {
 	red2: [255, 40, 0],
 	hole: [213, 94, 0],
 	electron: [86, 180, 233],
-	EFColor: [240, 228, 66],
+	efx: [230, 159, 0],
+	efy: [0, 114, 178],
 	graph: [102, 194, 255],
 	wires: [255, 255, 255],
 	CDColor: [2, 104, 255], // charge density
@@ -122,7 +123,7 @@ let vdCharge; // actual vd charge amount in mA
 let prevVGChargeScreen; // keep track of last vg charge before current slider change
 
 let vgChargeScreen = 0; // number of charges for animation for vg wire - visual representation
-let vdChargeScreen = 10; // number of charges for animation for vd wire - visual representation
+let vdFlow = 0; // number of charges for animation for vd wire - visual representation
 
 let beforechange = 0;
 
@@ -157,6 +158,7 @@ let FermiVoltage = 0; //used to plot Ef
 
 // Data for electric field ============================================================
 let efGrid = efGrid_vd00_vg00;
+let hoverColumn = 0;
 
 // [vars] Graphing ============================================================
 let currentGraph = "ef";
@@ -166,7 +168,7 @@ let EFData = [];
 // base dimensions
 const unit = 8;
 const dim = {
-	x: unit * 26,
+	x: unit * 34,
 	y: unit * 44,
 
 	width: unit * 80, // 640
@@ -183,7 +185,7 @@ const dim = {
 	batteryHeight: 20,
 
 	vgY: unit * 26, // inner wire // height from top of base = 208
-	vdY: unit * 20, // outer wire
+	vdY: unit * 19, // outer wire
 };
 
 const controls = {
@@ -208,6 +210,9 @@ const base = {
 	width: dim.width,
 	height: dim.height,
 
+	graphX: dim.x - 128,
+	graphY: dim.y,
+
 	// gate metal + insulator
 	metalX: dim.x + (dim.width - dim.metalWidth) / 2,
 
@@ -224,7 +229,7 @@ const base = {
 	smallRadius: unit,
 	largeRadius: unit,
 
-	bandY: 150,
+	bandY: 120,
 
 	drainX: dim.x + dim.width - dim.sourceWidth,
 	drainEndX: dim.x + dim.width,
@@ -358,14 +363,6 @@ function setup() {
 	batteryNegOn = loadImage("batteryNegOn.png");
 	groundImg = loadImage("ground.png");
 	leftGroundImg = loadImage("leftGround.png");
-
-	// test particles
-
-	// Initialize particles
-	// for (let i = 0; i < PARTICLE_COUNT; i++) {
-	// 	const spacing = (i / PARTICLE_COUNT) * (4 * SQUARE_SIZE);
-	// 	particles[i] = new Particle(SQUARE_SIZE, spacing, PARTICLE_SPEED);
-	// }
 }
 
 function scaleToWindow() {
@@ -377,17 +374,6 @@ function scaleToWindow() {
 		sy = (windowHeight * 0.95) / scale_y;
 	}
 }
-
-// function accessGrid() {
-// 	// create test charge
-// 	let newCharge = new Charge(35, 70, "h", 1000, "i");
-
-// 	let row = Math.ceil(newCharge.y / 10); // 7 - 7th row
-// 	let col = Math.ceil(newCharge.x / 10); // 3.5 - round up = 4th row
-
-// 	let chargeEFX = efGrid[row][col].efx;
-// 	let chargeEFY = efGrid[row][col].efy;
-// }
 
 function draw() {
 	if (sceneCount >= 1) {
@@ -404,28 +390,8 @@ function draw() {
 			drawGraph();
 			updateWireElectrons();
 			drawMetalPosCharges();
-			// if (vgLoopAnimated) {
-			// 	enableControls();
-
-			// }
 			drawBandDiagram();
 		}
-
-		// test particle
-		noFill();
-		stroke(200);
-		// rect(
-		// 	windowWidth / 2 - SQUARE_SIZE / 2,
-		// 	windowHeight / 2 - SQUARE_SIZE / 2,
-		// 	SQUARE_SIZE,
-		// 	SQUARE_SIZE
-		// );
-
-		// Update and display particles
-		particles.forEach((particle) => {
-			// particle.update();
-			// particle.display();
-		});
 	}
 }
 
@@ -454,9 +420,7 @@ function resetScene() {
 	metalPosCharges = [];
 	showMetalPosCharges = false;
 	vdOn = true;
-	// vg = 0.3;
 	vgCharge = 0;
-	// vd = 0.2;
 	vdCharge = 0;
 
 	vgChargeScreen = 0;
@@ -465,26 +429,25 @@ function resetScene() {
 	updateProfile(vdCharge, vgCharge);
 
 	// reset sliders
-	let vdSlider = document.querySelector(`.vdSlider`);
-	vdSlider.value = 0;
+	if (sceneCount >= 1) {
+		let vdSlider = document.querySelector(`.vdSlider${sceneCount}`);
+		if (vdSlider) {
+			vdSlider.value = 0;
+		}
+		let vgSlider = document.querySelector(`.vgSlider${sceneCount}`);
 
-	let vgSlider = document.querySelector(`.vgSlider`);
-	vgSlider.value = 0;
+		if (vgSlider) {
+			vgSlider.value = 0;
+		}
+	}
 	toggleChargeSliders("on");
 
-	let profileSlider = document.querySelector(`.profileSlider`);
-	profileSlider.value = 1;
-
-	// holes = [];
-	// electrons = [];
 	chargeID = 0;
 
 	vgLoop = [];
 	vdLoop = [];
 	vgLoopOn = false;
 	vdLoopOn = false;
-	// vgChargeScreen = 30;
-	// vdChargeScreen = 30;
 
 	generationEffects = [];
 
@@ -504,7 +467,6 @@ function resetScene() {
 function resetVGLoop(direction) {
 	prevVGCharge = 0;
 	vgLoop = [];
-	// metalPosCharges = [];
 	for (let i = 0; i < vgChargeScreen; i++) {
 		// moving electrons
 		let x, y;
@@ -522,18 +484,12 @@ function resetVGLoop(direction) {
 }
 
 function initCharges() {
-	// holes = [];
-	// electrons = [];
 	let holeCount = 200;
 	let fixedNegCharges = holeCount / 2;
 	let electronCount = 100; // source and drain each
 	let fixedPosCharges = electronCount / 2;
-	// holeCount = 20;
-	// electronCount = 10;
 
 	let buffer = 12; // draw inside box borders
-	// let electronCount =
-	// 	Math.pow(100, (Math.log10(Math.round(addedDopants / 5)) - 8) / 2) / 1000;
 
 	// source fixed positive charges
 	for (let i = 0; i < fixedPosCharges; i++) {
@@ -588,7 +544,6 @@ function initCharges() {
 	for (let i = 0; i < electronCount; i++) {
 		// initiate source electrons
 		let x = random(base.x + buffer, base.x + base.sourceWidth - buffer);
-		// let b = random(30*sy,730*sy);
 		let y = random(base.y + buffer, base.y + base.sourceHeight - buffer);
 
 		let newCharge = new Charge(x, y, "e", chargeID, "i");
@@ -603,7 +558,6 @@ function initCharges() {
 			base.x + base.width - base.sourceWidth + buffer,
 			base.x + base.width - buffer
 		);
-		// let b = random(30*sy,730*sy);
 		y = random(base.y + buffer, base.y + base.sourceHeight - buffer);
 		newCharge = new Charge(x, y, "e", chargeID, "i");
 		newCharge.botz =
@@ -622,44 +576,14 @@ function toggleRecombine() {
 }
 
 function regenerate() {
-	// // Regenerate pairs at time intervals
-	// setInterval(time_graph, 0.00000000002);
-	// // allow for recom during interval
-	// setInterval(toggleRecombine, 2000);
-
-	// generate balls based on frequency
+	// generate electron hole pairs based on frequency
 	generationInterval = setInterval(function () {
 		generateCharges(1);
-	}, generationRate); // scene changing T
+	}, generationRate);
 
 	setInterval(toggleRecombine, recomRate);
-
-	// run_outer = setInterval(function () {
-	// 	generateCharges_outer(1);
-	// }, 1000 / generateScene3); // scene changing T
-
-	// count_pn = setInterval(function () {
-	// 	count_pn_f();
-	// }, interval_pn);
 }
 
-// test generation / recombination effects
-// function mouseClicked() {
-// 	let x = mouseX - 100;
-// 	let y = mouseY - 120;
-
-// 	generationEffects.push(new Charge(x, y, "ge", chargeID));
-
-// 	let newElectron = new Charge(x, y, "e", chargeID, "g");
-// 	electrons.push(newElectron);
-
-// 	let newHole = new Charge(x, y, "h", chargeID, "g");
-// 	holes.push(newHole);
-
-// 	chargeID += 1;
-// }
-
-//generate electron hole pairs based on frequency
 function generateCharges(numCharges) {
 	// reset interval
 	clearInterval(generationInterval);
@@ -670,36 +594,19 @@ function generateCharges(numCharges) {
 		generateCharges(1);
 	}, generationRate);
 
-	// if (scene(1) || scene(2) || scene(3)) {
-	// if (electronCount > 0) {
-	// 	generatedElectrons = [];
-	// 	generatedHoles = [];
-	// 	recombinationRate = 0;
-	// } else if (electronCount == 0) {
 	for (let i = 0; i < numCharges; i++) {
 		let x = random(base.x, base.endX);
 		let y = random(base.y, base.endY);
-
 		generationEffects.push(new Charge(x, y, "ge", chargeID));
-		//let xx = findClosestValue(electronLine, a);
-		// let xx = findClosestValue(electronBand, a);
 
 		let newElectron = new Charge(x, y, "e", chargeID, "g");
-		// aa.origin.x = xx;
-		// aa.top = 1;
 		electrons.push(newElectron);
 
-		// let yy = findClosestValue(holeBand, a);
-
 		let newHole = new Charge(x, y, "h", chargeID, "g");
-		// bb.origin.y = yy;
-		// bb.top = 1;
 		holes.push(newHole);
 
 		chargeID += 1;
 	}
-	// }
-	// }
 }
 
 function findClosestValue(array, targetX) {
@@ -864,59 +771,34 @@ function checkDest(electron, dest) {
 }
 
 function animateVDLoop() {
-	let stopPositions = [];
-	stopPositions.push(createVector(base.wire.vdRight.x, base.wire.vdRight.y));
-	stopPositions.push(createVector(base.wire.vdLeft.x, base.wire.vdLeft.y));
-	stopPositions.push(
-		createVector(base.wire.leftMetal.x, base.wire.leftMetal.y)
-	);
-	let stops = [1, 2, 3]; // based on stopPositions
-
 	for (let i = 0; i < vdLoop.length; i++) {
 		let electron = vdLoop[i];
 		electron.draw();
 
-		let atDest1 = checkDest(electron, stopPositions[0], false);
-		let atDest2 = checkDest(electron, stopPositions[1], false);
-		let atDest3 = checkDest(electron, stopPositions[2], false);
+		// conditions for moving in directions
+		let Up =
+			electron.position.x > base.wire.vdRight.x - 8 &&
+			electron.position.y > base.wire.vdRight.y;
+		let Left =
+			electron.position.x > base.wire.vdLeft.x + 8 &&
+			electron.position.y < base.wire.vdRight.y + 20;
+		let Down =
+			electron.position.x < base.wire.vdLeft.x + 8 &&
+			electron.position.y < base.wire.leftMetal.y;
+		let Right =
+			electron.position.x < base.wire.vdRight.x + 8 &&
+			electron.position.y > base.wire.leftMetal.y - 8;
 
-		if (atDest1) {
-			if (!electron.passedDest.includes(stops[0])) {
-				electron.updatePassed(stops[0]);
-			}
-		}
-		if (atDest2) {
-			if (!electron.passedDest.includes(stops[1])) {
-				electron.updatePassed(stops[1]);
-			}
-		}
-		if (atDest3) {
-			if (!electron.passedDest.includes(stops[2])) {
-				electron.updatePassed(stops[2]);
-			}
-		}
-
-		if (!electron.passedDest.includes(stops[0])) {
-			electron.move(stopPositions[0]);
-		}
-		if (
-			electron.passedDest.includes(stops[0]) &&
-			!electron.passedDest.includes(stops[1])
-		) {
-			electron.move(stopPositions[1]);
-		}
-		if (
-			electron.passedDest.includes(stops[1]) &&
-			!electron.passedDest.includes(stops[2])
-		) {
-			electron.move(stopPositions[2]);
-		}
-		if (electron.passedDest.includes(stops[2])) {
-			electron.clearPassed();
-			electron.position = createVector(
-				base.wire.rightMetal.x,
-				base.wire.rightMetal.y
-			);
+		if (Up) {
+			electron.move(createVector(base.wire.vdRight.x, base.wire.vdRight.y));
+		} else if (Left) {
+			electron.move(createVector(base.wire.vdLeft.x, base.wire.vdLeft.y));
+		} else if (Down) {
+			electron.move(createVector(base.wire.leftMetal.x, base.y));
+		} else if (Right) {
+			//  jump back to right, avoid gap in flow
+			electron.updatePosition(base.wire.vdRight.x, base.wire.rightMetal.y);
+			// electron.move(createVector(base.wire.vdRight.x, base.wire.rightMetal.y));
 		}
 	}
 }
@@ -929,22 +811,9 @@ function resetVGLoopPositions() {
 }
 
 function animateVGLoop() {
-	// let stopPositions = [];
-	// stopPositions.push(createVector(...base.wire.vgRight));
-	// stopPositions.push(createVector(...base.wire.vgLeft));
-	// stopPositions.push(createVector(...base.wire.leftMetal));
-
-	// let stops = [1, 2, 3]; // based on stopPositions
-
-	let positions = [];
-
 	for (let i = 0; i < vgLoop.length; i++) {
 		let electron = vgLoop[i];
 		electron.draw();
-
-		// let atDest1 = checkDest(electron, stopPositions[0], false);
-		// let atDest2 = checkDest(electron, stopPositions[1], false);
-		// let atDest3 = checkDest(electron, stopPositions[2], false);
 
 		if (vgLoopDirection == 0) {
 			// move to left metal
@@ -982,39 +851,6 @@ function animateVGLoop() {
 					electron.move(createVector(base.wire.vgRight.x, base.wire.vgRight.y)); // right
 				}
 			}
-
-			// check if done
-			// if (electron.position.y > base.wire.topMetal.y - 8) {
-			// 	// vgLoop.splice(i);
-			// 	vgLoop[i].hide();
-			// }
-
-			// if (
-			// 	electron.position.x < base.wire.vg.x &&
-			// 	electron.position.y > base.wire.vgRight.y
-			// ) {
-			// 	electron.move(createVector(...base.wire.vgLeft));
-			// } else if (electron.position.x < base.wire.vdLeft.x) {
-			// 	electron.move(createVector(...base.wire.vgRight));
-			// } else if (
-			// 	electron.position.x > base.wire.vg.x &&
-			// 	electron.position.y < base.wire.leftMetal.y
-			// ) {
-			// 	electron.move(createVector(...base.wire.topMetal));
-			// }
-			// if (
-			// 	electron.position.x < base.wire.vdLeft.x + 8 &&
-			// 	electron.position.y < base.wire.leftMetal.y
-			// ) {
-			// 	electron.move(createVector(...base.wire.vgLeft));
-			// } else if (
-			// 	electron.position.x < base.wire.vgRight.x &&
-			// 	electron.position.y < base.wire.vgRight.y
-			// ) {
-			// 	electron.move(createVector(...base.wire.vgRight));
-			// } else if (electron.position.x > base.wire.vgRight.x - 16) {
-			// 	electron.move(createVector(...base.wire.topMetal));
-			// }
 		}
 	}
 
@@ -1023,7 +859,6 @@ function animateVGLoop() {
 			if (i == vgLoop.length - 1) {
 				// remove from metal charges the difference in charge amount
 				for (let i = 0; i < removeFromMetalCharges; i++) {
-					console.log("popping i");
 					metalPosCharges.pop();
 					removeFromMetalCharges -= 1;
 				}
@@ -1072,30 +907,30 @@ function togglevd() {
 	vdLoopOn = !vdLoopOn;
 }
 
-function disableApplyCharge() {
-	let btn = document.querySelector(`.chargeButton`);
-	btn.classList.add("disabled");
-	btn.disabled = true;
-}
+// function disableApplyCharge() {
+// 	let btn = document.querySelector(`.chargeButton${sceneCount}`);
+// 	btn.classList.add("disabled");
+// 	btn.disabled = true;
+// }
 
 function disableVGSlider() {
-	let slider = document.querySelector(`.vgSlider`);
+	let slider = document.querySelector(`.vgSlider${sceneCount}`);
 	slider.disabled = true;
 }
 
-function enableApplyCharge() {
-	let btn = document.querySelector(`.chargeButton`);
-	btn.classList.remove("disabled");
-	btn.disabled = false;
-}
+// function enableApplyCharge() {
+// 	let btn = document.querySelector(`.chargeButton${sceneCount}`);
+// 	btn.classList.remove("disabled");
+// 	btn.disabled = false;
+// }
 
 function enableVGSlider() {
-	let slider = document.querySelector(`.vgSlider`);
+	let slider = document.querySelector(`.vgSlider${sceneCount}`);
 	slider.disabled = false;
 }
 
 function toggleChargeSliders(state) {
-	const chargeSliders = document.querySelectorAll(".vgSlider");
+	const chargeSliders = document.querySelectorAll(`.vgSlider${sceneCount}`);
 	if (state == "on") {
 		chargeSliders.forEach((slider) => {
 			slider.disabled = false;
@@ -1135,38 +970,103 @@ function setBand(band) {
 function updateProfile(vd, vg) {
 	vdCharge = vd;
 	vgCharge = vg;
+
+	// vd 0, vary vg
 	if (vd == 0 && vg == 0) {
 		efGrid = efGrid_vd00_vg00;
 		setBand(band_vd00_vg00);
-	} else if (vd == 0.2 && vg == 0.3) {
-		efGrid = efGrid_vd02_vg03;
-		setBand(band_vd02_vg03);
-	} else if (vd == 0.2 && vg == 0.9) {
-		efGrid = efGrid_vd02_vg09;
-		setBand(band_vd02_vg09);
-	} else if (vd == 0.2 && vg == 3.0) {
-		efGrid = efGrid_vd02_vg30;
-		setBand(band_vd02_vg30);
-	} else if (vd == 0.2 && vg == 2.5) {
-		efGrid = efGrid_vd02_vg25;
-		setBand(band_vd02_vg25);
-	} else if (vd == 1.6 && vg == 2.5) {
-		efGrid = efGrid_vd16_vg25;
-		setBand(band_vd16_vg25);
-	} else if (vd == 4.5 && vg == 2.5) {
-		efGrid = efGrid_vd45_vg25;
-		setBand(band_vd45_vg25);
+	} else if (vd == 0 && vg == 0.5) {
+		efGrid = efGrid_vd00_vg05;
+		setBand(band_vd00_vg05);
+	} else if (vd == 0 && vg == 1.0) {
+		efGrid = efGrid_vd00_vg10;
+		setBand(band_vd00_vg10);
+	} else if (vd == 0 && vg == 1.3) {
+		efGrid = efGrid_vd00_vg13;
+		setBand(band_vd00_vg13);
+	}
+
+	// vd .1, vary vg
+	else if (vd == 0.1 && vg == 0) {
+		efGrid = efGrid_vd01_vg00;
+		setBand(band_vd01_vg00);
+	} else if (vd == 0.1 && vg == 0.5) {
+		efGrid = efGrid_vd01_vg05;
+		setBand(band_vd01_vg05);
+	} else if (vd == 0.1 && vg == 1.0) {
+		efGrid = efGrid_vd01_vg10;
+		setBand(band_vd01_vg10);
+	} else if (vd == 0.1 && vg == 1.3) {
+		efGrid = efGrid_vd01_vg13;
+		setBand(band_vd01_vg13);
+	}
+
+	// vd .3, vary vg
+	else if (vd == 0.3 && vg == 0) {
+		efGrid = efGrid_vd03_vg00;
+		setBand(band_vd03_vg00);
+	} else if (vd == 0.3 && vg == 0.5) {
+		efGrid = efGrid_vd03_vg05;
+		setBand(band_vd03_vg05);
+	} else if (vd == 0.3 && vg == 1.0) {
+		efGrid = efGrid_vd03_vg10;
+		setBand(band_vd03_vg10);
+	} else if (vd == 0.3 && vg == 1.3) {
+		efGrid = efGrid_vd03_vg13;
+		setBand(band_vd03_vg13);
+	}
+
+	// vd 1.0, vary vg
+	else if (vd == 1.0 && vg == 0) {
+		efGrid = efGrid_vd10_vg00;
+		setBand(band_vd10_vg00);
+	} else if (vd == 1.0 && vg == 0.5) {
+		efGrid = efGrid_vd10_vg05;
+		setBand(band_vd10_vg05);
+	} else if (vd == 1.0 && vg == 1.0) {
+		efGrid = efGrid_vd10_vg10;
+		setBand(band_vd10_vg10);
+	} else if (vd == 1.0 && vg == 1.3) {
+		efGrid = efGrid_vd10_vg13;
+		setBand(band_vd10_vg13);
 	}
 
 	// currently: if profile is not included, nothing happens - stays on last selected valid profile
 }
 
-function updateVD(value) {
-	let vdChargeMap = [0.0, 0.2, 1.6, 4.5];
-	vdCharge = vdChargeMap[value];
+function updateVD(value, input) {
+	// being updated by slider with value range [0-3]
+	let valueToChargeMap = [0.0, 0.1, 0.3, 1.0];
+	vdCharge = valueToChargeMap[value];
 	updateProfile(vdCharge, vgCharge);
-	let vdChargeScreenMap = [0, 10, 20, 30];
-	vdChargeScreen = vdChargeScreenMap[value];
+	scaleVDFlow();
+}
+
+function scaleVDFlow() {
+	// scale vd flow amount (ranges .5 - 6) to a visual amount of charges on screen
+
+	// map vd to visual amount based on vg, vd values (listed in vdValues.png)
+	if (vgCharge == 0 || vgCharge == 0.5 || vdCharge == 0) {
+		// no VD flow
+		vdFlow = 0;
+	} else if (vdCharge == 0.1 && vgCharge == 1.0) {
+		vdFlow = 0.5;
+	} else if (vdCharge == 0.3 && vgCharge == 1.0) {
+		vdFlow = 1;
+	} else if (vdCharge == 1.0 && vgCharge == 1.0) {
+		vdFlow = 1.2;
+	} else if (vdCharge == 0.1 && vgCharge == 1.3) {
+		vdFlow = 2;
+	} else if (vdCharge == 0.3 && vgCharge == 1.3) {
+		vdFlow = 5;
+	} else if (vdCharge == 1.0 && vgCharge == 1.3) {
+		vdFlow = 6;
+	}
+
+	// scale vd flow amount
+	// let vdChargeScale = 8;
+	// vdFlow = vdFlow * vdChargeScale;
+
 	resetVDLoop();
 }
 
@@ -1174,19 +1074,57 @@ function resetVDLoop() {
 	// currently clears out and animates from beginning
 	// able to make more continuous when Vd slider is changed?
 	vdLoop = [];
-	for (let i = 0; i < vdChargeScreen; i++) {
-		let x = base.wire.rightMetal.x;
-		// yRange is range of y used to spread out the charges during animation
-		// yRange is divided by vdChargeScreen to determine how spread out charges are
-		let yRange = 900;
-		let y = base.wire.rightMetal.y + i * (yRange / vdChargeScreen);
 
-		vdLoop.push(new wireCharge(x, y, "vd"));
+	// total total distance electron animates
+	let dis1 = base.wire.leftMetal.y - base.wire.vdLeft.y;
+	let dis2 = base.wire.vdRight.x - base.wire.vdLeft.x;
+	let dis3 = base.wire.rightMetal.y - base.wire.vdRight.y;
+	let disTotal = dis1 + dis2 + dis3; // 800
+
+	let mapCharge = {
+		0: 0,
+		0.5: [240, Math.floor(disTotal / 240)],
+		1.0: [160, Math.floor(disTotal / 160)],
+		1.2: [120, Math.floor(disTotal / 120)],
+		2: [100, Math.floor(disTotal / 100)],
+		5: [40, Math.floor(disTotal / 40)],
+		6: [20, Math.floor(disTotal / 20)],
+	};
+
+	let distance = mapCharge[vdFlow][0];
+	let amount = mapCharge[vdFlow][1];
+
+	if (vdFlow > 0) {
+		for (let i = 0; i < amount; i++) {
+			// for (let i = 0; i < vdFlow; i++) {
+			let x = base.wire.rightMetal.x;
+			// yRange is range of y used to spread out the charges during animation
+			// yRange is divided by vdFlow to determine how spread out charges are
+
+			// let x, y;
+
+			// let distance = vdFlow ;
+			// if (direction == 0) {
+			// 	x = base.wire.vgRight.x;
+			// 	y = base.wire.topMetal.y + i * distance;
+			// } else {
+			// 	x = base.wire.vgLeft.x;
+			// 	y = base.wire.topMetal.y + i * distance;
+			// }
+			let yRange = 1000;
+			// let y =
+			// 	base.wire.rightMetal.y +
+			// 	i * (yRange / vdFlow) +
+			// 	Math.random() * 10;
+
+			y = base.wire.rightMetal.y + i * distance;
+
+			vdLoop.push(new wireCharge(x, y, "vd"));
+		}
 	}
 }
 
 function resetMetalCharges() {
-	// console.log("in resetmetalcharges");
 	metalPosCharges = [];
 	for (let i = 0; i < vgChargeScreen; i++) {
 		let x = base.wire.vgRight.x;
@@ -1209,7 +1147,7 @@ function updateVG(value) {
 	// prevVGChargeScreen = vgChargeScreen;
 	prevVGChargeScreen = beforechange;
 
-	let valueToChargeMap = [0.0, 0.3, 0.9, 2.5, 3.0];
+	let valueToChargeMap = [0.0, 0.5, 1.0, 1.3];
 	vgCharge = valueToChargeMap[value];
 	updateProfile(vdCharge, vgCharge);
 
@@ -1224,37 +1162,31 @@ function updateVG(value) {
 	beforechange = vgChargeScreen;
 
 	if (prevVGChargeScreen == 0) {
-		// console.log("prev 0 now > 0");
 		// previously 0, now > 0
 		//1 on paper
 		vgLoopDirection = 0;
 		resetMetalCharges();
 	} else if (prevVGChargeScreen > 0 && beforechange == 0) {
 		// previously > 0, now 0
-		// console.log("// previously > 0, now 0");
 		vgLoopDirection = 1;
 		vgChargeScreen = prevVGChargeScreen; //whatever previous was
 		removeFromMetalCharges = vgChargeScreen;
 	} else if (prevVGChargeScreen < beforechange) {
-		// console.log("// previously smaller, now larger");
 		// previously smaller, now larger
 		vgLoopDirection = 0;
 		vgChargeScreen = vgChargeScreen - prevVGChargeScreen;
 
 		addToMetalCharges = vgChargeScreen;
 	} else if (prevVGChargeScreen > beforechange) {
-		// console.log("// previously larger, now smaller");
 		// previously larger, now smaller
 		vgLoopDirection = 1;
 		vgChargeScreen = prevVGChargeScreen - vgChargeScreen;
 
 		// remove some move metal
 		removeFromMetalCharges = vgChargeScreen;
-		// console.log("removefrommetalcharges", removeFromMetalCharges);
 	}
 	toggleChargeSliders("off");
 	resetVGLoop(vgLoopDirection);
-	// console.log("resetted vgLoop");
 	// disableApplyCharge();
 	disableVGSlider();
 
@@ -1264,14 +1196,15 @@ function updateVG(value) {
 		// maps actual vg amount to vg to # electrons animated on the screen
 		let chargeMap = {
 			0.0: 0,
-			0.3: 5,
-			0.9: 10,
-			2.5: 15,
-			3.0: 20,
+			0.5: 5,
+			1.0: 10,
+			1.3: 13,
 		};
 
 		return chargeMap[vgChargeActual];
 	}
+
+	scaleVDFlow();
 }
 function updateWireElectrons() {
 	if (sceneCount != 2) {
@@ -1343,7 +1276,7 @@ function updateCharges() {
 
 		if (electrons[i].appear > 20) {
 			// electrons[i].straight_walk();
-			// if (electrons[i].position.y > 49 * sy) {
+			// if (electrons[i].position.y > 49) {
 			electrons[i].update();
 			// }
 		}
@@ -1355,7 +1288,7 @@ function updateCharges() {
 
 		if (holes[i].appear > 20) {
 			// holes[i].straight_walk();
-			// if (holes[i].position.y > 49 * sy) {
+			// if (holes[i].position.y > 49) {
 			holes[i].update();
 			// }
 		}
@@ -1635,7 +1568,7 @@ function drawBase() {
 	// style bases
 	fill(...color.bg);
 	stroke(...color.white);
-	strokeWeight(1.2);
+	strokeWeight(1);
 	canvas.drawingContext.setLineDash([]);
 
 	// source
@@ -1787,7 +1720,8 @@ function drawWires() {
 			);
 		}
 
-		stroke(...color.wires);
+		// strokeWeight(0.5);
+		stroke(...color.wires, 160);
 		noFill();
 		// wire from source to vd battery
 		beginShape();
@@ -1827,7 +1761,8 @@ function drawWires() {
 
 		// wires
 
-		stroke(...color.wires);
+		// strokeWeight(0.5);
+		stroke(...color.wires, 160);
 		noFill();
 		// wire from source metal to vg battery
 		beginShape();
@@ -1898,132 +1833,235 @@ function drawControls() {
 	text("Electric Field", controls.ef.x + 40, controls.ef.y + 16);
 }
 
+function updateHoverColumn(x) {
+	hoverColumn = Math.floor(x / 10);
+}
+
 function drawGraph() {
-	drawAxes();
-	drawLineOver();
-	drawEFData();
-	function drawLineOver() {
-		noFill();
-		stroke(...color.graph, 180);
-		strokeWeight(1);
-		// graph y axis
-		if (mouseX > base.x)
-			line(mouseX / sx, base.y - 200, mouseX / sx, base.endY);
+	// variables for dynamic axes based on highest peak of efx or efy
+	let highestPeak = 0;
+	let graphScale = 100;
+	let mouseInTransistor =
+		mouseX / sx > base.x && mouseX / sx - base.x < base.width;
+
+	if (mouseInTransistor) {
+		drawHoverLine();
+		drawEFData();
 	}
-	function drawAxes() {
+	drawYAxis();
+	drawXAxis();
+
+	function drawHoverLine() {
 		noFill();
-		stroke(...color.graph, 180);
+		stroke(...color.graph, 220);
 		strokeWeight(1);
 
-		let offset = unit * 16;
+		// graph hover line for ef graph
+
+		line(mouseX / sx, base.y, mouseX / sx, base.endY);
+		updateHoverColumn(mouseX / sx - base.x);
+	}
+
+	function drawYAxis() {
+		noFill();
+		stroke(...color.graph, 220);
+		strokeWeight(1);
+
+		// graph y axis
+		line(base.graphX, base.graphY - base.metalHeight, base.graphX, base.endY);
+
+		let axisScale = 50;
+		let numYAxisTicks = base.height / axisScale;
+		// graph -y axis ticks
+		// for (let i = 1; i < numYAxisTicks; i++) {
+		// 	let x = base.graphX;
+		// 	let y = base.graphY + i * axisScale;
+		// 	line(x, y, x + 5, y); // Draw the line
+		// 	text(`${"# \u00B5m"} `, x - 30, y);
+		// }
+
+		// .5 micrometer
+		let x = base.graphX;
+		let y = base.y + base.sourceHeight;
+		line(x, y, x + 5, y); // Draw the line
+		text(".5\u00B5m", x - 24, y);
+
+		// 1
+		x = base.graphX;
+		y = base.y + base.height;
+		line(x, y, x + 5, y); // Draw the line
+		text("1\u00B5m", x - 24, y);
+
+		// graph +y axis ticks
+		// for (let i = 1; i < 2; i++) {
+		// 	let x = base.graphX;
+		// 	let y = base.graphY - i * axisScale;
+		// 	line(x, y, x + 5, y); // Draw the line
+		// 	text(`${"#"} V/cm`, x - 30, y);
+		// }
+
+		noStroke();
+		fill(...color.graph);
+		textSize(10);
+	}
+	function drawXAxis() {
+		// peak brackets
+		// 51000
+		// 60000
+		// 50000
+		// 40000
+		// 30000
+		// 20000
+		// 10000
+		// 0
+
+		// when below 10000
+		// 9,8thousand, etc. to 1000
+
+		stroke("red");
+		line(
+			base.graphX + 70,
+			base.graphY,
+			base.graphX + 70,
+			base.graphY + base.height
+		); // highest peak (right?)
+
+		stroke("white");
+		line(base.graphX + 70, base.graphY, base.graphX + 70, base.graphY - 10); // highest peak (right?)
+
+		noFill();
+		stroke(...color.graph, 180);
+		strokeWeight(1);
 
 		// graph x axis
-		line(
-			base.x - offset - 56,
-			base.y - base.metalHeight,
-			base.metalX,
-			base.y - base.metalHeight
-		);
-		// graph y axis
-		line(base.x - offset, base.y - 200, base.x - offset, base.endY);
+		line(0, base.graphY, base.metalX, base.graphY); // starts at left edge of canvas
 
-		if (currentGraph == "ef") {
-			// Electric Field
-			let numXAxisTicks = 10;
-			// graph +x axis ticks
-			for (let i = 0; i < numXAxisTicks; i++) {
-				let x = (base.x - offset) * i;
-				let y = base.y - base.metalHeight;
+		// the bigger the peak > the bigger the graph scale > the smaller spacing between ticks
+		// graph +x axis ticks
+		let numXAxisTicks = 10;
+
+		let xUnit = " V/cm";
+		for (let i = 1; i < numXAxisTicks; i++) {
+			let axisScaleFactor = 4000 / graphScale;
+
+			if (axisScaleFactor < 23) {
+				xUnit = "";
+			}
+
+			let x = base.graphX + i * axisScaleFactor; // EDIT!!
+
+			let y = base.graphY;
+			if (x < base.x) {
 				line(x, y, x, y - 5); // Draw the line
+				text(`${i}`, x, y + 12); // \u00B5m
 			}
-
-			let numYAxisTicks = 25;
-			// graph -y axis ticks
-			for (let i = 0; i < numYAxisTicks; i++) {
-				let x = base.x - offset;
-				let y = (base.y - 200) * i + 32;
-				line(x, y, x + 5, y); // Draw the line
-			}
-
-			noStroke();
-			fill(...color.graph);
-			textSize(10);
-
-			text("800 V/cm", base.x - offset + 32, 80);
-			text("–800 V/cm", base.x - offset + 32, 300);
-
-			text("5 \u00B5m", base.x - offset + 160, base.y - base.metalHeight - 16);
-		} else if (currentGraph == "cd") {
-			// Charge Density
-			let numXAxisTicks = 10;
-			// graph +x axis ticks
-			for (let i = 0; i < numXAxisTicks; i++) {
-				let x = (base.x - offset) * i;
-				let y = base.y - base.metalHeight;
-				line(x, y, x, y - 5); // Draw the line
-			}
-
-			let numYAxisTicks = 25;
-			// graph -y axis ticks
-			for (let i = 0; i < numYAxisTicks; i++) {
-				let x = base.x - offset;
-				let y = (base.y - 200) * i + 32;
-				line(x, y, x + 5, y); // Draw the line
-			}
-
-			noStroke();
-			fill(...color.graph);
-			textSize(10);
-
-			text("20 μC/cm\u00B3", base.x - offset + 32, 80);
-			text("-20 μC/cm\u00B3", base.x - offset + 32, 300);
-
-			text("5 \u00B5m", base.x - offset + 160, base.y - base.metalHeight - 16);
 		}
+
+		// graph -x axis ticks
+		for (let i = 1; i < numXAxisTicks; i++) {
+			let x = base.graphX - ((i * 20) / graphScale) * 200; // EDIT!!
+			let y = base.graphY;
+			if (x < base.x) {
+				line(x, y, x, y - 5); // Draw the line
+				text(`-${i}`, x, y + 12); // \u00B5m
+			}
+
+			if (i == numXAxisTicks - 1) {
+				text(`-${i} V/cm`, x, y + 12); // \u00B5m
+			}
+		}
+
+		noStroke();
+		fill(...color.graph);
+		textSize(10);
+	}
+
+	function scaleToPeak() {
+		// get highest peak and graph scale first
+		for (let row = 0; row < efGrid.length; row++) {
+			// for every row, plot efy at specific col
+			let efy = efGrid[row][hoverColumn].efy;
+			let efx = efGrid[row][hoverColumn].efx;
+			if (efy > highestPeak) {
+				highestPeak = efy;
+			}
+			if (efx > highestPeak) {
+				highestPeak = efx;
+			}
+		}
+
+		// divide highestPeak by 1000 to get kilovolts (kV)
+
+		console.log(highestPeak);
+		graphScale = highestPeak / 70; // the divisor is chosen by visually checking if highest peak fits for all x
+		// higher the graph scale, smaller it will render
+		// higher the peak, higher the graph scale
 	}
 
 	function drawEFData() {
-		//////////////////////////////////////////////////// draw E-field graph on second graph when switch is On, and draw charge density graph when not clicked switch
-		noStroke();
+		styleText();
 
-		fill(218, 112, 214, 100);
-		// if (electronBand_data_v1.length > 0) {
-		// if (appliedVoltage > 0 || appliedVoltage < 0) {
+		let efxLabel = { x: 20, y: 230 };
+		let efyLabel = { x: 20, y: 260 };
+
+		text("Electric field in x direction", efxLabel.x + 90, efxLabel.y + 6);
+		text("Electric field in y direction", efyLabel.x + 90, efyLabel.y + 6);
+
+		stroke("white");
+		// draw efx label
+		fill(...color.efx, 160);
+		circle(efxLabel.x, efxLabel.y, 20);
+
+		// draw efy label
+		fill(...color.efy, 160);
+		circle(efyLabel.x, efyLabel.y, 20);
+
+		// draw efx data
+		stroke("white");
+		fill(...color.efx, 160);
+
 		beginShape();
 
-		vertex(250 * sx, (385 / 2 + 98) * sy);
+		scaleToPeak();
 
-		// draw electric field graph
-		// Add all points as curve vertices
-		// for (let i = 0; i < EFData.length; i++) {
-		// 	let x = EFData[i].x;
-		// 	let y =
-		// 		10 * (EFData[i].y / Math.pow(10, 6)) * (40 / 1530) * 500 * sy +
-		// 		(385 / 2 + 98) * sy;
-		// 	// let y =
-		// 	// 	(EFData[i].y / Math.pow(10, 4)) * 2 +
-		// 	// 	(385 / 2 + 96.25) * sy;
+		vertex(base.graphX, base.graphY);
 
-		// 	vertex(x, y);
-		// }
-		// vertex(
-		// 	EFData[bandData.length - 2].x,
-		// 	EFData[bandData.length - 2].y / Math.pow(10, 6) + (385 / 2 + 98) * sy
-		// );
+		for (let row = 0; row < efGrid.length; row++) {
+			// for every row, plot efx at specific col
+			let efx = efGrid[row][hoverColumn].efx;
+			if (efx > highestPeak) {
+				highestPeak = efx;
+			}
+			let y = base.graphY + (base.height * row) / 32; // plot over y of transistor
+			let x = base.graphX + efx / graphScale;
+			vertex(x, y);
+		}
+		vertex(base.graphX, base.graphY + base.height);
+		endShape();
+
+		// draw efy data
+		stroke("white");
+		fill(...color.efy, 160);
+		beginShape();
+		vertex(base.graphX, base.graphY);
+		for (let row = 0; row < efGrid.length; row++) {
+			// for every row, plot efy at specific col
+			let efy = efGrid[row][hoverColumn].efy;
+			if (efy > highestPeak) {
+				highestPeak = efy;
+			}
+			let y = base.graphY + (base.height * row) / 32;
+			let x = base.graphX + efy / graphScale;
+			vertex(x, y);
+		}
+
+		vertex(base.graphX, base.graphY + base.height);
 
 		endShape();
 	}
 }
 
 function drawBandDiagram() {
-	// draw band threshold - where hole charges show up on band
-	// line(
-	// 	base.x,
-	// 	base.y + base.bandThreshold,
-	// 	base.endX,
-	// 	base.y + base.bandThreshold
-	// );
-
 	beginShape();
 
 	let subscriptAddY = 2;
@@ -2037,24 +2075,23 @@ function drawBandDiagram() {
 	noStroke();
 
 	// Ec label
-	fill(...color.electron); // negative color
-	textSize(eTextSize * sx);
-	text("E", 920 * sx, 75 * sy);
-	textSize(subscriptTextSize * sx);
-	text("c", (920 + subscriptAddX) * sx, (75 + subscriptAddY) * sy); // subscript
+	fill(...color.electron);
+	textSize(eTextSize);
+	text("E", 920, 75);
+	textSize(subscriptTextSize);
+	text("c", 920 + subscriptAddX, 75 + subscriptAddY);
 
 	// Ev label
-	fill(...color.hole); // positive color
-	textSize(eTextSize * sx);
-	text("E", 920 * sx, 118 * sy);
-	textSize(subscriptTextSize * sx);
-	text("v", (920 + subscriptAddX) * sx, (118 + subscriptAddY) * sy);
+	fill(...color.hole);
+	textSize(eTextSize);
+	text("E", 920, 118);
+	textSize(subscriptTextSize);
+	text("v", 920 + subscriptAddX, 118 + subscriptAddY);
 
-	textSize(12 * sx);
+	textSize(12);
 
 	noFill();
 	strokeWeight(1);
-	//Draw E_f
 
 	noFill();
 	stroke(...color.electron);
@@ -2064,26 +2101,11 @@ function drawBandDiagram() {
 
 	// populate
 	for (var k = 0; k < bandLength; k++) {
-		// let x1 = 17;
-		// let x2 = 349;
-		// let y1 = 0;
-		// let y2 = 679;
-		// let a = (y2 - y1) / (x2 - x1);
-		// let b = y1 - a * x1;
-		// let y = a * bandData[k] + b;
-
-		// vertex drawn from bandData
-		// curveVertex(base.x + y, base.bandY + bandData[k] * 40 - 100);
-		// curveVertex(base.x + y, base.bandY + bandData[k] * 40 - 100);
-
-		let vertexX = base.x + (base.width / bandLength) * k;
+		let columns = 64;
+		let vertexX = base.x + (base.width * k) / columns;
 		let vertexY = base.bandY - bandData[k] * 40 - 100;
 		curveVertex(vertexX, vertexY);
-
-		// electronBand[k] = [base.x + y, base.bandY + bandData[k] * (40 / 1.2) - 100];
 		electronBand[k] = [vertexX, vertexY];
-
-		//}
 	}
 	endShape();
 
@@ -2093,35 +2115,15 @@ function drawBandDiagram() {
 
 	for (var k = 0; k < bandLength; k++) {
 		//hole curve
-		let x1 = 17;
-		let x2 = 349;
-		let y1 = 0;
-		let y2 = 679;
-		let a = (y2 - y1) / (x2 - x1);
-		let b = y1 - a * x1;
-		let x = a * xPositionData[k] + b;
-
-		let ver;
-
-		let vertexX = base.x + (base.width / bandLength) * k;
+		let columns = 64;
+		let vertexX = base.x + (base.width * k) / columns;
 		let vertexY = base.bandY - bandData[k] * 40;
 		let bandGap = -60;
 
 		curveVertex(vertexX, vertexY + bandGap);
 		holeBand[k] = [vertexX, vertexY + bandGap];
-		// curveVertex(base.x + x, -30 + base.bandY + bandData[k] * 40 - 30);
-		// holeBand[k] = [base.x + x, base.bandY + bandData[k] * (40 / 1.2) - 60];
 	}
 	endShape();
 	noStroke();
 	strokeWeight(1);
-
-	// calculate electric field
-	for (let i = 0; i < bandLength - 1; i++) {
-		let y =
-			((bandData[i + 1] - bandData[i]) /
-				(xPositionData[i + 1] - xPositionData[i])) *
-			Math.pow(10, 7);
-		EFData[i] = { x: electronBand[i][0], y: y };
-	}
 }

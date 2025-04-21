@@ -22,11 +22,17 @@
 }
 
 .container {
-	width: 1000px;
+	max-width: 90% !important;
+}
+
+.col-lg-4 {
+	max-width: 28% !important;
 }
 
 .title {
-	margin-top: 240px;
+	margin-top: 300px;
+	margin-left: 10% !important;
+	margin-right: 10% !important;
 }
 
 .title h1 {
@@ -36,7 +42,9 @@
 	letter-spacing: 2px;
 	font-size: 48px;
 	line-height: 96px;
+
 	/* identical to box height */
+
 	text-align: center;
 
 	color: #fff7ae;
@@ -44,7 +52,7 @@
 
 .title p {
 	margin-top: 30px;
-	font-family: "Bai Jamjuree";
+	font-family: Bai Jamjuree;
 	font-style: normal;
 	font-weight: normal;
 	font-size: 20px;
@@ -299,17 +307,6 @@ input:checked + .slider:before {
 	color: white;
 }
 
-datalist {
-	display: flex;
-	justify-content: space-between;
-	color: white;
-	width: 50%;
-}
-
-input {
-	width: 50%;
-}
-
 .browser-spec {
 	padding: 16px;
 	border-left: 5px solid #fef6b6;
@@ -450,7 +447,7 @@ datalist {
 	display: flex;
 	justify-content: space-between;
 	color: white;
-	width: 70%;
+	width: 240px;
 }
 
 datalist option {

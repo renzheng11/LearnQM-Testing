@@ -61,6 +61,11 @@ class wireCharge {
 		}
 	}
 
+	updatePosition(x, y) {
+		this.position.x = x;
+		this.position.y = y;
+	}
+
 	updatePassed(value) {
 		this.passedDest.push(value);
 	}
@@ -85,25 +90,24 @@ class wireCharge {
 
 		// Scale the direction vector by the ball's speed
 		if (this.loop == "vd") {
-			direction.mult(15); // mult(speed)
+			direction.mult(20); // mult(speed)
 		} else {
-			direction.mult(20); // if above 10, will go above wire (height is divisble by 10?)
+			direction.mult(this.speed); // if above 10, will go above wire (height is divisble by 10?)
 		}
 
 		// Update the position based on the direction vector
 		this.position.add(direction);
 
 		if (this.loop == "vd") {
-			// outer loop
-			// horizontal
-			if (this.position.y < base.vdY) {
-				// this.position.y += 1;
-			}
-			if (this.position.y > base.vdY) {
-				// this.position.y -= 1;
-			}
-
-			// vertical
+			// // outer loop
+			// // horizontal
+			// if (this.position.y < base.vdY) {
+			// 	this.position.y += 2;
+			// }
+			// if (this.position.y > base.vdY) {
+			// 	this.position.y -= 2;
+			// }
+			// // vertical
 			// if (this.position.x < base.wire.leftMetal.x - 4) {
 			// 	if (this.position.x < base.wire.leftMetal.x) {
 			// 		this.position.x += 1;
@@ -113,21 +117,21 @@ class wireCharge {
 			// 	}
 			// }
 		} else {
-			// inner loop
-			if (this.position.y < base.vgY) {
-				// this.position.y += 1;
-			}
-			if (this.position.y > base.vgY) {
-				// this.position.y -= 1;
-			}
-			// if (this.position.x < base.wire.leftMetal.x - 4) {
-			// vertical
-			if (this.position.x < base.wire.leftMetal.x) {
-				// this.position.x += 1;
-			}
-			if (this.position.x > base.wire.leftMetal.x) {
-				// this.position.x -= 1;
-			}
+			// // inner loop
+			// if (this.position.y < base.vgY) {
+			// 	this.position.y += 1;
+			// }
+			// if (this.position.y > base.vgY) {
+			// 	this.position.y -= 1;
+			// }
+			// // if (this.position.x < base.wire.leftMetal.x - 4) {
+			// // vertical
+			// if (this.position.x < base.wire.leftMetal.x) {
+			// 	this.position.x += 1;
+			// }
+			// if (this.position.x > base.wire.leftMetal.x) {
+			// 	this.position.x -= 1;
+			// }
 		}
 	}
 }

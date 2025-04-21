@@ -1,4 +1,4 @@
-let band_vd00_vg00 = [
+let band_vd03_vg00 = [
         { cband: -1.02, vband: 0.10 }, //c1
         { cband: -1.02, vband: 0.10 }, //c2
         { cband: -1.02, vband: 0.10 }, //c3
@@ -39,28 +39,28 @@ let band_vd00_vg00 = [
         { cband: -0.20, vband: 0.92 }, //c38
         { cband: -0.20, vband: 0.92 }, //c39
         { cband: -0.20, vband: 0.92 }, //c40
-        { cband: -0.20, vband: 0.92 }, //c41
-        { cband: -0.20, vband: 0.92 }, //c42
-        { cband: -0.21, vband: 0.92 }, //c43
-        { cband: -0.22, vband: 0.91 }, //c44
-        { cband: -0.23, vband: 0.89 }, //c45
-        { cband: -0.25, vband: 0.87 }, //c46
-        { cband: -0.30, vband: 0.82 }, //c47
-        { cband: -0.42, vband: 0.70 }, //c48
-        { cband: -0.92, vband: 0.21 }, //c49
-        { cband: -1.02, vband: 0.10 }, //c50
-        { cband: -1.02, vband: 0.10 }, //c51
-        { cband: -1.02, vband: 0.10 }, //c52
-        { cband: -1.02, vband: 0.10 }, //c53
-        { cband: -1.02, vband: 0.10 }, //c54
-        { cband: -1.02, vband: 0.10 }, //c55
-        { cband: -1.02, vband: 0.10 }, //c56
-        { cband: -1.02, vband: 0.10 }, //c57
-        { cband: -1.02, vband: 0.10 }, //c58
-        { cband: -1.02, vband: 0.10 }, //c59
-        { cband: -1.02, vband: 0.10 }, //c60
-        { cband: -1.02, vband: 0.10 }, //c61
-        { cband: -1.02, vband: 0.10 }, //c62
-        { cband: -1.02, vband: 0.10 }, //c63
-        { cband: -1.02, vband: 0.10 } //c64
+        { cband: -0.21, vband: 0.92 }, //c41
+        { cband: -0.21, vband: 0.91 }, //c42
+        { cband: -0.22, vband: 0.91 }, //c43
+        { cband: -0.23, vband: 0.90 }, //c44
+        { cband: -0.25, vband: 0.88 }, //c45
+        { cband: -0.28, vband: 0.84 }, //c46
+        { cband: -0.34, vband: 0.78 }, //c47
+        { cband: -0.51, vband: 0.62 }, //c48
+        { cband: -1.18, vband: -0.05 }, //c49
+        { cband: -1.32, vband: -0.20 }, //c50
+        { cband: -1.32, vband: -0.20 }, //c51
+        { cband: -1.32, vband: -0.20 }, //c52
+        { cband: -1.32, vband: -0.20 }, //c53
+        { cband: -1.32, vband: -0.20 }, //c54
+        { cband: -1.32, vband: -0.20 }, //c55
+        { cband: -1.32, vband: -0.20 }, //c56
+        { cband: -1.32, vband: -0.20 }, //c57
+        { cband: -1.32, vband: -0.20 }, //c58
+        { cband: -1.32, vband: -0.20 }, //c59
+        { cband: -1.32, vband: -0.20 }, //c60
+        { cband: -1.32, vband: -0.20 }, //c61
+        { cband: -1.32, vband: -0.20 }, //c62
+        { cband: -1.32, vband: -0.20 }, //c63
+        { cband: -1.32, vband: -0.20 } //c64
 ];

@@ -278,6 +278,7 @@ function fetchBandDiagramData() {
  *******************************************************/
 function setup() {
 	fetchBandDiagramData();
+	// let canvas = createCanvas((2 * windowWidth) / 3, windowHeight);
 	let canvas = createCanvas((2 * windowWidth) / 3, windowHeight);
 	canvas.parent("visualization");
 	frameRate(10);

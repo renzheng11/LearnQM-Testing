@@ -280,6 +280,11 @@ class Charge {
 		}
 	}
 
+	moveToSource() {
+		this.position.x -= base.width - base.sourceWidth;
+		this.velocity.y = -this.velocity.y;
+	}
+
 	update() {
 		this.accelerate(); // update this.velocity baed on EF
 		//this.velocity.limit(this.maxspeed);
@@ -322,13 +327,62 @@ class Charge {
 			} else if (this.position.x > base.drainX) {
 				// if vd on & vg voltage is large enough
 				// !!! need to revise vgCharge
-				if (vdOn && vdCharge > 0 && Math.random() * 10 < 5) {
-					// if (vdOn && vgCharge > 3 && Math.random() * 10 < 5) {
-					// electrons that go out of top of drain goes through
-					// move position to top of source +
-					this.position.x -= base.width - base.sourceWidth;
+
+				// let mapCharge = {
+				// 	0: 0
+				// 	0.5
+				// 	1.0
+				// 	1.2
+				// 	2
+				// 	5
+				// 	6
+				// };
+
+				let vdFlowConditions = [
+					vdCharge == 0.1 && vgCharge == 1.0, // 0
+					vdCharge == 0.3 && vgCharge == 1.0, // 1
+					vdCharge == 1.0 && vgCharge == 1.0, // 2
+					vdCharge == 0.1 && vgCharge == 1.3, // 3
+					vdCharge == 0.3 && vgCharge == 1.3, // 4
+					vdCharge == 1.0 && vgCharge == 1.3, // 5
+				];
+
+				// probability of leaving drain and moving to source
+				let multiplier = 1;
+				let vdFlowProb = [
+					Math.random() * 6 < multiplier * 0.5, // 0 - for flow = .5
+					Math.random() * 6 < multiplier * 1, // 1 - for flow = 1
+					Math.random() * 6 < multiplier * 1.2, // 2 - for flow = 1.2
+					Math.random() * 6 < multiplier * 2, // 3 - for flow = 2
+					Math.random() * 6 < multiplier * 5, // 4 - for flow = 5
+					Math.random() * 6 < multiplier * 6, // 5 - for flow = 6
+				];
+
+				if (vgCharge == 0 || vgCharge == 0.5 || vdCharge == 0) {
+					// no VD flow
 					this.velocity.y = -this.velocity.y;
-				} else {
+					this.position.y += 8;
+				} else if (vdFlowConditions[0] && vdFlowProb[0]) {
+					this.moveToSource();
+				} else if (vdFlowConditions[1] && vdFlowProb[1]) {
+					this.moveToSource();
+				} else if (vdFlowConditions[2] && vdFlowProb[2]) {
+					this.moveToSource();
+				} else if (vdFlowConditions[3] && vdFlowProb[3]) {
+					this.moveToSource();
+				} else if (vdFlowConditions[4] && vdFlowProb[4]) {
+					this.moveToSource();
+				} else if (vdFlowConditions[5] && vdFlowProb[5]) {
+					this.moveToSource();
+				}
+				// if (vdOn && vdCharge > 0 && Math.random() * 10 < 5) {
+				// 	// if (vdOn && vgCharge > 3 && Math.random() * 10 < 5) {
+				// 	// electrons that go out of top of drain goes through
+				// 	// move position to top of source +
+				// 	this.position.x -= base.width - base.sourceWidth;
+				// 	this.velocity.y = -this.velocity.y;
+				// }
+				else {
 					// bounce off top of drain
 					this.velocity.y = -this.velocity.y;
 					this.position.y += 8;
