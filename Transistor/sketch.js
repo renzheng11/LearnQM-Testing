@@ -1816,20 +1816,21 @@ function drawGraph() {
 	}
 
 	function getPeak() {
+		console.log(hoverColumn);
 		// get highest peak of efx or efy data
 		for (let row = 0; row < efGrid.length; row++) {
 			// for every row, plot efy at specific col
-			let efy = efGrid[row][hoverColumn].efy;
+			// let efy = efGrid[row][hoverColumn].efy;
 			let efx = efGrid[row][hoverColumn].efx;
-			if (Math.abs(efy) > Math.abs(peakY)) {
-				peakY = Math.abs(efy);
-			}
+			// if (Math.abs(efy) > Math.abs(peakY)) {
+			// 	peakY = Math.abs(efy);
+			// }
 			if (Math.abs(efx) > Math.abs(peakX)) {
 				peakX = Math.abs(efx);
 			}
-			if (Math.abs(efy) > Math.abs(efPeak)) {
-				efPeak = Math.abs(efy);
-			}
+			// if (Math.abs(efy) > Math.abs(efPeak)) {
+			// 	efPeak = Math.abs(efy);
+			// }
 			if (Math.abs(efx) > Math.abs(efPeak)) {
 				efPeak = Math.abs(efx);
 			}
@@ -1876,6 +1877,7 @@ function drawGraph() {
 		// scale graphscale by percentage to graph at percentage
 		graphScale = graphScale / percent;
 
+		// draw efx data
 		beginShape();
 
 		vertex(base.graphX, base.graphY);
@@ -1896,24 +1898,24 @@ function drawGraph() {
 		endShape();
 
 		// draw efy data
-		stroke("white");
-		fill(...color.efy, 160);
-		beginShape();
-		vertex(base.graphX, base.graphY);
-		for (let row = 0; row < efGrid.length; row++) {
-			// for every row, plot efy at specific col
-			let efy = efGrid[row][hoverColumn].efy;
+		// stroke("white");
+		// fill(...color.efy, 160);
+		// beginShape();
+		// vertex(base.graphX, base.graphY);
+		// for (let row = 0; row < efGrid.length; row++) {
+		// 	// for every row, plot efy at specific col
+		// 	let efy = efGrid[row][hoverColumn].efy;
 
-			let y = base.graphY + (base.height * row) / 32;
-			let x = base.graphX + efy / graphScale;
-			if (x < base.graphX + graphMaxX + 12) {
-				vertex(x, y);
-			}
-		}
+		// 	let y = base.graphY + (base.height * row) / 32;
+		// 	let x = base.graphX + efy / graphScale;
+		// 	if (x < base.graphX + graphMaxX + 12) {
+		// 		vertex(x, y);
+		// 	}
+		// }
 
-		vertex(base.graphX, base.graphY + base.height);
+		// vertex(base.graphX, base.graphY + base.height);
 
-		endShape();
+		// endShape();
 	}
 }
 

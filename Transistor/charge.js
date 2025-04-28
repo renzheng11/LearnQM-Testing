@@ -140,11 +140,12 @@ class Charge {
 				// fill(...color.pos, 160);
 				// circle(this.x, this.y, 20);
 			} else if (this.type == "mp") {
+				let add = 20;
 				// positive charge in metal
 				stroke(255, 120);
 				strokeWeight(5);
-				line(this.x - 10, this.y, this.x + 10, this.y);
-				line(this.x, this.y - 10, this.x, this.y + 10);
+				line(this.x - 10, this.y + 20, this.x + 10, this.y + 20);
+				line(this.x, this.y + 10, this.x, this.y + 30); // up and down
 				noStroke();
 
 				// fill(...color.pos, 160);
@@ -154,7 +155,7 @@ class Charge {
 				stroke(255, 60);
 				strokeWeight(5);
 				line(this.x - 10, this.y, this.x + 10, this.y);
-				// line(this.x, this.y - 10, this.x, this.y + 10);
+				// line(this.+ 10, this.x,30his.y + 10);
 				noStroke();
 				strokeWeight(1);
 			} else if (this.type == "ge") {

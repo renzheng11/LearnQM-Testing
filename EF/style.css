@@ -243,7 +243,7 @@
 	border-radius: 25px;
 }
 
-.slider:before {
+/* .slider:before {
 	position: absolute;
 	content: "";
 	height: 18px;
@@ -253,16 +253,16 @@
 	background-color: white;
 	transition: 0.4s;
 	border-radius: 50%;
-}
+} */
 
 input:checked + .slider {
 	background-color: darkgoldenrod;
 }
 
-input:checked + .slider:before {
+/* input:checked + .slider:before {
 	transform: translateX(25px);
 	background-color: yellow;
-}
+} */
 
 /* override bootstrap */
 label {
@@ -363,13 +363,6 @@ input[type="range"] {
 	position: relative;
 }
 
-input[type="range"]::-webkit-slider-runnable-track {
-	width: 240px;
-	height: 6px;
-	border-radius: 5px;
-	background: #575757;
-}
-
 input[type="range"]::-webkit-slider-thumb {
 	-webkit-appearance: none;
 	appearance: none;
@@ -378,7 +371,6 @@ input[type="range"]::-webkit-slider-thumb {
 	background: #fff7ae;
 	border-radius: 50%;
 	cursor: pointer;
-	/* margin-top: -5px; */
 	position: relative;
 	box-shadow: none;
 }
@@ -401,6 +393,17 @@ input[type="range"]::-moz-range-progress {
 input[type="range"]::-ms-fill-lower {
 	background: #fff7ae;
 	border-radius: 5px;
+}
+
+datalist {
+	display: flex;
+	justify-content: space-between;
+	color: white;
+	width: 70%;
+}
+
+datalist option {
+	font-size: 0.8rem;
 }
 
 /* ToggleGroup */

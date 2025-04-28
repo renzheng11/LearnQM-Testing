@@ -320,18 +320,11 @@ input[type="range"] {
 	-webkit-appearance: none;
 	width: 240px;
 	height: 6px;
-	background: var(--bgGrey);
+	background: #575757;
 	border-radius: 5px;
 	outline: none;
 	transition: background 0.3s;
 	position: relative;
-}
-
-input[type="range"]::-webkit-slider-runnable-track {
-	width: 240px;
-	height: 6px;
-	border-radius: 5px;
-	background: var(--bgGrey);
 }
 
 input[type="range"]::-webkit-slider-thumb {
@@ -339,10 +332,9 @@ input[type="range"]::-webkit-slider-thumb {
 	appearance: none;
 	width: 20px;
 	height: 20px;
-	background: var(--brand);
+	background: #fff7ae;
 	border-radius: 50%;
 	cursor: pointer;
-	/* margin-top: -5px; */
 	position: relative;
 	box-shadow: none;
 }
@@ -350,21 +342,32 @@ input[type="range"]::-webkit-slider-thumb {
 input[type="range"]::-moz-range-thumb {
 	width: 20px;
 	height: 20px;
-	background: var(--brand);
+	background: #fff7ae;
 	border-radius: 50%;
 	cursor: pointer;
 	box-shadow: none;
 }
 
 input[type="range"]::-moz-range-progress {
-	background: var(--brand);
+	background: #fff7ae;
 	height: 6px;
 	border-radius: 5px;
 }
 
 input[type="range"]::-ms-fill-lower {
-	background: var(--brand);
+	background: #fff7ae;
 	border-radius: 5px;
+}
+
+datalist {
+	display: flex;
+	justify-content: space-between;
+	color: white;
+	width: 70%;
+}
+
+datalist option {
+	font-size: 0.8rem;
 }
 
 .backButton {
