@@ -102,9 +102,10 @@ class Charge {
 		// Return the 'b' value of the element with the x value closest to targetX
 		return closestBValue;
 	}
-
 	draw() {
 		// draw charges in transistor
+
+		let size = 8; // fixed charges
 		if (this.show) {
 			if (this.type == "e") {
 				//electron
@@ -132,49 +133,41 @@ class Charge {
 				//plus sign add electron
 				stroke(255, 60);
 				strokeWeight(5);
-				line(this.x - 10, this.y, this.x + 10, this.y);
-				line(this.x, this.y - 10, this.x, this.y + 10);
+				line(this.x - size, this.y, this.x + size, this.y);
+				line(this.x, this.y - size, this.x, this.y + size);
 				noStroke();
 				strokeWeight(1);
-
-				// fill(...color.pos, 160);
-				// circle(this.x, this.y, 20);
 			} else if (this.type == "mp") {
+				let add = 20;
 				// positive charge in metal
-				stroke(255, 120);
-				strokeWeight(5);
-				line(this.x - 10, this.y, this.x + 10, this.y);
-				line(this.x, this.y - 10, this.x, this.y + 10);
+				stroke(255, 160);
+				strokeWeight(4);
+				line(
+					this.x - size / 1.2,
+					this.y + size / 1.2,
+					this.x + size / 1.2,
+					this.y + size / 1.2
+				);
+				line(this.x, this.y, this.x, this.y + (size * 2) / 1.2); // up and down
 				noStroke();
-
-				// fill(...color.pos, 160);
-				// circle(this.x, this.y, 20);
 			} else if (this.type == "fn") {
 				//plus sign add electron
 				stroke(255, 60);
 				strokeWeight(5);
-				line(this.x - 10, this.y, this.x + 10, this.y);
-				// line(this.x, this.y - 10, this.x, this.y + 10);
+				line(this.x - size, this.y, this.x + size, this.y);
 				noStroke();
 				strokeWeight(1);
 			} else if (this.type == "ge") {
 				// generation effect
 				strokeWeight(1);
-				// fill(...color.electron, this.opacity);
-				// stroke(...color.electron, this.opacity);
 				fill(...color.generation, this.opacity);
 				stroke(...color.generation, this.opacity);
 				ellipse(this.position.x, this.position.y, this.diameter);
 			} else if (this.type == "re" && this.recomDiameter > 0) {
 				// recombination effect
-				// stroke(...color.hole, this.opacity);
-				// fill(...color.hole, this.opacity / 4);
 				stroke(...color.recom, this.opacity);
 				fill(...color.recom, this.opacity / 4);
-				// stroke("fff");
-				// noFill();
 				strokeWeight(1);
-				// ellipse(this.position.x, this.position.y, this.diameter);
 				ellipse(this.position.x, this.position.y, this.recomDiameter);
 			}
 			this.drawOnBand();

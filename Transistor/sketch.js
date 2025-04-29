@@ -534,7 +534,7 @@ function setMetalChargesPositions() {
 	let maxNumMetalCharges = vgChargeMap[1.3];
 	let x = base.x + base.sourceWidth;
 	let y = base.y - base.metalHeight;
-	let distance = (base.width - base.sourceWidth * 2) / maxNumMetalCharges;
+	let distance = (base.width - base.sourceWidth * 2) / maxNumMetalCharges - 0.2; // subtracting small amount to make it fit into box
 
 	for (let i = 1; i <= maxNumMetalCharges; i++) {
 		metalChargesPositions.push({
@@ -1198,7 +1198,7 @@ function resetMetalCharges() {
 		// metal
 		x = getMetalX(metalChargesPositions);
 
-		y = base.y - base.metalHeight * 1.5;
+		y = base.y - base.metalHeight - 14;
 		let newCharge = new Charge(x, y, "mp", chargeID, "g");
 		metalCharges.push(newCharge);
 		chargeID++;
