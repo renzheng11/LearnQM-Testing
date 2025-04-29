@@ -140,16 +140,6 @@ const base = {
 			x: dim.x + dim.width - dim.sourceWidth / 2,
 			y: dim.y - dim.metalHeight,
 		},
-
-		// vgLeft: [dim.x + dim.sourceWidth / 2, dim.vgY], // corner
-		// vgRight: [dim.x + 420, dim.vgY], // corner
-		// topMetal: [dim.x + 420, dim.y - dim.metalHeight * 2 + 16],
-		// vdLeft: [dim.x + dim.sourceWidth / 2, dim.vdY],
-		// vdRight: [dim.x + dim.width - dim.sourceWidth / 2, dim.vdY],
-		// rightMetal: [
-		// 	dim.x + dim.width - dim.sourceWidth / 2,
-		// 	dim.y - dim.metalHeight,
-		// ],
 	},
 
 	efXMin: dim.x + 150.4,
@@ -188,6 +178,9 @@ let botzDistribution = [];
 let scatterCount = 20; // count down to next scatter
 let scatterInterval;
 let willScatter;
+
+let initHoleCount = 200; // initial hole count at beginning of scene
+let initElectronCount = 100; // source and drain each
 
 // [vars] Effects for generation & recombination ===============================================
 
@@ -241,11 +234,21 @@ let vgLoopOn = false; // toggles vg battery electron transfer
 let vdLoopOn = true; // toggles vd battery electron transfer
 let vgLoopAnimated = true;
 
+// maps actual vg amount to vg to # electrons animated on the screen
+let vgChargeMap = {
+	0.0: 0,
+	0.5: 8,
+	1.0: 16,
+	1.3: 20,
+};
+
+let metalChargesPositions = [];
+
 let triedVDChange = 0; // if user has used vd slider at least once in scene 1
 
 let vgLoopDirection = 0; // left - pos to neg
-let showMetalPosCharges = false; // show positive charges on gate
-let metalPosCharges = []; // positive charges on gate when vg battery is on
+let showmetalCharges = false; // show positive charges on gate
+let metalCharges = []; // positive charges on gate when vg battery is on
 
 let dis1 = base.wire.leftMetal.y - base.wire.vdLeft.y; // left wire
 let dis2 = base.wire.vdRight.x - base.wire.vdLeft.x; // middle wire
@@ -270,18 +273,13 @@ let bandScale = 1; // change the verticle distribution scale of band diagram
 let electronBand = []; // graph negative line
 let holeBand = []; // graph green line
 
-// let electronBand_data = new Array(100).fill(0);
-// let holeBand_data = [];
-// let holeBand_data_indice = [];
-// let holeBand_v1 = []; //for json data v_data_1.json store green line data
-// let electronBand_v1 = []; //for json data v_data_1.json store negative line data
-// let holeBand_data_v1 = []; //for json data v_data_1.json store green line data
-// let electronBand_data_v1 = []; //for json data v_data_1.json store negative line data
-
 // Data for electric field ============================================================
 let efGrid = efGrid_vd00_vg00;
 let hoverColumn = 0;
 let EFData = [];
+
+let graphMode = "both"; // graph ef in x direction, ef in y direction, or both (selected by ToggleGroup)
+let scaleGraphOn = true;
 
 /**
  * Default text style
@@ -305,7 +303,6 @@ let bandData = band_vd00_vg00; //current array displayibg
 // Updating Functions ============================================================
 
 function setup() {
-	// accessGrid();
 	sx = windowWidth / scale_x;
 	sy = windowHeight / scale_y;
 	canvas = createCanvas(windowWidth / 2 + 200, windowHeight);
@@ -313,10 +310,7 @@ function setup() {
 	context = canvas.drawingContext;
 	frameRate(10);
 	scaleWindow();
-
-	// reset all variables
 	resetScene();
-
 	batteryPosOff = loadImage("batteryPosOff.png");
 	batteryNegOff = loadImage("batteryNegOff.png");
 	batteryPosOn = loadImage("batteryPosOn.png");
@@ -338,7 +332,6 @@ function scaleToWindow() {
 function draw() {
 	if (sceneCount >= 1) {
 		scaleToWindow();
-
 		scale(sx);
 		background(...color.bg);
 
@@ -350,9 +343,103 @@ function draw() {
 			drawBandDiagram();
 			drawGraph();
 			updateWireElectrons();
-			drawMetalPosCharges();
+			drawmetalCharges();
 			drawBandDiagram();
 		}
+	}
+
+	stabilizeChargeCount();
+}
+
+function stabilizeChargeCount() {
+	// stabilize hole count =======================================================================================
+	// constantly count number of holes in transistor
+	// if number dips lower than original amount, bring some holes from bottom metal into transistor (create new holes to represent existing holes)
+
+	// clean out holes that are below transistor - for code performance
+	for (let index = 0; index < holes.length; index++) {
+		const hole = holes[index];
+		let buffer = 50; // allow holes to leave first before getting spliced, allows code in charge.js that brings hole back up for each hole that leaves transistor
+		if (hole.position.y > base.endY + buffer) {
+			holes.splice(index, 1);
+		}
+	}
+
+	// count number of holes
+	let numHolesInTransistor = holes.filter(
+		(hole) => hole.position.y < base.endY
+	).length; // currently stabilizes around 215
+
+	// if hole count drops below original hole count, bring some holes from bottom metal
+	if (numHolesInTransistor < initHoleCount) {
+		var newCharge = new Charge(
+			random(base.x, base.endX),
+			base.endY,
+			"h",
+			chargeID,
+			"g"
+		);
+		newCharge.direction = createVector(random(-1, 1), -1);
+		// newCharge.movingVelocity = this.movingVelocity;
+		newCharge.velocity = createVector(0, -10);
+		newCharge.botz =
+			botzDistribution[Math.floor(Math.random() * botzDistribution.length)];
+		newCharge.chargeCreated = true;
+		chargeID++;
+		holes.push(newCharge);
+	}
+	// stabilize electron count =======================================================================================
+
+	// constantly count number of electrons in source / drain
+	// if number dips lower than original amount, bring some electrons from left / right metal into source / drain (create new electrons to represent existing electrons)
+
+	// SOURCE
+	// count number of electrons
+	let numElectronsInSource = electrons.filter(
+		(electron) => electron.position.x < base.sourceEndX
+	).length; // currently stabilizes around ??
+
+	if (numElectronsInSource < initElectronCount) {
+		var newCharge = new Charge(
+			random(base.x, base.sourceEndX),
+			base.y,
+			"e",
+			chargeID,
+			"g"
+		);
+		newCharge.direction = createVector(random(-1, 1), 1);
+		// newCharge.movingVelocity = this.movingVelocity;
+		newCharge.velocity = createVector(0, 10);
+		newCharge.botz =
+			botzDistribution[Math.floor(Math.random() * botzDistribution.length)];
+		newCharge.chargeCreated = true;
+		chargeID++;
+		electrons.push(newCharge);
+	}
+
+	// DRAIN
+	// SOURCE
+	// count number of electrons
+	let numElectronsInDrain = electrons.filter(
+		(electron) => electron.position.x > base.drainX
+	).length; // currently stabilizes around ??
+
+	if (numElectronsInDrain < initElectronCount) {
+		var newCharge = new Charge(
+			random(base.drainX, base.drainEndX),
+			base.y,
+			"e",
+			chargeID,
+			"g"
+		);
+		newCharge.direction = createVector(random(-1, 1), 1);
+		// newCharge.movingVelocity = this.movingVelocity;
+		newCharge.velocity = createVector(0, 10);
+		newCharge.botz =
+			botzDistribution[Math.floor(Math.random() * botzDistribution.length)];
+		newCharge.chargeCreated = true;
+		chargeID++;
+		electrons.push(newCharge);
 	}
 }
 
@@ -381,8 +468,8 @@ function resetScene() {
 	recomTempElectrons = [];
 	recomTempHoles = [];
 
-	metalPosCharges = [];
-	showMetalPosCharges = false;
+	metalCharges = [];
+	showmetalCharges = false;
 	vdOn = false;
 	vgCharge = 0;
 	vdCharge = 0;
@@ -404,6 +491,7 @@ function resetScene() {
 	initCharges();
 	updateBotz();
 	setIntervals();
+	setMetalChargesPositions();
 
 	if (sceneCount != 2) {
 		resetVDLoop();
@@ -428,6 +516,32 @@ function resetScene() {
 		}
 	}
 	toggleChargeSliders("on");
+
+	// reset scale graph toggle
+	scaleGraphOn = true;
+	let scaleGraphToggle = document.querySelector(`#scaleGraphToggle`);
+	scaleGraphToggle.checked = true;
+
+	// reset toggleGroup and graphMode to both x & y
+	graphMode = "both";
+	let toggleGroup = document.querySelector(`#toggleBoth`);
+	toggleGroup.checked = true;
+}
+
+function setMetalChargesPositions() {
+	// define set of equidistant positions within top metal for positive charges when VG is applied
+	metalChargesPositions = [];
+	let maxNumMetalCharges = vgChargeMap[1.3];
+	let x = base.x + base.sourceWidth;
+	let y = base.y - base.metalHeight;
+	let distance = (base.width - base.sourceWidth * 2) / maxNumMetalCharges;
+
+	for (let i = 1; i <= maxNumMetalCharges; i++) {
+		metalChargesPositions.push({
+			x: x + i * distance - 6,
+			taken: false,
+		});
+	}
 }
 
 // Updating Functions ============================================================
@@ -452,10 +566,9 @@ function resetVGLoop(direction) {
 }
 
 function initCharges() {
-	let holeCount = 200;
-	let fixedNegCharges = holeCount / 2;
-	let electronCount = 100; // source and drain each
-	let fixedPosCharges = electronCount / 2;
+	let fixedNegCharges = initHoleCount / 2;
+
+	let fixedPosCharges = initElectronCount / 2;
 
 	let buffer = 12; // draw inside box borders
 
@@ -490,7 +603,7 @@ function initCharges() {
 	}
 
 	// initiate substrate holes
-	for (let i = 0; i < holeCount; i++) {
+	for (let i = 0; i < initHoleCount; i++) {
 		// regenerate position if in source OR drain
 		let x = 0;
 		let y = 0;
@@ -509,7 +622,7 @@ function initCharges() {
 		chargeID++;
 	}
 
-	for (let i = 0; i < electronCount; i++) {
+	for (let i = 0; i < initElectronCount; i++) {
 		// initiate source electrons
 		let x = random(base.x + buffer, base.x + base.sourceWidth - buffer);
 		let y = random(base.y + buffer, base.y + base.sourceHeight - buffer);
@@ -692,31 +805,6 @@ function recom(electrons, holes) {
 				recomTempHoles.push(
 					new Charge(holes[k].position.x, holes[k].position.y, "th", recomCount)
 				);
-				// recomEffectsPositions[recomCount] = p5.Vector.div(
-				// 	p5.Vector.add(holes[k].position, electrons[i].position),
-				// 	2
-				// );
-
-				// //effects
-
-				// recomEffects[recomCount] = new Charge(
-				// 	recomEffectsPositions[recomCount].x,
-				// 	recomEffectsPositions[recomCount].y,
-				// 	"re",
-				// 	recomCount
-				// );
-				// recomTempElectrons[recomCount] = new Charge(
-				// 	electrons[i].position.x,
-				// 	electrons[i].position.y,
-				// 	"te",
-				// 	recomCount
-				// );
-				// recomTempHoles[recomCount] = new Charge(
-				// 	holes[k].position.x,
-				// 	holes[k].position.y,
-				// 	"th",
-				// 	recomCount
-				// );
 
 				recomCount++;
 
@@ -805,14 +893,15 @@ function resetVGLoopPositions() {
 }
 
 function animateVGLoop() {
-	showMetalPosCharges = true;
+	showmetalCharges = true;
 
 	// draw new metal pos charges if any
 	for (let i = 0; i < addToMetalCharges; i++) {
-		x = random(base.x + base.sourceWidth, base.endX - base.sourceWidth);
+		// x = random(base.x + base.sourceWidth, base.endX - base.sourceWidth);
+		x = getMetalX(metalChargesPositions);
 		y = base.y - base.metalHeight * 1.5;
 		let newCharge = new Charge(x, y, "mp", chargeID, "g");
-		metalPosCharges.push(newCharge);
+		metalCharges.push(newCharge);
 		chargeID++;
 		addToMetalCharges -= 1;
 	}
@@ -865,7 +954,8 @@ function animateVGLoop() {
 			if (i == vgLoop.length - 1) {
 				// remove from metal charges the difference in charge amount
 				for (let i = 0; i < removeFromMetalCharges; i++) {
-					metalPosCharges.pop();
+					let popped = metalCharges.pop();
+					releaseMetalPosition(metalChargesPositions, popped.x);
 					removeFromMetalCharges -= 1;
 				}
 
@@ -891,11 +981,11 @@ function animateVGLoop() {
 	}
 }
 
-function drawMetalPosCharges() {
+function drawmetalCharges() {
 	// draw pos charges in top metal
-	if (showMetalPosCharges) {
-		for (let i = 0; i < metalPosCharges.length; i++) {
-			metalPosCharges[i].draw();
+	if (showmetalCharges) {
+		for (let i = 0; i < metalCharges.length; i++) {
+			metalCharges[i].draw();
 		}
 	}
 }
@@ -1099,19 +1189,46 @@ function resetVDLoop() {
 }
 
 function resetMetalCharges() {
-	metalPosCharges = [];
+	metalCharges = [];
 	for (let i = 0; i < vgChargeScreen; i++) {
 		let x = base.wire.vgRight.x;
 		let y = base.wire.leftMetal.y + i * 50;
 		vgLoop.push(new wireCharge(x, y, "vd"));
 
 		// metal
-		x = random(base.x + base.sourceWidth, base.endX - base.sourceWidth);
+		x = getMetalX(metalChargesPositions);
+
 		y = base.y - base.metalHeight * 1.5;
 		let newCharge = new Charge(x, y, "mp", chargeID, "g");
-		metalPosCharges.push(newCharge);
+		metalCharges.push(newCharge);
 		chargeID++;
 	}
+}
+
+function getMetalX(arr) {
+	// gets random available x position within the metal
+	const availableIndices = arr
+		.map((item, index) => (!item.taken ? index : null))
+		.filter((index) => index !== null);
+
+	if (availableIndices.length === 0) {
+		return null; // or throw an error if all are taken
+	}
+
+	const randomIndex =
+		availableIndices[Math.floor(Math.random() * availableIndices.length)];
+	arr[randomIndex].taken = true;
+	return arr[randomIndex].x;
+}
+
+function releaseMetalPosition(arr, x) {
+	// mark the position in metal as open again
+	const item = arr.find((obj) => obj.x === x);
+	if (item) {
+		item.taken = false;
+		return true; // success
+	}
+	return false; // not found
 }
 
 function updateVG(value) {
@@ -1124,14 +1241,6 @@ function updateVG(value) {
 	let valueToChargeMap = [0.0, 0.5, 1.0, 1.3];
 	vgCharge = valueToChargeMap[value];
 	updateProfile(vdCharge, vgCharge);
-
-	// maps actual vg amount to vg to # electrons animated on the screen
-	let vgChargeMap = {
-		0.0: 0,
-		0.5: 8,
-		1.0: 16,
-		1.3: 20,
-	};
 
 	vgChargeScreen = vgChargeMap[vgCharge];
 
@@ -1666,6 +1775,15 @@ function updateHoverColumn(x) {
 	hoverColumn = Math.floor(x / 10);
 }
 
+function switchGraphMode(mode) {
+	graphMode = mode;
+}
+
+function toggleScaleGraph() {
+	scaleGraphOn = !scaleGraphOn;
+	console.log(scaleGraphOn);
+}
+
 function drawGraph() {
 	// variables for dynamic axes based on highest peak of efx or efy
 	let efPeak = 0; // highest peak of ef
@@ -1677,9 +1795,6 @@ function drawGraph() {
 
 	let mouseInTransistor =
 		mouseX / sx > base.x && mouseX / sx - base.x < base.width; // is mouse being hovered over transistor
-
-	let peakX = 0;
-	let peakY = 0;
 
 	getPeak();
 	drawAxes();
@@ -1706,6 +1821,7 @@ function drawGraph() {
 		noFill();
 		stroke(...color.graph, 220);
 		strokeWeight(1);
+		textSize(12);
 
 		// graph y axis
 		line(base.graphX, base.graphY - base.metalHeight, base.graphX, base.endY);
@@ -1727,16 +1843,6 @@ function drawGraph() {
 
 		noStroke();
 		fill(...color.graph);
-		textSize(10);
-
-		// x-axis
-		// stroke("red");
-		// line(
-		// 	base.graphX + 100,
-		// 	base.graphY,
-		// 	base.graphX + 100,
-		// 	base.graphY + base.height
-		// ); // graphMaxX
 
 		noFill();
 		stroke(...color.graph, 180);
@@ -1779,8 +1885,14 @@ function drawGraph() {
 	function drawXTicks() {
 		// draws a discrete range of x values based on max range
 
-		textSize(10);
-		let xUnit = " V/cm";
+		// draw unit
+		textSize(12);
+		noStroke();
+		fill(...color.graph);
+		text("V/cm", base.graphX + graphMaxX, base.graphY + 30);
+
+		// draw ticks
+
 		for (let i = 1; i <= numTicks; i++) {
 			let distanceBetween = graphMaxX / numTicks;
 			let x = base.graphX + i * distanceBetween; // EDIT!!
@@ -1792,7 +1904,7 @@ function drawGraph() {
 
 				noStroke();
 				fill(...color.graph);
-				text(`${i * xTickMultiplier}`, x, y + 12); // \u00B5m
+				text(`${i * xTickMultiplier}`, x, y + 16); // \u00B5m
 			}
 		}
 
@@ -1806,70 +1918,43 @@ function drawGraph() {
 
 				noStroke();
 				fill(...color.graph);
-				text(`-${i * xTickMultiplier}`, x, y + 12); // \u00B5m
+				text(`-${i * xTickMultiplier}`, x, y + 16); // \u00B5m
 			}
-
-			// if (i == numTicks - 1) {
-			// 	text(`-${i * xTickMultiplier} V/cm`, x, y + 12); // \u00B5m
-			// }
 		}
 	}
 
 	function getPeak() {
-		console.log(hoverColumn);
-		// get highest peak of efx or efy data
-		for (let row = 0; row < efGrid.length; row++) {
-			// for every row, plot efy at specific col
-			// let efy = efGrid[row][hoverColumn].efy;
-			let efx = efGrid[row][hoverColumn].efx;
-			// if (Math.abs(efy) > Math.abs(peakY)) {
-			// 	peakY = Math.abs(efy);
-			// }
-			if (Math.abs(efx) > Math.abs(peakX)) {
-				peakX = Math.abs(efx);
+		if (scaleGraphOn) {
+			// get highest peak of efx or efy data
+			for (let row = 0; row < efGrid.length; row++) {
+				// for every row, plot efy at specific col
+				let efy = efGrid[row][hoverColumn].efy;
+				let efx = efGrid[row][hoverColumn].efx;
+
+				if (
+					Math.abs(efy) > Math.abs(efPeak) &&
+					(graphMode == "y" || graphMode == "both")
+				) {
+					efPeak = Math.abs(efy);
+				}
+				if (
+					Math.abs(efx) > Math.abs(efPeak) &&
+					(graphMode == "x" || graphMode == "both")
+				) {
+					efPeak = Math.abs(efx);
+				}
 			}
-			// if (Math.abs(efy) > Math.abs(efPeak)) {
-			// 	efPeak = Math.abs(efy);
-			// }
-			if (Math.abs(efx) > Math.abs(efPeak)) {
-				efPeak = Math.abs(efx);
-			}
+		} else {
+			// if scaleGraphOn is set to false - set default efPeak to highest possible efPeak
+			efPeak = 50000;
 		}
 	}
 
 	function drawEFData() {
+		// draw graph legend labels
 		styleText();
 
-		let efxLabel = { x: 26, y: 230 };
-		let efyLabel = { x: 26, y: 260 };
-
-		text(
-			"Electric field (kV) in x direction" + `-- (${peakX})`,
-			efxLabel.x + 120,
-			efxLabel.y + 6
-		);
-		text(
-			"Electric field (kV) in y direction" + `-- (${peakY})`,
-			efyLabel.x + 120,
-			efyLabel.y + 6
-		);
-
-		stroke("white");
-		// draw efx label
-		fill(...color.efx, 160);
-		circle(efxLabel.x, efxLabel.y, 20);
-
-		// draw efy label
-		fill(...color.efy, 160);
-		circle(efyLabel.x, efyLabel.y, 20);
-
-		// draw efx data
-		stroke("white");
-		fill(...color.efx, 160);
-
 		// set scale
-		// graphScale = efPeak / graphScale;
-
 		graphScale = efPeak / graphMaxX; // divisor is pixel value beyond x axis where max will be drawn
 		// get percentage of ef max compared to discrete range max
 		let percent = efPeak / 1000 / maxRange; // percentage good
@@ -1877,45 +1962,72 @@ function drawGraph() {
 		// scale graphscale by percentage to graph at percentage
 		graphScale = graphScale / percent;
 
-		// draw efx data
-		beginShape();
+		// graph ef in x direction
+		if (graphMode == "x" || graphMode == "both") {
+			let efxLabel = { x: 26, y: 230 };
+			styleText();
+			text("Electric field in x direction", efxLabel.x + 90, efxLabel.y + 5);
+			stroke("white");
+			// draw efx label
+			fill(...color.efx, 160);
+			circle(efxLabel.x, efxLabel.y, 20);
 
-		vertex(base.graphX, base.graphY);
+			// draw efx data
+			stroke("white");
+			fill(...color.efx, 160);
 
-		for (let row = 0; row < efGrid.length; row++) {
-			// for every row, plot efx at specific col
-			let efx = efGrid[row][hoverColumn].efx;
+			// draw efx data
+			beginShape();
 
-			let y = base.graphY + (base.height * row) / 32; // plot over y of transistor
-			let x = base.graphX + efx / graphScale;
+			vertex(base.graphX, base.graphY);
 
-			if (x < base.graphX + graphMaxX + 12) {
-				// condition prevents plotting when ef still scaling (happens when mouse hovers too fast)
-				vertex(x, y);
+			for (let row = 0; row < efGrid.length; row++) {
+				// for every row, plot efx at specific col
+				let efx = efGrid[row][hoverColumn].efx;
+
+				let y = base.graphY + (base.height * row) / 32; // plot over y of transistor
+				let x = base.graphX + efx / graphScale;
+
+				if (x < base.graphX + graphMaxX + 12) {
+					// condition prevents plotting when ef still scaling (happens when mouse hovers too fast)
+					vertex(x, y);
+				}
 			}
+			vertex(base.graphX, base.graphY + base.height);
+			endShape();
 		}
-		vertex(base.graphX, base.graphY + base.height);
-		endShape();
 
-		// draw efy data
-		// stroke("white");
-		// fill(...color.efy, 160);
-		// beginShape();
-		// vertex(base.graphX, base.graphY);
-		// for (let row = 0; row < efGrid.length; row++) {
-		// 	// for every row, plot efy at specific col
-		// 	let efy = efGrid[row][hoverColumn].efy;
+		// graph ef in y direction
+		if (graphMode == "y" || graphMode == "both") {
+			let efyLabel = { x: 26, y: 260 };
+			styleText();
+			text("Electric field in y direction", efyLabel.x + 90, efyLabel.y + 5);
 
-		// 	let y = base.graphY + (base.height * row) / 32;
-		// 	let x = base.graphX + efy / graphScale;
-		// 	if (x < base.graphX + graphMaxX + 12) {
-		// 		vertex(x, y);
-		// 	}
-		// }
+			// draw efy label
+			stroke("white");
+			fill(...color.efy, 160);
+			circle(efyLabel.x, efyLabel.y, 20);
 
-		// vertex(base.graphX, base.graphY + base.height);
+			// draw efy data
+			stroke("white");
+			fill(...color.efy, 160);
+			beginShape();
+			vertex(base.graphX, base.graphY);
+			for (let row = 0; row < efGrid.length; row++) {
+				// for every row, plot efy at specific col
+				let efy = efGrid[row][hoverColumn].efy;
 
-		// endShape();
+				let y = base.graphY + (base.height * row) / 32;
+				let x = base.graphX + efy / graphScale;
+				if (x < base.graphX + graphMaxX + 12) {
+					vertex(x, y);
+				}
+			}
+
+			vertex(base.graphX, base.graphY + base.height);
+
+			endShape();
+		}
 	}
 }
 
@@ -1935,16 +2047,16 @@ function drawBandDiagram() {
 	// Ec label
 	fill(...color.electron);
 	textSize(eTextSize);
-	text("E", 920, 75);
+	text("E", 900, 66);
 	textSize(subscriptTextSize);
-	text("c", 920 + subscriptAddX, 75 + subscriptAddY);
+	text("c", 900 + subscriptAddX, 66 + subscriptAddY);
 
 	// Ev label
 	fill(...color.hole);
 	textSize(eTextSize);
-	text("E", 920, 118);
+	text("E", 900, 106);
 	textSize(subscriptTextSize);
-	text("v", 920 + subscriptAddX, 118 + subscriptAddY);
+	text("v", 900 + subscriptAddX, 106 + subscriptAddY);
 
 	textSize(12);
 

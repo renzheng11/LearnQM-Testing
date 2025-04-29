@@ -105,6 +105,8 @@ class Charge {
 
 	draw() {
 		// draw charges in transistor
+
+		let size = 8; // fixed charges
 		if (this.show) {
 			if (this.type == "e") {
 				//electron
@@ -132,49 +134,41 @@ class Charge {
 				//plus sign add electron
 				stroke(255, 60);
 				strokeWeight(5);
-				line(this.x - 10, this.y, this.x + 10, this.y);
-				line(this.x, this.y - 10, this.x, this.y + 10);
+				line(this.x - size, this.y, this.x + size, this.y);
+				line(this.x, this.y - size, this.x, this.y + size);
 				noStroke();
 				strokeWeight(1);
-
-				// fill(...color.pos, 160);
-				// circle(this.x, this.y, 20);
 			} else if (this.type == "mp") {
+				let add = 20;
 				// positive charge in metal
-				stroke(255, 120);
-				strokeWeight(5);
-				line(this.x - 10, this.y, this.x + 10, this.y);
-				line(this.x, this.y - 10, this.x, this.y + 10);
+				stroke(255, 160);
+				strokeWeight(4);
+				line(
+					this.x - size / 1.2,
+					this.y + size / 1.2,
+					this.x + size / 1.2,
+					this.y + size / 1.2
+				);
+				line(this.x, this.y, this.x, this.y + (size * 2) / 1.2); // up and down
 				noStroke();
-
-				// fill(...color.pos, 160);
-				// circle(this.x, this.y, 20);
 			} else if (this.type == "fn") {
 				//plus sign add electron
 				stroke(255, 60);
 				strokeWeight(5);
-				line(this.x - 10, this.y, this.x + 10, this.y);
-				// line(this.x, this.y - 10, this.x, this.y + 10);
+				line(this.x - size, this.y, this.x + size, this.y);
 				noStroke();
 				strokeWeight(1);
 			} else if (this.type == "ge") {
 				// generation effect
 				strokeWeight(1);
-				// fill(...color.electron, this.opacity);
-				// stroke(...color.electron, this.opacity);
 				fill(...color.generation, this.opacity);
 				stroke(...color.generation, this.opacity);
 				ellipse(this.position.x, this.position.y, this.diameter);
 			} else if (this.type == "re" && this.recomDiameter > 0) {
 				// recombination effect
-				// stroke(...color.hole, this.opacity);
-				// fill(...color.hole, this.opacity / 4);
 				stroke(...color.recom, this.opacity);
 				fill(...color.recom, this.opacity / 4);
-				// stroke("fff");
-				// noFill();
 				strokeWeight(1);
-				// ellipse(this.position.x, this.position.y, this.diameter);
 				ellipse(this.position.x, this.position.y, this.recomDiameter);
 			}
 			this.drawOnBand();
@@ -326,6 +320,17 @@ class Charge {
 				this.position.y += 8;
 			} else if (this.position.x > base.drainX) {
 				// if vd on & vg voltage is large enough
+				// !!! need to revise vgCharge
+
+				// let mapCharge = {
+				// 	0: 0
+				// 	0.5
+				// 	1.0
+				// 	1.2
+				// 	2
+				// 	5
+				// 	6
+				// };
 
 				let vdFlowConditions = [
 					vdCharge == 0.1 && vgCharge == 1.0, // 0
@@ -363,7 +368,15 @@ class Charge {
 					this.moveToSource();
 				} else if (vdFlowConditions[5] && vdFlowProb[5]) {
 					this.moveToSource();
-				} else {
+				}
+				// if (vdOn && vdCharge > 0 && Math.random() * 10 < 5) {
+				// 	// if (vdOn && vgCharge > 3 && Math.random() * 10 < 5) {
+				// 	// electrons that go out of top of drain goes through
+				// 	// move position to top of source +
+				// 	this.position.x -= base.width - base.sourceWidth;
+				// 	this.velocity.y = -this.velocity.y;
+				// }
+				else {
 					// bounce off top of drain
 					this.velocity.y = -this.velocity.y;
 					this.position.y += 8;
@@ -371,12 +384,11 @@ class Charge {
 			}
 		}
 
-		// Bottom
+		// Move in and out of metal on bottom
 		if (this.position.y > base.endY) {
 			this.direction.y = 10;
 			this.show = 0;
 
-			// if holes leave the bottom into the metal, bring some back to keep the number of holes consistent (create new charges that represent existing charges coming from metal)
 			if (this.type == "h" && !this.chargeCreated) {
 				// holes
 				var newCharge = new Charge(
@@ -393,6 +405,22 @@ class Charge {
 				this.chargeCreated = true;
 				chargeID++;
 				holes.push(newCharge);
+			} else if (this.type == "e" && !this.chargeCreated) {
+				// electrons
+				var newCharge = new Charge(
+					random(base.x, base.endX),
+					base.endY,
+					"e",
+					chargeID,
+					"g"
+				);
+				newCharge.direction = createVector(random(-1, 1), -1);
+				newCharge.movingVelocity = this.movingVelocity;
+				newCharge.velocity = createVector(0, -10);
+				newCharge.botz = this.botz;
+				this.chargeCreated = true;
+				chargeID++;
+				electrons.push(newCharge);
 			}
 		}
 
@@ -445,98 +473,99 @@ class Charge {
 			let row = Math.floor(y / 10); // 7 - 7th row
 			let col = Math.floor(x / 10); // 3.5 - round up = 4th row
 
-			Ey = efGrid[row][col].efy / 2;
-			if (Ey < 6000) {
-				Ey = 0;
-			} else {
-				Ey = Ey / 100000;
-			}
-
 			// CHANGE PROFILE - change name of efGrid
 			Ex = efGrid[row][col].efx;
-
 			if (Ex < 3000 && Ex > -3000) {
 				Ex = 0;
 			} else {
 				Ex = Ex / 100000;
 			}
 
-			if (row < 5) {
-				Ex = efGrid[0][col].efx;
-				Ex = Ex / 100000;
+			Ey = efGrid[row][col].efy / 2;
+			if (Ey < 6000) {
+				Ey = 0;
+			} else {
+				Ey = Ey / 100000;
 			}
-			if (vgCharge == 1.3) {
-				if (vdCharge == 0) {
-					if (col > 8 && col < 32 && row < 3) {
-						Ex = -0.01;
-					}
-					if (col > 33 && col < 57 && row < 3) {
-						Ex = 0.01;
-					}
-				}
-
-				if (vdCharge == 0.1) {
-					if (Ex > 0 && row < 3) {
-						Ex = -Ex;
-					}
-					if (row < 3) {
-						Ex = 3 * Ex;
-					}
-					if (col > 3 && col < 14 && row < 5) {
-						Ex = -0.1;
-					}
-				}
-
-				if (vdCharge == 0.3) {
-					if (Ex > 0 && row < 3) {
-						Ex = -Ex;
-					}
-					if (row < 3) {
-						Ex = 3 * Ex;
-					}
-					if (col > 3 && col < 14 && row < 5) {
-						Ex = -0.1;
-					}
-				}
-
-				if (vdCharge == 1) {
-					if (Ex > 0 && row < 3) {
-						Ex = -Ex;
-					}
-					if (row < 3) {
-						Ex = 3 * Ex;
-					}
-					if (col > 3 && col < 14 && row < 5) {
-						Ex = -0.1;
-					}
-					if (
-						this.type == "h" &&
-						col < 49 - 0.3 * row &&
-						col > 46 - 0.3 * row
-					) {
-						Ex = 0.5;
-						Ey = -0.5;
-					}
-				}
-			}
-			// Ey = efGrid[row][col].efy / 2;
-			// if (Ey < 6000) {
-			// 	Ey = 0;
-			// } else {
-			// 	Ey = Ey / 100000;
-			// }
 		} else {
 			Ex = 0;
 			Ey = 0;
 		}
 		let col = Math.floor((640 - 120) / 10);
 
+		// if (x > 140 && x < 180 && y < 160) {Ex=0.5;}
+		// if (y > 140 && y < 180 && x < 160) {Ey=0.5;}
+		// ==================================================================================================
+
+		// let Ex = 0;
+		// let Ey = 0;
+
+		// // --- SOURCE electric field ---
+		// // check if in x
+		// if (
+		// 	this.position.x > base.ef.source.xMin &&
+		// 	this.position.x < base.ef.source.xMax
+		// ) {
+		// 	// check in y
+		// 	if (this.position.y < base.ef.source.yMax) {
+		// 		// in EF zone
+		// 		let xDistance = Math.abs(this.position.x - base.sourceEndX);
+		// 		// let xDistance = this.position.x - base.x;
+		// 		Ex = xDistance * 160;
+		// 	}
+		// }
+
+		// // check if in y
+		// else if (
+		// 	this.position.y > base.ef.source.yMin &&
+		// 	this.position.y < base.ef.source.yMax
+		// ) {
+		// 	// check if in x
+		// 	if (this.position.x < base.ef.source.xMax) {
+		// 		// in EF zone
+		// 		let yDistance = Math.abs(this.position.y - base.sourceEndY);
+		// 		Ey = yDistance * 160;
+		// 	}
+		// }
+
+		// // --- DRAIN electric field ---
+		// // check if in x
+		// if (
+		// 	this.position.x > base.ef.drain.xMin &&
+		// 	this.position.x < base.ef.drain.xMax
+		// ) {
+		// 	// check in y
+		// 	if (this.position.y < base.ef.drain.yMax) {
+		// 		// in EF zone
+		// 		// let xDistance = this.position.x - base.x;
+		// 		let xDistance = Math.abs(base.drainX - this.position.x);
+		// 		Ex = -xDistance * 160;
+		// 	}
+		// }
+		// // check if in y
+		// else if (
+		// 	this.position.y > base.ef.drain.yMin &&
+		// 	this.position.y < base.ef.drain.yMax
+		// ) {
+		// 	// check if x
+		// 	if (this.position.x > base.ef.drain.xMin) {
+		// 		// in EF zone
+		// 		let yDistance = Math.abs(this.position.y - base.sourceEndY);
+		// 		Ey = yDistance * 160;
+		// 	}
+		// }
+
+		// NOT IN EF
+		// else {
+		// 	this.diameter = 10;
+		// }
+
 		//We need to multpliy the elctric feild by a constant to convert it to accelration on our screen. We need to find the value with trial and error. For now I just use a factor of 5.
 
 		let randomXdirection = createVector(random(-1, 1), 1);
 		let randomYdirection = createVector(1, random(-1, 1));
 
-		let accelFactor = 5; ////It might be better to make it a global variable that we define. We can do that later.
+		let accelFactor = 6; ////It might be better to make it a global variable that we define. We can do that later.
 		this.accel.x = Ex * accelFactor;
 		this.accel.y = Ey * accelFactor;
 
@@ -544,12 +573,6 @@ class Charge {
 			//if an electron, accel in in the opposite direction of the electric field.
 			this.accel.x = -this.accel.x;
 			this.accel.y = -this.accel.y;
-		}
-
-		if (this.type == "h") {
-			//if an electron, accel in in the opposite direction of the electric field.
-			this.accel.x = this.accel.x / 10;
-			this.accel.y = this.accel.y;
 		}
 
 		this.velocity.add(this.accel);

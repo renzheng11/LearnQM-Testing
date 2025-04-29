@@ -124,12 +124,11 @@
 					<h1>Scene 1 [VD]</h1>
 
 					<p>
-						Try applying a charge to VD Sunt deserunt officia tempor
-						reprehenderit minim aliqua quis nulla ut incididunt irure veniam
-						aliqua anim amet. Occaecat dolor ea ullamco id tempor commodo dolor
-						eiusmod enim nulla nostrud voluptate. Pariatur aliqua voluptate ad.
-						Esse fugiat ut anim nulla proident. Ea velit nostrud nulla do
-						voluptate reprehenderit ad nulla.
+						Try applying a charge.
+						<span class="highlight">
+							Hover over the transistor to see electric field at the given x
+							position.
+						</span>
 					</p>
 
 					<br /><br />
@@ -168,12 +167,11 @@
 				<div class="col-lg-4">
 					<h1>Scene 2 [VG]</h1>
 					<p>
-						Try applying a charge Sunt deserunt officia tempor reprehenderit
-						minim aliqua quis nulla ut incididunt irure veniam aliqua anim amet.
-						Occaecat dolor ea ullamco id tempor commodo dolor eiusmod enim nulla
-						nostrud voluptate. Pariatur aliqua voluptate ad. Esse fugiat ut anim
-						nulla proident. Ea velit nostrud nulla do voluptate reprehenderit ad
-						nulla.
+						Try applying a charge.
+						<span class="highlight">
+							Hover over the transistor to see electric field at the given x
+							position.
+						</span>
 					</p>
 					<br /><br />
 					<!-- Vg -->
@@ -218,10 +216,11 @@
 				<div class="col-lg-4">
 					<h1>Scene 3 [VD & VG]</h1>
 					<p>
-						Try applying a charge. Hover over the transistor to see electric (in
-						x direction and y direction) field at the x position. Note: The
-						scale is dynamic and changes to fit the highest peak in electric
-						field.
+						Try applying a charge.
+						<span class="highlight">
+							Hover over the transistor to see electric field at the given x
+							position.
+						</span>
 					</p>
 					<br /><br />
 					<!-- Vg -->
@@ -294,7 +293,6 @@
 						<option value="6" label="6"></option>
 					</datalist>
 					<label for="profileSlider" class="labels">Profile (Vd & Vg)</label> -->
-					<br /><br />
 					<button
 						class="button resetButton"
 						type="button"
@@ -302,6 +300,49 @@
 					>
 						Reset
 					</button>
+
+					<p>Graph electric field direction:</p>
+					<div class="ToggleGroup">
+						<input
+							id="toggleX"
+							name="state-d"
+							type="radio"
+							onchange="switchGraphMode('x')"
+						/>
+						<label for="toggleX" onclick="">X</label>
+
+						<input
+							id="toggleY"
+							name="state-d"
+							type="radio"
+							checked=""
+							onchange="switchGraphMode('y')"
+						/>
+						<label for="toggleY" onclick="">Y</label>
+
+						<input
+							id="toggleBoth"
+							name="state-d"
+							type="radio"
+							checked=""
+							onchange="switchGraphMode('both')"
+						/>
+						<label for="toggleBoth" onclick="">X & Y</label>
+
+						<a></a>
+					</div>
+
+					<div class="switchContainer">
+						<label class="switch">
+							<input
+								id="scaleGraphToggle"
+								type="checkbox"
+								onchange="toggleScaleGraph()"
+							/>
+							<span class="handle"></span>
+						</label>
+						<span>Scale graph to highest peak in electric field</span>
+					</div>
 				</div>
 			</div>
 
