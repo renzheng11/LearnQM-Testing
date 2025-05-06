@@ -164,11 +164,18 @@ function updateDopantAmount(value) {
 
 // update number of electrons transferred to other box
 function updateNumTransfer(value) {
+	console.log("initial", value);
+	if (value > -500 && value < 500) {
+		// approx correlates to 0 on slider
+		value = 0;
+		console.log("0");
+	}
 	if (value < 0) {
 		reverse = true;
 	} else {
 		reverse = false;
 	}
+
 	numTransfer = Math.round(value / 555); // ???
 	// if (numTransfer < 0) {
 	// 	numTransfer = 1;

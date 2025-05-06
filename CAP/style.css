@@ -295,7 +295,9 @@ datalist {
 	justify-content: space-between;
 	color: white;
 	width: 70%;
+	margin-left: -6px;
 }
+/*datalist is shifted a little to the left to be accurate to the value*/
 
 datalist option {
 	font-size: 0.8rem;

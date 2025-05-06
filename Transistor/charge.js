@@ -181,25 +181,25 @@ class Charge {
 			// draw electrons on band
 			fill(...color.electron, 160);
 			noStroke();
+			this.bandPosition.y = this.bandOrigin.y - (this.botz * 8.8 * 2 * 0.1) / 3;
 			if (
 				this.bandPosition.y > 10 &&
 				this.position.y < base.y + base.bandThreshold
 			) {
 				ellipse(this.position.x, this.bandPosition.y, 5);
 			}
-			this.bandPosition.y = this.bandOrigin.y - (this.botz * 8.8 * 2 * 0.1) / 3;
 		} else if (this.type == "h") {
 			// draw holes on band
 			noFill();
 			stroke(...color.hole, 160); //
 			strokeWeight(1);
+			this.bandPosition.y = this.bandOrigin.y + (this.botz * 8.8 * 2 * 0.1) / 3;
 			if (
 				this.bandPosition.y > 10 &&
 				this.position.y < base.y + base.bandThreshold
 			) {
 				ellipse(this.position.x, this.bandPosition.y, 5);
 			}
-			this.bandPosition.y = this.bandOrigin.y + (this.botz * 8.8 * 2 * 0.1) / 3;
 		}
 	}
 
@@ -338,7 +338,7 @@ class Charge {
 					Math.random() * 6 < multiplier * 2, // 3 - for flow = 2
 					Math.random() * 6 < multiplier * 5, // 4 - for flow = 5
 					Math.random() * 6 < multiplier * 6, // 5 - for flow = 6
-				];
+				]; // flow = x used old numbers for drain current, but work for visual purposes
 
 				if (vgCharge == 0 || vgCharge == 0.5 || vdCharge == 0) {
 					// no VD flow
@@ -361,6 +361,12 @@ class Charge {
 					this.velocity.y = -this.velocity.y;
 					this.position.y += 8;
 				}
+
+				// temporarily hide it so it doesn't show up on the wrong position on left side of band diagram (takes time to update)
+				this.show = false;
+				setTimeout(() => {
+					this.show = true;
+				}, 200);
 			}
 		}
 
