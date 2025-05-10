@@ -460,7 +460,6 @@ function resetScene() {
 	initCharges();
 	updateBotz();
 	setIntervals();
-	setMetalChargesPositions();
 	updateProfile(vdCharge, vgCharge);
 
 	// reset animations
@@ -866,11 +865,7 @@ function animateVGLoop() {
 		setTimeout(() => {
 			if (i == vgLoop.length - 1) {
 				// remove from metal charges the difference in charge amount
-				for (let i = 0; i < removeFromMetalCharges; i++) {
-					let popped = metalCharges.pop();
-					releaseMetalPosition(metalChargesPositions, popped.x);
-					removeFromMetalCharges -= 1;
-				}
+				resetMetalCharges();
 			}
 			vgLoopAnimated = true;
 			toggleVGSlider("on"); // turn slider back on
@@ -1036,64 +1031,28 @@ function resetVDLoop() {
 	}
 }
 
-function setMetalChargesPositions() {
-	// Function: define set of equidistant positions within top metal for positive charges when VG is applied
-	metalChargesPositions = [];
-	let maxNumMetalCharges = vgChargeMap[1.3];
-	let x = base.x + base.sourceWidth;
-	let distance = (base.width - base.sourceWidth * 2) / maxNumMetalCharges - 0.2; // subtracting small amount to make it fit into box
-
-	for (let i = 1; i <= maxNumMetalCharges; i++) {
-		metalChargesPositions.push({
-			x: x + i * distance - 6,
-			taken: false, // is the position already taken by exisitng metal
-		});
-	}
-}
-
 function resetMetalCharges() {
-	// Function: reset positive charges at gate (above oxide)
-
+	// Function: reset positive charges positions at gate (above oxide)
+	let numMetalCharges = vgChargeMap[vgCharge];
 	metalCharges = [];
-	for (let i = 0; i < vgChargeScreen; i++) {
+	for (let i = 0; i < numMetalCharges; i++) {
 		// initialize wire electrons
 		let x = base.wire.vgRight.x;
 		let y = base.wire.leftMetal.y + i * 50;
 		vgLoop.push(new wireCharge(x, y, "vd"));
 
-		// initailize positive charges
-		x = getMetalX(metalChargesPositions);
+		// initialize positive charges
+		let metalWidth = base.width - base.sourceWidth / 2;
+		let scaleWidth = 1.78; // tested number to scaleWidth width to fit entire width of metal
+
+		let distance = metalWidth / numMetalCharges / scaleWidth; // get distance between each pos charge
+
+		x = 12 + base.sourceEndX + distance * i; // place at distance apart across metal
 		y = base.y - base.metalHeight - 14;
 		let newCharge = new Charge(x, y, "mp", chargeID, "g");
 		metalCharges.push(newCharge);
 		chargeID++;
 	}
-}
-
-function getMetalX(arr) {
-	// gets random available x position at gate
-	const availableIndices = arr
-		.map((item, index) => (!item.taken ? index : null))
-		.filter((index) => index !== null);
-
-	if (availableIndices.length === 0) {
-		return null; // all positions are taken
-	}
-
-	const randomIndex =
-		availableIndices[Math.floor(Math.random() * availableIndices.length)];
-	arr[randomIndex].taken = true;
-	return arr[randomIndex].x;
-}
-
-function releaseMetalPosition(arr, x) {
-	// Function: mark a position at gate as open again
-	const item = arr.find((obj) => obj.x === x);
-	if (item) {
-		item.taken = false;
-		return true; // success
-	}
-	return false; // not found
 }
 
 function updateVG(value) {
@@ -1116,25 +1075,23 @@ function updateVG(value) {
 		// previously 0, now > 0
 		//1 on paper
 		vgLoopDirection = 0;
-		resetMetalCharges();
 	} else if (prevVGChargeScreen > 0 && currentVGChargeScreen == 0) {
 		// previously vg > 0, now 0
 		vgLoopDirection = 1;
 		vgChargeScreen = prevVGChargeScreen;
-		// remove positive charges from gate
-		removeFromMetalCharges = vgChargeScreen;
 	} else if (prevVGChargeScreen < currentVGChargeScreen) {
 		// previously vg was smaller, now larger
 		vgLoopDirection = 0;
 		vgChargeScreen = vgChargeScreen - prevVGChargeScreen;
 		// add positive charges to gate
-		addToMetalCharges = vgChargeScreen;
 	} else if (prevVGChargeScreen > currentVGChargeScreen) {
 		// previously vg was larger, now smaller
 		vgLoopDirection = 1;
 		vgChargeScreen = prevVGChargeScreen - vgChargeScreen;
-		// remove positive charges from gate
-		removeFromMetalCharges = vgChargeScreen;
+	}
+
+	if (vgLoopDirection == 0) {
+		resetMetalCharges();
 	}
 	toggleVGSlider("off");
 	resetVGLoop(vgLoopDirection);

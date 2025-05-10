@@ -1,7 +1,6 @@
 class wireCharge {
 	constructor(x, y, loop) {
 		this.position = createVector(x, y);
-		// this.velocity = createVector(random(4, 12), 0); // Initial random velocity
 		this.velocity = createVector(10, 0); // Initial random velocity
 		this.show = true;
 		this.passedDest = [0];
@@ -22,9 +21,6 @@ class wireCharge {
 		}
 
 		// inner loop
-		// initial y is randomized below metal so they appear to be flowing out separately.. don't show if position is below metal/insulator
-		// if (this.loop == 0) {
-		// if on right side (where top metal is higher)
 		if (this.loop == "vg") {
 			show = true;
 			// insulator
@@ -80,8 +76,6 @@ class wireCharge {
 
 	move(destination) {
 		// Calculate the vector pointing from the current position to the destination
-		let leftoverX = destination.x - this.position.x;
-		let leftoverY = destination.y - this.position.y;
 		let direction = createVector(
 			destination.x - this.position.x,
 			destination.y - this.position.y
@@ -92,54 +86,12 @@ class wireCharge {
 
 		// Scale the direction vector by the ball's speed
 		if (this.loop == "vd") {
-			// if (leftoverX) {
-			// 	direction.mult(Math.abs(leftoverX)); // mult(speed)
-			// } else if (leftoverY) {
-			// 	direction.mult(Math.abs(leftoverY)); // mult(speed)
-			// } else {
 			direction.mult(this.speed);
-			// }
 		} else {
 			direction.mult(this.speed); // if above 10, will go above wire (height is divisble by 10?)
 		}
 
 		// Update the position based on the direction vector
 		this.position.add(direction);
-
-		if (this.loop == "vd") {
-			// // outer loop
-			// // horizontal
-			// if (this.position.y < base.vdY) {
-			// 	this.position.y += 2;
-			// }
-			// if (this.position.y > base.vdY) {
-			// 	this.position.y -= 2;
-			// }
-			// // vertical
-			// if (this.position.x < base.wire.leftMetal.x - 4) {
-			// 	if (this.position.x < base.wire.leftMetal.x) {
-			// 		this.position.x += 1;
-			// 	}
-			// 	if (this.position.x > base.wire.leftMetal.x) {
-			// 		this.position.x -= 1;
-			// 	}
-			// }
-		} else {
-			// // inner loop
-			// if (this.position.y < base.vgY) {
-			// 	this.position.y += 1;
-			// }
-			// if (this.position.y > base.vgY) {
-			// 	this.position.y -= 1;
-			// }
-			// // if (this.position.x < base.wire.leftMetal.x - 4) {
-			// // vertical
-			// if (this.position.x < base.wire.leftMetal.x) {
-			// 	this.position.x += 1;
-			// }
-			// if (this.position.x > base.wire.leftMetal.x) {
-			// 	this.position.x -= 1;
-			// }
-		}
 	}
 }

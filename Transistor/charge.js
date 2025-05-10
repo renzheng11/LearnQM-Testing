@@ -362,7 +362,7 @@ class Charge {
 			let col = Math.floor(x / 10); // data is split up into 64 columns
 
 			// Assign Ex and Ey to data
-			Ey = efGrid[row][col].efy / 2;
+			Ey = efGrid[row][col].efz / 2;
 			if (Ey < 6000) {
 				Ey = 0;
 			} else {
