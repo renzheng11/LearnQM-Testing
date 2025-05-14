@@ -226,8 +226,6 @@ let vgLoopAnimated = true; // not currently animating
 
 let metalCharges = []; // positive charges on gate (right above oxide) when vg battery is on
 let metalChargesPositions = []; // positions of positive charges at gate
-let addToMetalCharges = 0; // number of metal charges to add to gate (when VG changed)
-let removeFromMetalCharges = 0; // number of metal charges to remove from gate (when VG changed)
 let showmetalCharges = false; // show positive charges on gate
 
 // Band Diagram ============================================================

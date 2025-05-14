@@ -237,7 +237,7 @@ class Charge {
 		this.moveBandDiagram();
 
 		// Bounce off boundaries
-		let buffer = 0;
+		let buffer = 3;
 
 		if (this.position.x - this.diameter < base.x + buffer) {
 			// bounce off left
@@ -351,7 +351,7 @@ class Charge {
 	accelerate() {
 		// Read electric field data from Voltage Profiles files ==============================================================
 		let Ex;
-		let Ey;
+		let Ez;
 
 		let x = this.x - base.x;
 		let y = this.y - base.y;
@@ -361,12 +361,12 @@ class Charge {
 			let row = Math.floor(y / 10); // data is split up into 32 rows
 			let col = Math.floor(x / 10); // data is split up into 64 columns
 
-			// Assign Ex and Ey to data
-			Ey = efGrid[row][col].efz / 2;
-			if (Ey < 6000) {
-				Ey = 0;
+			// Assign Ex and Ez to data
+			Ez = efGrid[row][col].efz / 2;
+			if (Ez < 6000) {
+				Ez = 0;
 			} else {
-				Ey = Ey / 100000;
+				Ez = Ez / 100000;
 			}
 
 			Ex = efGrid[row][col].efx;
@@ -393,13 +393,13 @@ class Charge {
 				}
 
 				if (vdCharge == 0.1) {
-					if (Ex > 0 && row < 3) {
+					if (Ex > 0 && row < 2) {
 						Ex = -Ex;
 					}
-					if (row < 3) {
+					if (row < 2) {
 						Ex = 3 * Ex;
 					}
-					if (col > 3 && col < 14 && row < 5) {
+					if (col > 3 && col < 14 && row < 2) {
 						Ex = -0.1;
 					}
 				}
@@ -430,21 +430,84 @@ class Charge {
 						this.type == "h" &&
 						col < 49 - 0.3 * row &&
 						col > 46 - 0.3 * row
-					) {
+					) { //Pinch off, move holes near the end of the channel
+						Ex = 0.5; 
+ 						Ez = -0.5;
+					}
+				}
+			}
+			if (vgCharge == 1) {
+				if (vdCharge == 0) {
+					if (col > 8 && col < 32 && row < 2) {
+						Ex = -0.01;
+					}
+					if (col > 33 && col < 57 && row < 2) {
+						Ex = 0.01;
+					}
+				}
+
+				if (vdCharge == 0.1) {
+					if (Ex > 0 && row < 2) {
+						Ex = -Ex;
+					}
+					if (row < 2) {
+						Ex = 3 * Ex;
+					}
+					if (col > 3 && col < 14 && row < 2) {
+						Ex = -0.1;
+					}
+				}
+
+				if (vdCharge == 0.3) {
+					if (Ex > 0 && row < 2) {
+						Ex = -Ex;
+					}
+					if (row < 2) {
+						Ex = 3 * Ex;
+					}
+					if (col > 3 && col < 14 && row < 2) {
+						Ex = -0.1;
+					}
+					if (
+						this.type == "h" &&
+						col < 49 - 0.3 * row &&
+						col > 47 - 0.3 * row
+					) { //Pinch off, move holes near the end of the channel
 						Ex = 0.5;
-						Ey = -0.5;
+						Ez = -0.5;
+					}
+				}
+
+				if (vdCharge == 1) {
+					if (Ex > 0 && row < 3) {
+						Ex = -Ex;
+					}
+					if (row < 3) {
+						Ex = 3 * Ex;
+					}
+					if (col > 3 && col < 14 && row < 5) {
+						Ex = -0.1;
+					}
+					if (
+						this.type == "h" &&
+						col < 49 - 0.3 * row &&
+						col > 43 - 0.3 * row
+					) {//Pinch off, move holes near the end of the channel
+						Ex = 0.5;
+						Ez = -0.4;
+						if (row<5){Ez = 0} //stop holes from going into the gate insulator
 					}
 				}
 			}
 		} else {
 			Ex = 0;
-			Ey = 0;
+			Ez = 0;
 		}
 
 		// Multpliy the electric field by a constant to convert it to accelration on screen. Find best value with trial and error.
 		let accelFactor = 5;
 		this.accel.x = Ex * accelFactor;
-		this.accel.y = Ey * accelFactor;
+		this.accel.y = Ez * accelFactor;
 
 		if (this.type == "e") {
 			// if an electron, accel in in the opposite direction of the electric field

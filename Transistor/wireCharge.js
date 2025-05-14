@@ -37,8 +37,6 @@ class wireCharge {
 			}
 		}
 
-		// }
-
 		if (show) {
 			fill(...color.electron);
 			ellipse(this.position.x, this.position.y, 8);
